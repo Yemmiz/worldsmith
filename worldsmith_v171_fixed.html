@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Worldsmith v1.7.1.1</title>
+<style>
+  :root{
+    --bg0:#07080c;
+    --bg1:#10131c;
+    --bg2:#17121f;
+    --panel:#171a24;
+    --panel2:#202433;
+    --panel3:#2a2337;
+    --ink:#f7ecd4;
+    --muted:#b9abc8;
+    --dim:#81758f;
+    --gold:#f3c66f;
+    --gold2:#a97830;
+    --ember:#ff9a56;
+    --arcane:#9dd8ff;
+    --rune:#b78cff;
+    --good:#87f7ac;
+    --bad:#ff879b;
+    --line:#41354e;
+    --line2:#5c4a64;
+    --chip:#30283e;
+    --shadow:#0009;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% -10%, #3a2757 0 0, transparent 34%),
+      radial-gradient(circle at 85% 5%, #43301e 0 0, transparent 30%),
+      radial-gradient(circle at 50% 110%, #14233a 0 0, transparent 38%),
+      linear-gradient(180deg,var(--bg1),var(--bg0) 70%);
+    overflow-x:hidden;
+  }
+  body:before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none;
+    background:
+      linear-gradient(90deg, transparent 0 49%, #ffffff06 50%, transparent 51%) 0 0/80px 80px,
+      linear-gradient(0deg, transparent 0 49%, #ffffff04 50%, transparent 51%) 0 0/80px 80px;
+    mask-image:radial-gradient(circle at top, #000 0, transparent 75%);
+  }
+  header{
+    max-width:1280px;
+    margin:0 auto;
+    padding:28px 16px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+  }
+  header:before{
+    content:"✦";
+    display:grid; place-items:center;
+    width:62px; height:62px;
+    flex:0 0 auto;
+    color:#24180b;
+    font-size:30px;
+    background:radial-gradient(circle at 30% 25%, #fff2ba, var(--gold) 52%, #a66f22 100%);
+    border-radius:22px;
+    box-shadow:0 0 0 1px #fff3,0 16px 38px #0009,0 0 42px #f3c66f33;
+    transform:rotate(-6deg);
+  }
+  header h1{
+    margin:0;
+    font-family:Georgia, 'Times New Roman', serif;
+    font-size:clamp(36px,8vw,76px);
+    line-height:.9;
+    letter-spacing:.02em;
+    color:var(--gold);
+    text-shadow:0 2px 0 #000,0 0 24px #f3c66f33;
+  }
+  header .sub{
+    color:var(--muted);
+    margin-top:8px;
+    max-width:760px;
+    line-height:1.45;
+  }
+  header:after{
+    content:"v1.1";
+    flex:0 0 auto;
+    padding:9px 13px;
+    border:1px solid #f3c66f55;
+    border-radius:999px;
+    color:var(--gold);
+    background:#0d0b12aa;
+    box-shadow:inset 0 0 20px #f3c66f12;
+    font-weight:800;
+    letter-spacing:.12em;
+  }
+  main{
+    max-width:1280px;
+    margin:0 auto;
+    padding:14px 16px 26px;
+    display:grid;
+    grid-template-columns:minmax(280px,360px) minmax(0,1fr);
+    gap:16px;
+  }
+  @media(max-width:900px){
+    header{align-items:flex-start;justify-content:flex-start;flex-wrap:wrap;padding-top:18px}
+    header:before{width:48px;height:48px;border-radius:17px;font-size:24px}
+    header:after{margin-left:62px;margin-top:-8px}
+    main{grid-template-columns:1fr;padding:10px}.card{order:2}.controls{order:1}
+  }
+  .box{
+    position:relative;
+    background:linear-gradient(180deg,#1b1e2aee,#11131bee 75%);
+    border:1px solid #5f4a673d;
+    border-radius:24px;
+    box-shadow:0 18px 60px var(--shadow), inset 0 1px 0 #ffffff10;
+    padding:16px;
+    backdrop-filter:blur(10px);
+  }
+  .box:before{
+    content:"";
+    position:absolute; inset:1px;
+    border-radius:23px;
+    pointer-events:none;
+    border:1px solid #f3c66f12;
+  }
+  .controls{position:sticky;top:10px;align-self:start}
+  @media(max-width:900px){.controls{position:static}}
+  label{
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    margin:13px 0 7px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    font-weight:800;
+  }
+  select,input[type=range]{width:100%}
+  select,input[type=text],#favSearch{
+    background:linear-gradient(180deg,#242838,#1b1e2b);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 12px;
+    font-size:15px;
+    outline:none;
+  }
+  select:focus,input:focus,textarea:focus{border-color:#f3c66f88;box-shadow:0 0 0 3px #f3c66f16}
+  input[type=range]{accent-color:var(--gold)}
+  input[type=file]{display:none}
+  .big{
+    width:100%;
+    border:0;
+    border-radius:20px;
+    padding:18px 16px;
+    margin-top:16px;
+    font-weight:950;
+    font-size:19px;
+    color:#24180b;
+    background:
+      radial-gradient(circle at 30% 15%,#fff2b7,transparent 30%),
+      linear-gradient(180deg,#ffe7a5,#f0bd5c 55%,#bd792b);
+    box-shadow:0 7px 0 #714716,0 20px 42px #0009,0 0 34px #f3c66f22;
+    cursor:pointer;
+    letter-spacing:.02em;
+  }
+  .big:hover{filter:saturate(1.08) brightness(1.03)}
+  .big:active{transform:translateY(4px);box-shadow:0 3px 0 #714716,0 12px 26px #0009}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .btn{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,#252938,#191c28);
+    color:var(--ink);
+    border-radius:14px;
+    padding:11px 10px;
+    margin-top:9px;
+    cursor:pointer;
+    font-weight:750;
+    box-shadow:inset 0 1px 0 #ffffff0c;
+  }
+  .btn:hover{border-color:#f3c66f88;color:#fff;background:linear-gradient(180deg,#30283b,#1f2030)}
+  .locks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .lock{
+    border:1px solid var(--line);
+    background:#272132;
+    color:var(--muted);
+    border-radius:999px;
+    padding:9px 10px;
+    font-size:13px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  .lock.on{color:#201404;background:linear-gradient(180deg,#ffe19a,var(--gold));border-color:#fff0bd;font-weight:900}
+  .title{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:clamp(32px,7vw,64px);
+    line-height:.96;
+    margin:0;
+    color:#fff7e5;
+    text-shadow:0 2px 0 #000,0 0 30px #9dd8ff18;
+  }
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .pill{
+    background:linear-gradient(180deg,#312941,#262133);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 11px;
+    color:var(--muted);
+    font-size:13px;
+    font-weight:750;
+  }
+  .pill.gold{color:#261700;background:linear-gradient(180deg,#ffe6a4,var(--gold));border-color:#ffe6aa;font-weight:950}
+  .pill.good{color:#05220f;background:linear-gradient(180deg,#b9ffd0,var(--good));border-color:#caffdb}
+  .pill.bad{color:#2b0610;background:linear-gradient(180deg,#ffc0c9,var(--bad));border-color:#ffd0d7}
+  h2{
+    font-size:12px;
+    color:var(--gold);
+    margin:18px 0 9px;
+    text-transform:uppercase;
+    letter-spacing:.16em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  h2:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px var(--gold)}
+  .section{
+    background:linear-gradient(180deg,#111521cc,#0c0e15dd);
+    border:1px solid #473a554d;
+    border-radius:18px;
+    padding:14px;
+    margin:12px 0;
+    box-shadow:inset 0 1px 0 #ffffff08;
+  }
+  .section p{margin:0;color:#efe6d3;line-height:1.52}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr 1fr}.locks{grid-template-columns:1fr 1fr}}
+  .kv{
+    background:linear-gradient(180deg,#1a1d2a,#12151e);
+    border:1px solid #3c3249;
+    border-radius:14px;
+    padding:11px;
+    min-height:66px;
+  }
+  .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.11em;font-weight:850}
+  .v{margin-top:6px;color:#fff6e8;font-weight:700;line-height:1.34;overflow-wrap:anywhere}
+  textarea{
+    width:100%;
+    min-height:150px;
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:#090b11;
+    color:var(--ink);
+    padding:13px;
+    resize:vertical;
+    line-height:1.45;
+  }
+  .fav{
+    padding:10px;
+    border:1px solid transparent;
+    border-bottom-color:#ffffff10;
+    cursor:pointer;
+    border-radius:12px;
+  }
+  .fav:hover{background:#ffffff08;border-color:#f3c66f33}
+  .small{font-size:12px;color:var(--muted);line-height:1.4}
+  .dna{height:13px;border-radius:999px;overflow:hidden;background:#090b11;display:flex;border:1px solid #ffffff12}
+  .dna span{display:block;height:100%}
+  .code{
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+    font-size:12px;
+    color:#d9f2ff;
+    background:#090b11;
+    border:1px solid #27374a;
+    border-radius:14px;
+    padding:12px;
+    white-space:pre-wrap;
+    overflow:auto;
+  }
+  .report{
+    margin-top:12px;
+    padding:11px;
+    border-radius:14px;
+    border:1px solid #3c3249;
+    background:#0d1018;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.45;
+  }
+  .ok{color:var(--good);font-weight:900}.warn{color:var(--bad);font-weight:900}
+  hr{border:0;border-top:1px solid var(--line);margin:8px 0}
+
+  .card{
+    overflow:hidden;
+  }
+  .card:before{
+    background:
+      radial-gradient(circle at 12% 0%, #f3c66f18, transparent 34%),
+      radial-gradient(circle at 92% 8%, #9dd8ff12, transparent 28%),
+      linear-gradient(180deg,#ffffff14,transparent 24%);
+  }
+  .concept-plate{
+    border:1px solid #f3c66f2e;
+    background:
+      linear-gradient(135deg,#261d30aa,#10131cdd 55%,#16111cdd),
+      radial-gradient(circle at 20% 15%,#f3c66f18,transparent 32%);
+    border-radius:22px;
+    padding:16px;
+    margin-bottom:12px;
+    box-shadow:inset 0 1px 0 #ffffff10, 0 18px 45px #0005;
+  }
+  .palette{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:10px;
+  }
+  @media(max-width:820px){.palette{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .swatch{
+    position:relative;
+    overflow:hidden;
+    min-height:112px;
+    border-radius:16px;
+    border:1px solid #ffffff1c;
+    background:#222;
+    box-shadow:inset 0 1px 0 #ffffff22, 0 10px 25px #0006;
+  }
+  .swatch:after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg,#ffffff2b,transparent 35%,#00000033 100%);
+    pointer-events:none;
+  }
+  .swatch-info{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:9px;
+    background:linear-gradient(180deg,transparent,#000b 25%,#000d);
+    z-index:1;
+  }
+  .swatch-role{
+    font-size:10px;
+    color:#f7ecd4cc;
+    text-transform:uppercase;
+    letter-spacing:.11em;
+    font-weight:900;
+  }
+  .swatch-name{
+    font-size:13px;
+    color:#fff7e8;
+    font-weight:900;
+    line-height:1.15;
+    margin-top:3px;
+  }
+  .swatch-hex{
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+    font-size:11px;
+    color:#d9f2ffcc;
+    margin-top:4px;
+  }
+  .palette-note{
+    margin-top:10px!important;
+    color:var(--muted)!important;
+    font-size:13px;
+  }
+
+</style>
+</head>
+<body>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, and keeps the v0.95 sanity engine intact.</div></div></header>
+<main>
+  <aside class="box controls">
+    <label>Category</label><select id="category"></select>
+    <label>Chaos: <span id="chaosLabel">50</span>%</label><input id="chaos" type="range" min="0" max="100" value="50" />
+    <button class="big" id="conjure">✦ Conjure Content</button>
+    <div class="row"><button class="btn" id="reroll">🔁 Reroll Unlocked</button><button class="btn" id="save">⭐ Save</button></div>
+    <div class="row"><button class="btn" id="copyPrompt">📋 Copy Prompt</button><button class="btn" id="copyJson">{} Copy JSON</button></div>
+    <div class="row"><button class="btn" id="copyMarkdown">📝 Copy Note</button><button class="btn" id="clearFavs">🧹 Clear Saves</button></div>
+    <div class="row"><button class="btn" id="runTest">🧪 Roll Test</button><button class="btn" id="exportSaves">📦 Export Saves</button></div>
+    <div class="row"><button class="btn" id="importSavesBtn">📥 Import Saves</button><button class="btn" id="copyAllSaves">📋 Copy All</button></div>
+    <input type="file" id="importSaves" accept="application/json,.json" />
+    <div id="testReport" class="report">Roll test not run yet.</div>
+    <label>Lock Fields</label><div class="locks" id="locks"></div>
+    <h2>Worldsmith Library</h2>
+    <input id="favSearch" placeholder="Search saved ideas..." style="width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px" />
+    <div class="row"><select id="favCat"><option value="">All categories</option></select><select id="favRarity"><option value="">All rarities</option></select></div>
+    <div id="favs" class="small"></div>
+  </aside>
+  <section class="box card">
+    <div class="concept-plate">
+      <h1 class="title" id="name">Press Conjure</h1>
+      <div class="meta" id="meta"></div>
+    </div>
+    <div class="section"><h2>Core Concept</h2><p id="desc">Generate a fantasy RPG concept.</p></div>
+    <div class="grid" id="details"></div>
+    <div class="section"><h2>Colour Palette</h2><div class="palette" id="palette"></div><p class="palette-note" id="paletteNote"></p></div>
+    <div class="section"><h2>Signature Mechanic</h2><p id="signature"></p></div>
+    <div class="section"><h2>Technical Mechanics</h2><div class="grid" id="tech"></div></div>
+    <div class="section"><h2>Why This Is Fun</h2><p id="why"></p></div>
+    <div class="section"><h2>Design DNA</h2><div class="dna" id="dna"></div><p class="small" id="dnaText" style="margin-top:8px"></p></div>
+    <div class="section"><h2>Image Prompt</h2><textarea id="prompt" readonly></textarea></div>
+    <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
+    <div class="section"><h2>Worldsmith v1.7 Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
+• Added palette data to prompts, markdown notes, and implementation JSON.
+• Pushed the concept card closer to a darker fantasy tool / item-card presentation.
+• Kept v1.0 layout improvements and v0.95 sanity validation intact.</div></div>
+  </section>
+</main>
+<script>
+const R = a => a[Math.floor(Math.random()*a.length)];
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Random Event'];
+const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
+const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
+const state={current:null, locks:{category:false,themes:false,rarity:false,attitude:false,role:false,mechanic:false}};
+const themes=['Fire','Frost','Storm','Fungal','Rot','Crystal','Holy','Shadow','Blood','Bone','Arcane','Void','Dream','Nature','Royal','Ancient','Goblin-made','Clockwork','Swamp','Desert','Ocean','Celestial','Insect','Rune-carved','Moonlit','Sunken','Eldritch','Infernal','Wildwood','Faerie','Draconic','Dwarven','Elven','Orcish','Graveyard','Ashen','Thorned','Alchemical','Astral','Pirate','Cultist','Scholarly','Mirror','Timeworn','Deep Sea','Underground','Cathedral','Forge','Library','Carnival','Serpent','Raven','Spider','Wolf','Machine'];
+const rarity=['Common','Uncommon','Rare','Epic','Legendary','Mythic','Unique'];
+const encounterTiers=['Normal','Veteran','Elite','Champion','Boss'];
+categories.forEach(c=>favCatEl.add(new Option(c,c))); [...rarity,...encounterTiers].forEach(r=>favRarityEl.add(new Option(r,r)));
+const complexityProfiles={
+  Common:{label:'Simple',themeMax:1,technicalRows:['trigger','effect','duration','power'],chancePool:[100],durationPool:['2.0 sec','3.0 sec','4.0 sec'],cooldownPool:['None','4.0 sec'],radiusPool:['melee range','small circle'],stackPool:['does not stack'],powerPool:['minor damage over time','-8% movement speed','small knockback','minor armour reduction'],counterPool:['move away','use basic positioning','focus it first'],why:'Simple concepts are best when the player understands them instantly. This stays readable, teaches one idea, and avoids bloating early-game or common content.'},
+  Uncommon:{label:'Light',themeMax:1,technicalRows:['trigger','effect','chance','duration','cooldown','power','counterplay'],chancePool:[35,50,65,100],durationPool:['3.0 sec','4.0 sec','5.0 sec'],cooldownPool:['3.0 sec','5.0 sec','6.0 sec'],radiusPool:['small circle','short cone','melee range'],stackPool:['does not stack','refreshes duration only'],powerPool:['-10% movement speed','-12% attack speed','small damage over time','10% reduced armour'],counterPool:null,why:'This adds one extra rule without becoming noisy. It gives the enemy or item a memorable hook while still being easy to parse during normal play.'},
+  Rare:{label:'Moderate',themeMax:2,technicalRows:['trigger','effect','chance','duration','cooldown','radius','power','stacks','counterplay'],chancePool:[25,30,35,40,50,65,100],durationPool:['3.5 sec','4.5 sec','6.0 sec','8.0 sec'],cooldownPool:['2.5 sec','4.0 sec','6.0 sec','8.0 sec'],radiusPool:['2.5m','3.5m','5m','short cone','line projectile'],stackPool:['does not stack','stacks up to 3 times','refreshes duration only'],powerPool:null,counterPool:null,why:'Rare concepts can ask the player to react to a real mechanic. This is enough complexity to support interesting combat without requiring boss-level explanation.'},
+  Epic:{label:'Advanced',themeMax:2,technicalRows:['trigger','effect','chance','duration','cooldown','radius','power','stacks','scaling','counterplay'],chancePool:[20,25,30,35,40,50,65,100],durationPool:null,cooldownPool:null,radiusPool:null,stackPool:null,powerPool:null,counterPool:null,why:'Epic concepts deserve a stronger identity. Conditional triggers, stacking, scaling, and counterplay can all appear because the concept is supposed to stand out.'},
+  Legendary:{label:'Complex',themeMax:3,technicalRows:['trigger','effect','chance','duration','cooldown','radius','power','stacks','scaling','counterplay','phaseRule'],chancePool:[15,20,25,30,35,40,50,65,100],durationPool:null,cooldownPool:null,radiusPool:null,stackPool:null,powerPool:null,counterPool:null,why:'Legendary concepts can bend rules a bit. They should feel like something players remember, discuss, and build strategies around.'},
+  Mythic:{label:'Wild',themeMax:3,technicalRows:['trigger','effect','chance','duration','cooldown','radius','power','stacks','scaling','counterplay','phaseRule','riskReward'],chancePool:[10,15,20,25,30,35,50,100],durationPool:null,cooldownPool:null,radiusPool:null,stackPool:null,powerPool:null,counterPool:null,why:'Mythic concepts are allowed to be strange, conditional, and dramatic. The key is still counterplay: weird is good, unreadable is not.'},
+  Unique:{label:'Handcrafted',themeMax:3,technicalRows:['trigger','effect','chance','duration','cooldown','radius','power','stacks','scaling','counterplay','phaseRule','riskReward'],chancePool:[100,50,35,25,15],durationPool:null,cooldownPool:null,radiusPool:null,stackPool:null,powerPool:null,counterPool:null,why:'Unique concepts should feel like bespoke content. They can have unusual rules because they are likely meant to be learned, named, and remembered.'}
+};
+function profileFor(r){return complexityProfiles[r]||complexityProfiles.Rare;}
+const attitudes=['Friendly','Neutral','Hostile','Corrupted','Curious','Cowardly','Aggressive','Wise','Playful','Insane','Secretive'];
+const byTheme={
+ Fire:{effects:['Burn','Scorch','Ignite','Ashen Weakness'],visual:['ember cracks','charred horns','smoke trails','molten seams'],biome:['volcanic ruins','ash fields'],counter:['Frost damage','standing in water']},
+ Frost:{effects:['Chill','Freeze','Brittle','Frostbite'],visual:['ice crystals','frosted fur','blue-white glow','frozen breath'],biome:['glacier caves','snowy pine forests'],counter:['Fire damage','movement skills']},
+ Storm:{effects:['Shock','Static Charge','Chain Lightning','Disorient'],visual:['sparking antlers','storm clouds','charged runes'],biome:['high cliffs','storm temples'],counter:['grounding pylons','interrupts']},
+ Fungal:{effects:['Spore Rot','Poison Bloom','Sleep Spores','Mycelium Mark'],visual:['mushroom caps','spore clouds','soft glowing gills'],biome:['damp caves','old forests'],counter:['Fire damage','cleansing herbs']},
+ Rot:{effects:['Decay','Wither','Armor Corrosion','Life Drain'],visual:['black sap','rotting bark','green vapors'],biome:['plague marsh','dead woods'],counter:['Holy damage','cleansing wells']},
+ Crystal:{effects:['Brittle','Reflective Shards','Crystal Prison','Resonance'],visual:['crystal antlers','gem plates','reflective growths'],biome:['crystal caverns','ancient mines'],counter:['blunt damage','sonic attacks']},
+ Holy:{effects:['Blind','Judgement','Purify','Sanctified Burn'],visual:['gold halos','white flames','sun sigils'],biome:['old shrines','sunlit ruins'],counter:['Shadow damage','line of sight breaks']},
+ Shadow:{effects:['Blind','Fear','Umbral Mark','Silence'],visual:['ragged shadow trails','purple eyes','black mist'],biome:['forgotten crypts','moonless woods'],counter:['light sources','Holy damage']},
+ Blood:{effects:['Bleed','Hemorrhage','Blood Pact','Leech'],visual:['red runes','vein-like tendrils','floating droplets'],biome:['ritual chambers','battlefields'],counter:['bandages','anti-leech wards']},
+ Bone:{effects:['Fracture','Bone Spear','Necrotic Mark','Armor Break'],visual:['bone masks','rib cages','ivory spikes'],biome:['catacombs','ossuaries'],counter:['crushing damage','turn undead']},
+ Arcane:{effects:['Mana Burn','Arcane Vulnerability','Blink Echo','Spell Lock'],visual:['floating glyphs','violet aura','rune rings'],biome:['wizard towers','leyline ruins'],counter:['silence','mana shields']},
+ Void:{effects:['Void Hunger','Gravity Snare','Reality Tear','Dread'],visual:['starless holes','inward glow','warped edges'],biome:['broken observatories','deep rifts'],counter:['stability anchors','distance']},
+ Nature:{effects:['Root','Regrowth','Thornmail','Verdant Mark'],visual:['vines','leafy crests','bark armor'],biome:['ancient groves','wild meadows'],counter:['Fire damage','cutting roots']}
+};
+const roles={
+ Monster:['Ambush predator','Pack hunter','Support caster','Area-denial bruiser','Fast skirmisher','Stationary guardian','Summoner','Debuffer'],
+ Boss:['Two-phase guardian','Arena controller','Summoner overlord','Duelist tyrant','Puzzle boss','Enrage beast','Mounted warlord'],
+ NPC:['Quest giver','Wandering merchant','Trainer','Hermit','Faction scout','Cursed noble','Village elder','Monster researcher'],
+ Spell:['Projectile spell','Area spell','Curse spell','Buff spell','Summon spell','Mobility spell','Trap spell','Channeled spell'],
+ Skill:['Melee cleave','Ranged shot','Defensive stance','Dash attack','Totem skill','Channel skill','Combo finisher'],
+ Weapon:['One-handed sword','Two-handed axe','Wand','Staff','Bow','Dagger','Mace','Shield weapon'],
+ Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
+ Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
+ Potion:['Life flask','Mana flask','Utility flask','Antidote','Explosive bottle','Transformation brew'],
+ 'Crafting Material':['Monster organ','Gemstone','Enchanted timber','Metal ingot','Boss shard','Rare herb'],
+ Currency:['Event coin','Faction token','Boss shard','Gem chip','Ticket','Ancient medal'],
+ Quest:['Rescue','Hunt','Gather','Escort','Mystery','Bargain','Dungeon unlock'],
+ 'Dungeon Room':['Trap room','Shrine room','Mini-boss room','Puzzle room','Treasure room','Ambush room'],
+ Biome:['Forest','Swamp','Desert','Cave','Ruins','Snowfield','Coast','Sky island'],
+ Vendor:['Potion vendor','Blacksmith','Curio trader','Event vendor','Beast tamer','Enchanter','Gem cutter'],
+ 'Random Event':['Traveling caravan','Meteor fall','Goblin raid','Haunted fog','Treasure goblin','Portal storm']
+};
+const nouns=['Warden','Seer','Maw','Keeper','Bloom','Sentinel','Hermit','Crown','Idol','Shard','Howler','Caller','Binder','Root','Glaive','Lantern','Oracle','Mire','Fang','Monolith'];
+const prefixes=['Ash','Frost','Thorn','Rot','Crystal','Moon','Blood','Storm','Sun','Bone','Void','Moss','Rune','Deep','Gloom','Amber','Iron','Pearl','Royal'];
+const suffixes=['of the Hollow','of Old Kings','of the Sleeping Grove','of the Broken Star','of the Mire','of the Last Flame','of the Deep Root','of the Glass Moon','of the Drowned Hall'];
+const triggerPools={
+  offensive:['When hit by an enemy','On critical hit','When an enemy enters range','Every 6 seconds in combat','When casting finishes','After blocking an enemy attack'],
+  defensive:['When below 35% health','When an ally is hit nearby','After blocking','When standing still for 2 seconds','After healing an ally'],
+  reward:['When an enemy dies nearby','When you kill an enemy','After cleansing a debuff','After avoiding damage for 4 seconds'],
+  retaliation:['When an ally dies nearby','When hit by an enemy','When a shield breaks','When surrounded by 3+ enemies']
+};
+const scalings=['scales with monster level','scales with missing health','scales with number of nearby enemies','scales with rarity tier','scales with player distance','scales with stacks consumed'];
+const stackRules=['does not stack','stacks up to 3 times','refreshes duration only','stacks intensity but not duration','consumes all stacks for a burst','spreads one stack to nearby enemies'];
+const counterBase=['interrupt the cast','move out of the marked zone','kill the summoned object','cleanse the debuff','break line of sight','burst it during recovery','use the opposite element','avoid hitting during shield phase'];
+const effectRules={
+  harmful:{verbs:['curses','marks','roots','burns','chills','silences','weakens','poisons','blinds','drains mana from','reduces armour of'],targets:['nearby enemies','the attacker','players in front','the highest-damage enemy','enemies behind cover'],validTarget:'Enemy'},
+  helpful:{verbs:['shields','heals','grants armour to','restores mana to','cleanses','empowers'],targets:['self','nearby allies','summoned minions','the lowest-health ally'],validTarget:'Self/Ally'},
+  summon:{verbs:['summons','creates','awakens'],targets:['a destructible object','two lesser minions','a temporary ward','a hazard zone'],validTarget:'Object/Summon'},
+  reward:{verbs:['restores mana to','grants a barrier to','empowers','refreshes cooldowns for'],targets:['self','nearby allies','summoned minions'],validTarget:'Self/Ally'},
+  retaliation:{verbs:['strikes','curses','marks','knocks back','drains mana from'],targets:['nearby enemies','the killer','the attacker','players in front'],validTarget:'Enemy'}
+};
+function mechanicFamily(cat,rar){
+  if(['Spell','Skill'].includes(cat)) return R(['offensive','defensive','reward']);
+  if(cat==='Boss') return R(['offensive','retaliation','summon']);
+  if(cat==='NPC'||cat==='Vendor'||cat==='Biome'||cat==='Quest'||cat==='Currency'||cat==='Crafting Material') return R(['reward','defensive']);
+  return R(['offensive','retaliation','summon','defensive']);
+}
+function familyEffectKind(fam){
+  if(fam==='defensive') return 'helpful';
+  if(fam==='reward') return 'reward';
+  if(fam==='summon') return 'summon';
+  if(fam==='retaliation') return 'retaliation';
+  return 'harmful';
+}
+function buildMechanicSentence(tech){
+  const chancePart=tech.chance==='100%'?'':`${tech.chance} chance: `;
+  return `${tech.name}: ${chancePart}${tech.trigger}, ${tech.action} ${tech.target} with ${tech.effect}.`;
+}
+function validateMechanic(tech){
+  const harmfulWords=['curse','mark','root','burn','chill','silence','weaken','poison','blind','drain','reduce','strike','knock'];
+  const helpfulWords=['shield','heal','restore','cleanse','empower','grant'];
+  const a=tech.action.toLowerCase(), t=tech.target.toLowerCase();
+  const harmful=harmfulWords.some(w=>a.includes(w));
+  const helpful=helpfulWords.some(w=>a.includes(w));
+  if(harmful && (t.includes('ally')||t.includes('minion')||t==='self')) return {ok:false,note:'Corrected: harmful effects target enemies, attackers, or players — not allies.'};
+  if(helpful && (t.includes('enemy')||t.includes('attacker')||t.includes('player'))) return {ok:false,note:'Corrected: helpful effects target self, allies, or summons — not enemies.'};
+  return {ok:true,note:'Passed target sanity check.'};
+}
+const locksEl=document.getElementById('locks');
+Object.keys(state.locks).forEach(k=>{const b=document.createElement('button');b.className='lock';b.textContent='🔓 '+k;b.onclick=()=>{state.locks[k]=!state.locks[k];b.classList.toggle('on',state.locks[k]);b.textContent=(state.locks[k]?'🔒 ':'🔓 ')+k};locksEl.appendChild(b)});
+document.getElementById('chaos').oninput=e=>document.getElementById('chaosLabel').textContent=e.target.value;
+function weightedThemes(rar, existing=[]){
+  const chaos=+document.getElementById('chaos').value; let pool=[...themes]; let result=[];
+  const prof=profileFor(rar);
+  const desired=chaos<25?1:chaos<70?2:3;
+  const count=Math.min(desired, prof.themeMax);
+  for(let i=0;i<count;i++){
+    let candidates=pool.filter(x=>!result.includes(x));
+    if(result.length && chaos<70){
+      const synergy={Fungal:['Rot','Nature','Swamp','Insect'],Crystal:['Arcane','Ancient','Frost'],Fire:['Ash','Storm','Sunken'],Frost:['Crystal','Moonlit','Ancient'],Shadow:['Void','Bone','Moonlit'],Holy:['Celestial','Royal','Fire'],Ocean:['Sunken','Storm','Pearl'],Clockwork:['Arcane','Rune-carved','Goblin-made']};
+      const s=(synergy[result[0]]||[]).filter(x=>candidates.includes(x)); if(s.length && Math.random()<.7)candidates=s;
+    }
+    result.push(R(candidates));
+  }
+  return result;
+}
+function themeInfo(ts){let first=ts.find(t=>byTheme[t])||'Arcane'; return byTheme[first]||byTheme.Arcane;}
+function genName(cat,ts,role){
+  const t=ts[0];
+  if(['Spell','Skill'].includes(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
+  if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
+  return `${t} ${R(nouns)} ${Math.random()<.45?R(suffixes):''}`.trim();
+}
+function mechanicName(effect,ts){return R([`${ts[0]} ${R(['Brand','Bloom','Oath','Echo','Hex','Pulse','Ward','Bite'])}`,`${effect} ${R(['Sigil','Mark','Curse','Resonance','Pact','Thorn'])}`,`${R(prefixes)} ${R(['Reprisal','Bloom','Judgement','Snare','Backlash'])}`]);}
+function pick(pool,fallback){return pool?R(pool):fallback;}
+function technical(cat,ts,rar){
+  const prof=profileFor(rar); const info=themeInfo(ts);
+  const family=mechanicFamily(cat,rar);
+  const kind=familyEffectKind(family);
+  const rules=effectRules[kind];
+  const effect=kind==='helpful'?R(['Regeneration','Barrier','Cleanse','Fortify','Mana Flow']):R(info.effects);
+  const trigger=R(triggerPools[family]||triggerPools.offensive);
+  const chance=R(prof.chancePool||[25,35,50,100]);
+  const dur=pick(prof.durationPool,(Math.random()*5+2).toFixed(1)+' sec');
+  const cd=pick(prof.cooldownPool,(Math.random()*4+1).toFixed(1)+' sec');
+  const radius=pick(prof.radiusPool,R(['2.5m','3.5m','5m','7m','small cone','medium circle','line projectile']));
+  const defaultPower= kind==='helpful'
+    ? R(['+12% movement speed','+18% armour','restores 8% mana','small barrier equal to 10% life','cleanses one minor debuff'])
+    : kind==='summon'
+      ? R(['summons 2 lesser echoes','creates a 4m hazard zone','spawns one destructible focus','awakens a temporary ward'])
+      : R(['-12% movement speed','-18% attack speed','8% damage over time per sec','+25% damage taken from '+ts[0],'12% reduced armour','minor knockback','1.0 sec silence','20% healing reduction']);
+  const power=pick(prof.powerPool,defaultPower);
+  const counter=prof.counterPool?R(prof.counterPool):R(info.counter||counterBase);
+  let tech={name:mechanicName(effect,ts),complexity:prof.label,family,validTarget:rules.validTarget,trigger,effect,action:R(rules.verbs),target:R(rules.targets),chance:chance+'%',duration:dur,cooldown:cd,radius,power,stacks:pick(prof.stackPool,R(stackRules)),scaling:R(scalings),counterplay:counter,technicalRows:prof.technicalRows,profileWhy:prof.why};
+  let validation=validateMechanic(tech);
+  if(!validation.ok){
+    tech.target=R(rules.targets); // self-repair from the same valid target pool
+    validation=validateMechanic(tech);
+  }
+  tech.validation=validation.note;
+  tech.sentence=buildMechanicSentence(tech);
+  tech.phaseRule=R(['changes behavior below 50% health','empowers nearby allies during enrage','becomes vulnerable after using the mechanic','alternates between aggressive and defensive windows','spawns a destructible focus object']);
+  tech.riskReward=R(['strong reward if interrupted','dangerous if ignored but profitable if baited','players can exploit the mechanic with clever positioning','high threat but long recovery window','can backfire and damage enemies']);
+  return tech;
+}
+
+
+
+// ---------- v0.9 Creature Intelligence ----------
+const creatureCategories=new Set(['Monster','Boss']);
+function isCreatureCategory(cat){return creatureCategories.has(cat);}
+const tierToComplexity={Normal:'Common',Veteran:'Uncommon',Elite:'Rare',Champion:'Epic',Boss:'Legendary'};
+const threatBudgets={
+  Normal:{points:2,abilityCount:[1,2],signature:false,phases:false,label:'Simple enemy'},
+  Veteran:{points:3,abilityCount:[2,3],signature:false,phases:false,label:'Slightly upgraded enemy'},
+  Elite:{points:5,abilityCount:[3,4],signature:true,phases:false,label:'Priority target'},
+  Champion:{points:7,abilityCount:[4,5],signature:true,phases:false,label:'Mini encounter anchor'},
+  Boss:{points:12,abilityCount:[5,6],signature:true,phases:true,label:'Full boss encounter'}
+};
+const monsterRoles=['Swarm','Bruiser','Tank','Assassin','Archer','Mage','Support','Summoner','Controller'];
+const rolePersonalities={
+  Swarm:['Reckless','Pack Hunter','Cowardly','Territorial'],
+  Bruiser:['Aggressive','Territorial','Reckless','Protective'],
+  Tank:['Protective','Patient','Territorial','Stubborn'],
+  Assassin:['Ambusher','Patient','Sadistic','Cowardly'],
+  Archer:['Cowardly','Patient','Pack Hunter','Skirmisher'],
+  Mage:['Patient','Protective','Cowardly','Cautious'],
+  Support:['Protective','Cowardly','Patient','Pack Hunter'],
+  Summoner:['Cautious','Protective','Cowardly','Patient'],
+  Controller:['Patient','Territorial','Cautious','Sadistic']
+};
+const roleAbilities={
+  Swarm:['quick bite','short leap','surrounding rush','death spore pop','pack screech'],
+  Bruiser:['heavy slam','shoulder charge','ground crack','knockback swing','rage roar'],
+  Tank:['shielded advance','taunting stomp','guard stance','armor plates','body block'],
+  Assassin:['shadow dash','backstab','vanish step','bleeding cut','isolation pounce'],
+  Archer:['aimed shot','retreating shot','pinning arrow','volley arc','mark target'],
+  Mage:['slow projectile','arcane burst','blink away','channel beam','elemental circle'],
+  Support:['heal nearby ally','grant barrier','cleanse ally','damage chant','revive lesser minion'],
+  Summoner:['summon lesser minions','open spawn pod','command minions','create ward','sacrifice minion'],
+  Controller:['root zone','silence pulse','push field','slow trap','vision blind']
+};
+const rolePurposes={
+  Swarm:['fills packs and pressures movement','teaches basic target sweeping','makes AoE skills feel valuable'],
+  Bruiser:['punishes standing still','creates visible melee danger','forces dodge timing'],
+  Tank:['protects weaker enemies','anchors a pack formation','teaches target prioritization'],
+  Assassin:['punishes isolated players','creates burst-threat moments','rewards awareness and positioning'],
+  Archer:['pressures from range','makes cover and movement matter','supports melee enemies from behind'],
+  Mage:['adds readable spell threats','forces interrupts or movement','creates elemental variety'],
+  Support:['becomes a priority target','teaches players to kill healers first','makes enemy packs feel coordinated'],
+  Summoner:['creates escalating pressure','rewards killing the source quickly','fills arenas without pure stat inflation'],
+  Controller:['controls space','forces route changes','makes the player solve positioning under pressure']
+};
+const roleWeaknesses={
+  Swarm:['dies quickly to area damage','low single-target threat','panic scatters when the leader dies'],
+  Bruiser:['long recovery after heavy attacks','slow turning speed','vulnerable after missing a charge'],
+  Tank:['low damage when ignored briefly','weak from behind','armor breaks after repeated heavy hits'],
+  Assassin:['fragile if revealed','retreats after missing burst','weak to slows and roots'],
+  Archer:['weak in melee range','must stand still while aiming','loses accuracy while moving'],
+  Mage:['interruptible casts','fragile during channeling','weak when mana shield breaks'],
+  Support:['poor self-defense','healing can be interrupted','danger drops sharply when isolated'],
+  Summoner:['weak without minions','summoning object can be destroyed','long setup time'],
+  Controller:['low direct damage','zones expire quickly','weak if forced to move']
+};
+
+// ---------- v0.95 Data Depth Pass ----------
+Object.assign(byTheme,{
+ Dream:{effects:['Sleep','Lucid Mark','Nightmare Echo','Dream Fray'],visual:['floating motes','soft surreal glow','unreal mask','misty ribbons'],biome:['dream groves','sleeping ruins'],counter:['taking damage wakes the target','clarity shrine']},
+ Royal:{effects:['Command','Oathbound Mark','Taxing Curse','Banner Aura'],visual:['broken crowns','torn banners','gold trim','ceremonial plates'],biome:['fallen keeps','royal roads'],counter:['destroy the banner','break line of command']},
+ Ancient:{effects:['Old Curse','Stone Memory','Timeworn Mark','Dust Seal'],visual:['eroded stone plates','ancient glyphs','mossy engravings','weathered bronze'],biome:['forgotten temples','buried roads'],counter:['activate old runes','use relic keys']},
+ 'Goblin-made':{effects:['Jury-rigged Trap','Explosive Fizzle','Scrap Snare','Grease Mark'],visual:['bolted scrap','loose straps','crooked metal teeth','bright warning paint'],biome:['goblin camps','scrap tunnels'],counter:['bait the trap','hit the unstable parts']},
+ Clockwork:{effects:['Gear Lock','Overwind','Ticking Bomb','Metal Fatigue'],visual:['exposed gears','brass plating','key-wound backs','clock hands'],biome:['old workshops','automaton vaults'],counter:['interrupt the wind-up','jam the gears']},
+ Swamp:{effects:['Mud Slow','Bog Rot','Leech Mark','Sinking Ground'],visual:['muddy legs','wet reeds','green bubbles','slime trails'],biome:['bog paths','reed marshes'],counter:['stand on dry ground','burn the reeds']},
+ Desert:{effects:['Sand Blind','Heat Haze','Glass Cut','Thirst Mark'],visual:['sand-worn cloth','sun-baked plates','glass shards','dust clouds'],biome:['red dunes','buried caravans'],counter:['use shade','break the glass focus']},
+ Ocean:{effects:['Tide Pull','Salt Wound','Drowning Mark','Pearl Shell'],visual:['wet shells','coral growths','sea-glass eyes','wave-like fins'],biome:['tide caves','sunken docks'],counter:['move with the current','shatter the shell']},
+ Celestial:{effects:['Starfall Mark','Moon Burn','Radiant Pull','Astral Silence'],visual:['star halos','moon glyphs','white-blue glow','constellation scars'],biome:['observatories','sky shrines'],counter:['hide from line of sight','eclipse the focus']},
+ Insect:{effects:['Swarm Bite','Chitin Crack','Pheromone Mark','Stinger Venom'],visual:['chitin plates','compound eyes','thin legs','stinger tails'],biome:['hive tunnels','overgrown nests'],counter:['kill the queen signal','use fire or smoke']},
+ 'Rune-carved':{effects:['Rune Brand','Glyph Lock','Seal Break','Mana Scratch'],visual:['carved symbols','glowing cuts','etched stone skin','floating letters'],biome:['rune halls','scholar ruins'],counter:['step off the glyph','interrupt the inscription']},
+ Moonlit:{effects:['Lunar Chill','Silver Blind','Moon Pact','Night Howl'],visual:['silver fur','moonlit edge glow','crescent horns','pale eyes'],biome:['moon groves','night roads'],counter:['use sunlight sources','wait for the moon pulse']},
+ Sunken:{effects:['Drowning Grip','Abyssal Pull','Waterlogged Weakness','Barnacle Bind'],visual:['barnacles','dripping cloth','rusted chains','kelp ribbons'],biome:['sunken halls','flooded libraries'],counter:['break the chain','stand on high ground']}
+});
+roleAbilities.Swarm.push('clinging bite','panic scatter','group frenzy');
+roleAbilities.Bruiser.push('overhead smash','wide cleave','staggering stomp');
+roleAbilities.Tank.push('shield wall','damage soak','protective shove');
+roleAbilities.Assassin.push('smoke vanish','hamstring cut','marked prey lunge');
+roleAbilities.Archer.push('poison arrow','warning flare','sidestep volley');
+roleAbilities.Mage.push('delayed rune','elemental shield','mana drain cast');
+roleAbilities.Support.push('protective ward','haste chant','spirit tether');
+roleAbilities.Summoner.push('spawn egg cluster','maintain portal','empower summoned minion');
+roleAbilities.Controller.push('gravity well','wall of thorns','fear pulse');
+roles.NPC.push('Lost apprentice','Retired monster hunter','Fence','Cartographer','Shrine keeper','Beast handler','Dungeon deserter');
+roles.Quest.push('Recover relic','Break curse','Clear nest','Scout biome','Protect caravan','Expose traitor','Repair shrine');
+roles['Dungeon Room'].push('Resource room','Locked reward room','Lore chamber','Wave defense room','Flooded crossing','Collapsed bridge');
+roles.Biome.push('Crystal forest','Mushroom caves','Royal ruins','Flooded marsh','Ash valley','Ancient battlefield');
+roles.Weapon.push('Fishing spear','One-handed scimitar','Rusty sword','Big club','Slingshot','Ritual dagger');
+roles.Armour.push('Shoulder guard','Round shield','Kite shield','Robe','Mask','Heavy greaves');
+
+const encounterUses=['pack filler','elite escort','corridor ambusher','treasure guardian','patrol encounter','rare spawn','dungeon-room anchor','event encounter','support unit in mixed packs'];
+const familyRoots=['Thornling','Mireborn','Ashkin','Crystal Brood','Hollowhide','Moonfang','Rotcap','Stormclaw','Bonebound','Sunken'];
+const familyRanks=['Hatchling','Skitterer','Stalker','Brute','Warden','Seer','Caller','Matriarch'];
+encounterUses.push('resource-node defender','shrine protector','bridge blocker','roaming pack leader','camp alarm unit','ritual guard','terrain hazard companion');
+familyRoots.push('Glasswing','Bogtooth','Ashroot','Runejaw','Pearlback','Sunscar','Deepcap','Gloomtail');
+// ---------- v1.7 World Depth Pass ----------
+Object.assign(byTheme,{
+ Eldritch:{effects:['Mind Fray','Forbidden Whisper','Tentacle Snare','Sanity Crack'],visual:['many small eyes','impossible angles','ink-black tendrils','glowing sigil mouths'],biome:['starless libraries','cyclopean ruins','foggy coastal shrines'],counter:['break line of sight','use grounding wards','interrupt the whisper']},
+ Infernal:{effects:['Hellfire Brand','Demon Pact','Ash Curse','Infernal Chains'],visual:['horned silhouettes','coal-black skin','lava cracks','smoking shackles'],biome:['burned chapels','sulfur pits','warlock camps'],counter:['holy water','break the pact circle','cool the chains']},
+ Wildwood:{effects:['Bramble Root','Living Bark','Green Hunger','Sap Snare'],visual:['ancient bark plates','leaf mantles','twisting roots','firefly motes'],biome:['old forests','spirit groves','overgrown ruins'],counter:['cut the roots','burn dry brambles','follow the fireflies']},
+ Faerie:{effects:['Glamour','Trick Step','Pixie Dust','Name Theft'],visual:['thin glowing wings','laughing masks','flower crowns','soft impossible colors'],biome:['ring meadows','moonlit glades','mushroom courts'],counter:['iron charms','refuse the bargain','step outside the ring']},
+ Draconic:{effects:['Dragonfire','Scale Ward','Wing Buffet','Wyrm Roar'],visual:['scale plates','horn crowns','smoking nostrils','wing-like cloaks'],biome:['volcanic nests','mountain hoards','ancient wyrm roads'],counter:['strike the exposed belly','use frost','break the horn focus']},
+ Dwarven:{effects:['Stone Oath','Anvil Guard','Runic Fortify','Forge Heat'],visual:['blocky armour','hammer icons','braided beards','angular stonework'],biome:['deep halls','mountain forges','abandoned mines'],counter:['shatter the rune plate','cool the forge','attack during hammer lift']},
+ Elven:{effects:['Silver Thorn','Moon Arrow','Grace Mark','Ancient Song'],visual:['leaf filigree','slender crescent shapes','silver bows','flowing cloaks'],biome:['hidden groves','white ruins','twilight bridges'],counter:['break concentration','block line of sight','disturb the song']},
+ Orcish:{effects:['War Cry','Blood Fury','Iron Hide','Banner Rage'],visual:['jaw tusks','painted shields','heavy cleavers','red war banners'],biome:['war camps','burned roads','spike palisades'],counter:['destroy the banner','bait the charge','separate the pack']},
+ Graveyard:{effects:['Grave Chill','Restless Dead','Tomb Dust','Mourning Bell'],visual:['tilted headstones','grave candles','mourning veils','cold blue wisps'],biome:['old cemeteries','foggy mausoleums','battle graves'],counter:['ring the bell','consecrate the grave','shatter the headstone']},
+ Ashen:{effects:['Ash Blind','Cinder Mark','Smoulder','Blackened Breath'],visual:['falling ash','burned cloth','charcoal plates','orange embers under grey'],biome:['ash valleys','burned villages','volcanic roads'],counter:['clear the smoke','use water','move upwind']},
+ Thorned:{effects:['Barb Mark','Thorn Lash','Briar Cage','Blood Rose'],visual:['hooked thorns','rose-red sap','bramble crowns','wrapped vines'],biome:['briar fields','witch hedges','overgrown keeps'],counter:['cut the vines','burn thorn nests','avoid the lash windup']},
+ Alchemical:{effects:['Volatile Flask','Transmute Flesh','Acid Splash','Catalyst Mark'],visual:['bubbling glass','copper tubes','colored fumes','stitched aprons'],biome:['failed labs','plague workshops','scholar cellars'],counter:['shatter the vials','vent the fumes','avoid mixed pools']},
+ Astral:{effects:['Star Step','Comet Trace','Gravity Lens','Constellation Brand'],visual:['constellation lines','floating astrolabes','star dust','blue-white trails'],biome:['sky bridges','observatories','fallen star craters'],counter:['hide from the star mark','disrupt the lens','step out of alignment']},
+ Pirate:{effects:['Powder Flash','Hook Snare','Rum Courage','Cannon Mark'],visual:['salt-worn coats','brass hooks','torn sails','barnacled pistols'],biome:['wreck coves','smuggler docks','foggy reefs'],counter:['douse the powder','cut the rope','use cover']},
+ Cultist:{effects:['Sacrifice Chant','Blood Oath','Forbidden Hymn','Marked Offering'],visual:['hooded masks','ritual knives','wax seals','painted sigils'],biome:['hidden chapels','basement shrines','forest circles'],counter:['interrupt the chant','destroy the idol','save the offering']},
+ Scholarly:{effects:['Seal Script','Memory Trap','Ink Bind','Index Curse'],visual:['floating books','ink ribbons','spectacles','scroll wings'],biome:['libraries','archives','wizard schools'],counter:['close the book','erase the ink','solve the glyph order']},
+ Mirror:{effects:['Reflected Pain','False Image','Glass Duplicate','Silver Trap'],visual:['cracked mirrors','silver masks','reversed shadows','glass butterflies'],biome:['mirror halls','royal dressing rooms','glass caves'],counter:['break the true mirror','ignore the duplicate','stand outside reflection']},
+ Timeworn:{effects:['Slow Age','Rewind Scar','Dust Loop','Old Hour'],visual:['hourglass dust','rusted clocks','cracked sundials','aged bronze'],biome:['clock towers','buried roads','forgotten plazas'],counter:['break the clock hand','step out of the loop','reset the dial']},
+ 'Deep Sea':{effects:['Pressure Crush','Abyss Glow','Kraken Grip','Black Tide'],visual:['deep-blue lanterns','angler lights','tentacle shapes','wet pressure suits'],biome:['abyssal trenches','sunken cities','black reefs'],counter:['rise to shallow ground','cut the tentacle','shatter the lamp']},
+ Underground:{effects:['Cave-In','Echo Sense','Stalagmite Spike','Burrow Mark'],visual:['stone dust','blind eyes','stalactite crowns','muddy claws'],biome:['deep caves','mine tunnels','underground rivers'],counter:['listen for rumble','stay off cracked ground','blind the echo source']},
+ Cathedral:{effects:['Bell Judgement','Stained Light','Choir Ward','Confession Mark'],visual:['stained glass shards','church bells','long robes','golden arches'],biome:['ruined cathedrals','holy crypts','pilgrim roads'],counter:['silence the bell','hide from the stained beam','break the reliquary']},
+ Forge:{effects:['Molten Edge','Anvil Shock','Tempered Hide','Sparkspray'],visual:['hot anvils','blacksmith aprons','orange sparks','hammer silhouettes'],biome:['forges','ironworks','mountain smithies'],counter:['cool the metal','avoid the hammer arc','break the bellows']},
+ Library:{effects:['Page Swarm','Forbidden Index','Paper Cut','Living Footnote'],visual:['flying pages','book chains','ink halos','wooden shelves'],biome:['grand libraries','dusty archives','scriptoriums'],counter:['close the tome','burn cursed pages','step away from shelves']},
+ Carnival:{effects:['Jester Hex','Lantern Trick','Mask Swap','Laughing Fear'],visual:['painted masks','striped tents','paper lanterns','twisted smiles'],biome:['abandoned fairs','roadside carnivals','moonlit tents'],counter:['remove the mask','ignore the laughter','break the music box']},
+ Serpent:{effects:['Venom Coil','Scale Glare','Constrict','Forked Curse'],visual:['snake coils','forked tongues','scale patterns','emerald eyes'],biome:['temple jungles','warm caves','sunlit ruins'],counter:['cut the coil','avoid eye contact','use antidote']},
+ Raven:{effects:['Omen Caw','Black Feather','Carrion Mark','Wing Blind'],visual:['black feathers','beak masks','ragged cloaks','watching birds'],biome:['gallows fields','old battlefields','dead trees'],counter:['scatter the flock','break the omen charm','hide under cover']},
+ Spider:{effects:['Web Root','Venom Bite','Silk Snare','Egg Burst'],visual:['thin legs','web mantles','clustered eyes','silk cocoons'],biome:['webbed tunnels','attics','dark forests'],counter:['burn the webs','kill egg sacs','keep moving']},
+ Wolf:{effects:['Pack Howl','Frost Fang','Lunge Mark','Alpha Call'],visual:['wolf pelts','snarling muzzles','moonlit fur','claw scars'],biome:['pine forests','snow trails','hunting grounds'],counter:['split the pack','avoid the howl','slow the alpha']},
+ Machine:{effects:['Saw Pulse','Steam Vent','Gear Snare','Logic Lock'],visual:['cog limbs','smoke stacks','oil stains','brass eyes'],biome:['machine halls','foundries','clockwork vaults'],counter:['jam the gears','vent the steam','hit exposed joints']}
+});
+
+prefixes.push('Black','White','Grey','Silver','Golden','Cinder','Iron','Glass','Elder','Witch','Grave','Bell','Crown','Oath','Wyrm','Briar','Lantern','Gilded','Feral','Ragged','Silent','Whisper','Crimson','Sable','Ivory','Verdant','Umbral','Abyssal','Runed','Hollow','Star','Mist','Vile','Blessed','Forgotten','Oaken','Sulfur','Marrow','Ink','Ashen','Thistle','Duskworn','Salt','Candle','Mirror','Clock','Rusted','Gallows','Chapel','Hearth','Fang');
+nouns.push('Chanter','Mender','Weaver','Vessel','Knight','Reaver','Pilgrim','Scribe','Smith','Bishop','Hound','Serpent','Drake','Witch','Grove','Bell','Chalice','Mask','Candle','Cairn','Basilisk','Gryphon','Manticore','Harpy','Gargoyle','Banshee','Wraith','Ghoul','Dryad','Treant','Djinn','Golem','Automaton','Familiar','Mandrake','Leviathan','Kraken','Wyvern','Owlbear','Acolyte','Mariner','Waystone','Reliquary','Compass','Hourglass','Gate','Shrine','Vault');
+suffixes.push('of the Black Stair','of the Gilded Root','of the Starless Sea','of the Candle Court','of the Iron Choir','of the Hollow Crown','of the Witch Road','of the Broken Bell','of the Old Forest','of the Mirror Gate','of the Ashen Chapel','of the Deep Vault','of the Serpent Moon','of the Raven Watch','of the Last Library','of the Thorn Court','of the Sunken Crown','of the Clock Tower','of the Drowned Orchard','of the Ivory Sepulcher','of the Green Flame','of the Red Comet','of the Shattered Anvil');
+roles.Monster.push('Burrowing lurker','Totem defender','Curse bearer','Beast pack alpha','Nest guardian','Corpse eater','Ruin scavenger','Possessed construct','Feral caster','Shrine beast','Cave horror','Winged harasser');
+roles.Boss.push('Ancient dragon','Corrupted monarch','Cathedral horror','Clockwork colossus','Abyssal priest','Witch queen','Forge titan','Undead general','Mirror tyrant','Beast matriarch','Eldritch oracle','Fallen champion');
+roles.NPC.push('Exiled prince','Grave tender','Rune scholar','Potion peddler','Witch hunter','Relic smuggler','Bell ringer','Moth priest','Old sailor','Goblin broker','Forest midwife','Runaway apprentice','Court jester','Dwarven mason','Elven waywatcher','Orc deserter','Bookbinder','Lantern keeper');
+roles.Spell.push('Ward spell','Sigil spell','Beam spell','Nova spell','Chain spell','Hex spell','Ritual spell','Aura spell','Ground rune','Transformation spell','Reflection spell','Weather spell');
+roles.Skill.push('Shield bash','Spear thrust','Whirlwind','Trap throw','Warcry','Marking shot','Pet command','Counter stance','Leap strike','Blade dance','Bomb toss','Rune strike');
+roles.Weapon.push('Warhammer','Spear','Halberd','Crossbow','Flail','Claw weapon','Greatsword','Hand axe','Javelin','Sickle','Spellblade','Totem staff','War pick','Hook blade');
+roles.Armour.push('Breastplate','Chainmail','Leather jerkin','Battle robe','Buckler','Tower shield','Pauldron','Hood','War mask','Bracers','Tabard','Scale mail');
+roles.Relic.push('Broken bell','Saint bone','Stained-glass shard','Dragon scale','Witch candle','Clockwork heart','Prayer wheel','Ancient astrolabe','Mariner compass','Mirror shard','Sealed book','Grave lantern');
+roles.Potion.push('Smoke flask','Rage brew','Iron-skin draught','Luck tonic','Invisibility vial','Haste cordial','Witchwater','Firebomb bottle','Frost phial','Antique perfume');
+roles['Crafting Material'].push('Demon horn','Dragon scale','Ancient parchment','Clockwork spring','Grave wax','Faerie dust','Spider silk','Raven feather','Serpent venom','Star metal','Sea glass','Witch root','Golem core','Cursed thread');
+roles.Currency.push('Pilgrim badge','Witch token','Arena mark','Moon pearl','Dwarven stamp','Goblin chit','Royal writ','Library card','Grave coin','Festival mask','Pirate doubloon','Cult seal','Forge coupon');
+roles.Quest.push('Seal rift','Find lost heir','Recover stolen bell','Investigate village','Awaken shrine','Track monster','Negotiate truce','Rescue prisoner','Map ruins','Gather proof','Break siege','Recover spellbook','Expose cult','Escort relic','Open old gate','Lift famine');
+roles['Dungeon Room'].push('Ritual chamber','Boss antechamber','Falling-floor trap','Rune lock room','Monster nest','Library vault','Armory hall','Chapel crossing','Mirror maze','Forge hall','Floodgate room','Alchemy lab','Crypt corridor','Beast pen');
+roles.Biome.push('Haunted forest','Eldritch coast','Dwarven mine','Elven grove','Orc warlands','Fungal canyon','Mirror desert','Graveyard moor','Cathedral city','Deep-sea trench','Goblin scrapyard','Faerie meadow','Infernal wasteland','Library dimension','Clockwork factory');
+roles.Vendor.push('Relic dealer','Book merchant','Fishmonger','Mask seller','Tattoo mystic','Ruin salvager','Stable master','Lantern seller','Witch apothecary','Grave goods trader','Monster butcher','Traveling chef','Rune engraver','Map seller','Auctioneer');
+roles['Random Event'].push('Pilgrim procession','Broken shrine','Monster migration','Burning wagon','Lost child','Fallen star','Bridge toll','Cursed well','Witch trial','Ghost funeral','Duel challenge','Escaped prisoner','Living treasure chest','Runaway golem','Storm omen','Market quarrel');
+encounterUses.push('boss door guardian','ambush tutorial','faction camp patrol','rare material protector','environmental pressure unit','ritual interruption target','treasure-room misdirection','roadside nuisance pack','elite warning encounter','world event escalation');
+familyRoots.push('Briarling','Candlewisp','Ironmaw','Gloomfeather','Saltback','Glasscoil','Thornjaw','Graveshell','Wyrmkin','Mossbeard','Frothhide','Ashmantle','Vilebloom','Lantern-Eater','Bellskull','Rootwretch','Cogmite','Silkfang','Ravencrook','Serpentkin','Murkfin');
+
+function tierRoll(cat){return cat==='Boss'?'Boss':R(encounterTiers.filter(t=>t!=='Boss'));}
+function roleRoll(cat,tier){ if(cat==='Boss'||tier==='Boss') return R(['Bruiser','Mage','Summoner','Controller','Tank']); return R(monsterRoles); }
+function rangeCount([a,b]){return a+Math.floor(Math.random()*(b-a+1));}
+function makeMonsterName(ts,role,tier){
+  const base=R(['Warden','Howler','Stalker','Brute','Caller','Seer','Maw','Sentinel','Crawler','Matriarch','Skitterer','Gorger']);
+  if(tier==='Normal') return `${ts[0]} ${base}`;
+  if(tier==='Veteran') return `${R(['Dire','Elder','Scarred','Hungry','Wild'])} ${ts[0]} ${base}`;
+  if(tier==='Elite') return `${R(prefixes)} ${base} ${R(['of the Pack','of the Deep Root','of the Old Path','of the Mire'])}`;
+  if(tier==='Champion') return `${R(['Grim','Ancient','Blooded','Crowned','Hollow'])} ${base}, ${R(['Packbreaker','Rootlord','Oath-Eater','Cave Tyrant'])}`;
+  return `${R(['The Drowned','The Hollow','The Glass','The Last','The Old'])} ${base} ${R(suffixes)}`;
+}
+function makeAbilities(role,tier,ts){
+  const budget=threatBudgets[tier]||threatBudgets.Normal;
+  const pool=[...(roleAbilities[role]||roleAbilities.Bruiser)];
+  const count=Math.min(rangeCount(budget.abilityCount),pool.length);
+  const chosen=[];
+  for(let i=0;i<count;i++){const pick=R(pool); chosen.push(pick); pool.splice(pool.indexOf(pick),1);}
+  if((tier==='Elite'||tier==='Champion'||tier==='Boss') && Math.random()<0.75) chosen.push(`${ts[0].toLowerCase()}-themed ${R(['burst','aura','mark','hazard','summon'])}`);
+  return chosen;
+}
+function makeRotation(role,abilities,tier){
+  const openers={Swarm:'rushes in with the pack',Bruiser:'walks forward and threatens a heavy windup',Tank:'moves between the player and weaker enemies',Assassin:'waits briefly, then dashes at isolated targets',Archer:'backs away and aims',Mage:'starts with a visible cast',Support:'checks ally health before acting',Summoner:'creates or calls the first minion',Controller:'places a zone between player and objective'};
+  const recovery={Swarm:'repositions around the player',Bruiser:'has a short recovery window',Tank:'returns to guard stance',Assassin:'retreats after burst',Archer:'backs up after firing',Mage:'blinks or steps away',Support:'moves behind allies',Summoner:'waits behind minions',Controller:'moves toward another choke point'};
+  const loop=[openers[role]||'detects player',abilities[0]||'basic attack'];
+  if(abilities[1]) loop.push(abilities[1]);
+  loop.push(recovery[role]||'repositions');
+  if(tier==='Veteran'||tier==='Elite'||tier==='Champion'||tier==='Boss') loop.push(abilities[2]||'uses a stronger attack');
+  if(tier==='Champion'||tier==='Boss') loop.push('changes pattern below 40% health');
+  return loop;
+}
+function makeHabitat(ts,role){
+  const info=themeInfo(ts);
+  const biome=R(info.biome||['old ruins','wild forests']);
+  const placement={Swarm:'appears in groups of 5–10',Bruiser:'guards doorways and open lanes',Tank:'stands in front of fragile enemies',Assassin:'hides near corners and side paths',Archer:'uses ledges or rear lines',Mage:'guards shrines or ritual circles',Support:'stays behind bruisers and tanks',Summoner:'prefers rooms with space for adds',Controller:'likes choke points and narrow paths'};
+  return [biome,placement[role]||'appears in mixed packs',R(['near resources','near old ruins','around treasure routes','near faction camps','inside side caves']),R(['more active at night','avoids open sunlight','guards a small territory','responds to nearby combat noise'])];
+}
+function makeFamily(ts){
+  const root=R(familyRoots);
+  const variants=[...familyRanks].sort(()=>Math.random()-0.5).slice(0,5);
+  return {name:`${ts[0]} ${root}`,variants:variants.map(v=>`${root} ${v}`)};
+}
+function makeBossPhases(role,ts,abilities){
+  return [
+    `Phase 1: establishes the ${role.toLowerCase()} pattern with ${abilities[0]||'basic attacks'}.`,
+    `Phase 2 at 60%: adds ${R(['arena hazards','summoned adds','faster cooldowns','rotating safe zones','shield breaks'])}.`,
+    `Enrage at 25%: ${R(['shorter recovery windows','stronger area attacks','rage aura empowers nearby minions','desperation leap','constant hazard pulses'])}.`,
+    `Death effect: ${R(['drops a temporary hazard','releases captives','spawns loot shards','opens a sealed route','cleanses the arena'])}.`
+  ];
+}
+function validateMonsterBrain(role,personality,abilities,tier){
+  const notes=[];
+  if(role==='Support' && abilities.some(a=>a.includes('charge')||a.includes('slam'))) notes.push('Support kept away from bruiser-only charge/slam behavior.');
+  if(role==='Tank' && abilities.some(a=>a.includes('vanish')||a.includes('blink'))) notes.push('Tank avoids constant teleport behavior so it can anchor the fight.');
+  if(personality==='Cowardly' && tier!=='Boss') notes.push('Cowardly behavior should retreat or call help instead of fighting to the death.');
+  if(!notes.length) notes.push('Passed role/personality sanity checks.');
+  return notes.join(' ');
+}
+function creatureConcept(forceReroll=false){
+  const old=state.current||{};
+  const cat=state.locks.category&&old.category?old.category:categoryEl.value;
+  const tier=state.locks.rarity&&old.encounterTier?old.encounterTier:tierRoll(cat);
+  const complexityRarity=tierToComplexity[tier]||'Rare';
+  const ts=state.locks.themes&&old.themes?old.themes:weightedThemes(complexityRarity);
+  const role=state.locks.role&&old.monsterRole?old.monsterRole:roleRoll(cat,tier);
+  const personality=state.locks.attitude&&old.combatPersonality?old.combatPersonality:R(rolePersonalities[role]||['Aggressive']);
+  const budget=threatBudgets[tier]||threatBudgets.Normal;
+  const abilities=makeAbilities(role,tier,ts);
+  const tech=(budget.signature||cat==='Boss') ? (state.locks.mechanic&&old.tech?old.tech:technical('Monster',ts,complexityRarity)) : null;
+  const name=makeMonsterName(ts,role,tier);
+  const info=themeInfo(ts);
+  const family=makeFamily(ts);
+  const rotation=makeRotation(role,abilities,tier);
+  const habitat=makeHabitat(ts,role);
+  const weakness=R(roleWeaknesses[role]||roleWeaknesses.Bruiser);
+  const purpose=R(rolePurposes[role]||rolePurposes.Bruiser);
+  const encounterUse=cat==='Boss'||tier==='Boss'?'boss arena':R(encounterUses);
+  const phases=(tier==='Boss'||cat==='Boss')?makeBossPhases(role,ts,abilities):null;
+  const signature=tech?tech.sentence:`${tier} rule: no signature mechanic. The creature stays focused on its role, movement pattern, and one or two readable actions.`;
+  const desc=`A ${tier.toLowerCase()} encounter-tier ${cat.toLowerCase()} built around ${ts.join(', ').toLowerCase()} fantasy. It acts as a ${role.toLowerCase()} with ${personality.toLowerCase()} combat behaviour and is mainly used as a ${encounterUse}.`;
+  const visual=[R(info.visual||['strong silhouette']),R(['large readable silhouette','broad simple shapes','chunky hand-painted forms','clear at small scale']),`${personality.toLowerCase()} movement style`,`${role.toLowerCase()} body language`];
+  const loot=[`${ts[0]} ${R(['Fang','Core','Shard','Spore','Claw','Rune'])}`,`${R(['Cracked','Living','Ancient','Polished'])} ${R(['Scale','Bone','Gem','Hide','Sigil'])}`];
+  const why=`This encounter works because it has a defined job: it ${purpose}. The threat budget keeps it from becoming overloaded, while the weakness gives players a practical answer: ${weakness}.`;
+  const palette=makePalette(ts,cat,null);
+  const c={creatureMode:true,category:cat,themes:ts,rarity:tier,encounterTier:tier,attitude:personality,combatPersonality:personality,role:role,monsterRole:role,threatBudget:budget,abilities,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),family,rotation,habitat,weakness,purpose,encounterUse,phases,brainValidation:validateMonsterBrain(role,personality,abilities,tier)};
+  state.current=c; render(c);
+}
+
+const itemCategories=new Set(['Weapon','Armour','Relic','Potion','Crafting Material','Currency']);
+const itemMechanicRarities=new Set(['Epic','Legendary']);
+function isItemCategory(cat){return itemCategories.has(cat);} 
+function itemCanHaveMechanic(cat,rar){return isItemCategory(cat)&&itemMechanicRarities.has(rar);} 
+const statPools={
+ Weapon:{
+   melee:['Physical Damage','Attack Speed','Critical Chance','Accuracy','Strength','Life on Hit'],
+   caster:['Spell Damage','Cast Speed','Mana','Cooldown Recovery','Arcane Damage','Mana on Kill'],
+   ranged:['Physical Damage','Projectile Speed','Critical Chance','Dexterity','Accuracy','Bleed Chance'],
+   shield:['Block Chance','Armour','Maximum Life','Resistance','Stun Recovery','Thorns Damage']
+ },
+ Armour:{
+   helmet:['Armour','Maximum Life','Mana','Resistance','Cooldown Recovery','Vision Radius'],
+   chest:['Armour','Maximum Life','Resistance','Strength','Reduced Damage Taken','Thorns Damage'],
+   gloves:['Attack Speed','Cast Speed','Accuracy','Dexterity','Life on Hit','Critical Chance'],
+   boots:['Movement Speed','Armour','Maximum Life','Resistance','Dodge Chance','Stun Recovery'],
+   belt:['Maximum Life','Potion Charges','Strength','Resistance','Gold Find','Inventory Capacity'],
+   cloak:['Evasion','Resistance','Movement Speed','Shadow Resistance','Dodge Chance','Mana']
+ },
+ Relic:{default:['Mana','Cooldown Recovery','Spell Damage','Resistance','All Attributes','Gold Find','Shrine Effect Duration']},
+ Potion:{default:['Instant Life Recovery','Life Recovery over Time','Mana Recovery','Movement Speed during effect','Removes Poison','Removes Chill','Short Resistance Boost']},
+ 'Crafting Material':{default:['Used for armour crafting','Used for weapon crafting','Adds resistance modifier','Adds life modifier','Improves quality','Used by rare vendor']},
+ Currency:{default:['Used at event vendors','Trades for crafting materials','Trades for cosmetics','Trades for dungeon keys','Faction exchange token']}
+};
+const itemVisualDetails=['plain but sturdy','worn but reliable','clean silhouette','strong material identity','simple ornamentation','readable colour theme','chunky fantasy shape','easy to identify at a glance'];
+itemVisualDetails.push('oversized silhouette','clear icon-read shape','distinct handle wrap','single strong ornament','visible material contrast','simple heroic proportions','clean bright accent color');
+function itemSlotGroup(cat,role){
+  const r=(role||'').toLowerCase();
+  if(cat==='Weapon'){ if(r.includes('wand')||r.includes('staff')) return 'caster'; if(r.includes('bow')) return 'ranged'; if(r.includes('shield')) return 'shield'; return 'melee'; }
+  if(cat==='Armour'){ if(r.includes('helmet')) return 'helmet'; if(r.includes('chest')) return 'chest'; if(r.includes('gloves')) return 'gloves'; if(r.includes('boots')) return 'boots'; if(r.includes('belt')) return 'belt'; if(r.includes('cloak')) return 'cloak'; return 'chest'; }
+  return 'default';
+}
+function itemAffixCount(rar){
+  const table={Common:[1,2],Uncommon:[2,3],Rare:[4,5],Epic:[3,4],Legendary:[3,4],Mythic:[4,5],Unique:[4,5]};
+  const range=table[rar]||[3,4]; return range[0]===range[1]?range[0]:range[0]+Math.floor(Math.random()*(range[1]-range[0]+1));
+}
+function itemStatPackage(cat,rar,ts,role){
+ const group=itemSlotGroup(cat,role);
+ const entry=statPools[cat]||statPools.Weapon;
+ const pool=[...(entry[group]||entry.default||entry.melee||[])];
+ const count=Math.min(itemAffixCount(rar), pool.length);
+ const out=[];
+ for(let i=0;i<count;i++){
+   const stat=R(pool); pool.splice(pool.indexOf(stat),1);
+   let val='';
+   if(stat.includes('Damage')) val='+'+R([4,6,8,10,12,15,18]);
+   else if(stat.includes('Resistance')) val='+'+R([5,7,9,12,15,18])+'%';
+   else if(stat.includes('Speed')||stat.includes('Chance')||stat.includes('Recovery')||stat.includes('Find')||stat.includes('Dodge')) val='+'+R([3,4,5,6,8,10])+'%';
+   else if(stat.includes('Life')||stat.includes('Mana')||stat.includes('Armour')||stat.includes('Evasion')) val='+'+R([10,14,18,24,32,40]);
+   else if(stat.includes('Strength')||stat.includes('Dexterity')||stat.includes('Attributes')||stat.includes('Accuracy')) val='+'+R([4,6,8,10,12]);
+   out.push((val?val+' ':'')+stat);
+ }
+ return out;
+}
+
+const themePalettes={
+ Fire:{base:['Charred Umber','#4A2118'],mid:['Hot Ember','#C9542A'],accent:['Molten Gold','#F6A646'],glow:['Firecore','#FFD06A']},
+ Frost:{base:['Deep Ice Blue','#18324A'],mid:['Frosted Steel','#8DB6CC'],accent:['Glacial Cyan','#9DE8FF'],glow:['Snowglow','#E9FBFF']},
+ Storm:{base:['Thunder Slate','#202A3A'],mid:['Rain Blue','#3E6E91'],accent:['Lightning Gold','#F4D66A'],glow:['Static Cyan','#A7F1FF']},
+ Fungal:{base:['Wet Bark','#3D3324'],mid:['Moss Cap','#6C7D3C'],accent:['Spore Green','#A8C85F'],glow:['Gilded Gills','#E2D382']},
+ Rot:{base:['Rot Black','#242016'],mid:['Sickly Olive','#66702F'],accent:['Toxic Green','#A6CE45'],glow:['Plague Glow','#DDF06C']},
+ Crystal:{base:['Deep Violet Stone','#302449'],mid:['Amethyst Plate','#7962B7'],accent:['Shard Cyan','#77D8EA'],glow:['Prism White','#F0F6FF']},
+ Holy:{base:['Warm Ivory','#D8C9A1'],mid:['Sun Gold','#E0B24D'],accent:['Sacred White','#FFF4D8'],glow:['Halo Light','#FFF0A8']},
+ Shadow:{base:['Night Purple','#1A1326'],mid:['Umbral Violet','#4D3470'],accent:['Cold Magenta','#9C6BCC'],glow:['Void Eye','#D3A8FF']},
+ Blood:{base:['Dried Blood','#45181D'],mid:['Crimson Hide','#8F2635'],accent:['Fresh Red','#D8484F'],glow:['Ritual Pink','#FF8A9A']},
+ Bone:{base:['Old Bone','#B8A77C'],mid:['Dust Brown','#6F6047'],accent:['Ivory Spike','#E8DDB7'],glow:['Necrotic Teal','#86D6B4']},
+ Arcane:{base:['Ink Blue','#191D3E'],mid:['Rune Violet','#614EC2'],accent:['Arcane Cyan','#76D9FF'],glow:['Mana White','#DDF8FF']},
+ Void:{base:['Starless Black','#090812'],mid:['Rift Purple','#35205E'],accent:['Abyss Blue','#314C8C'],glow:['Impossible Glow','#9B8CFF']},
+ Dream:{base:['Dusky Lavender','#6A5685'],mid:['Soft Rose','#C184AC'],accent:['Dream Cyan','#8EDAE6'],glow:['Lucid Pearl','#FFF0FF']},
+ Nature:{base:['Deep Leaf','#2D4A2A'],mid:['Living Bark','#7A583A'],accent:['Fresh Leaf','#7EC85B'],glow:['Verdant Light','#C9F08D']},
+ Royal:{base:['Royal Plum','#3D243F'],mid:['Banner Red','#8F2F45'],accent:['Crown Gold','#E5B75A'],glow:['Polished Gem','#7FD7FF']},
+ Ancient:{base:['Weathered Stone','#605C4E'],mid:['Old Bronze','#8B6C3E'],accent:['Moss Green','#6B8756'],glow:['Rune Dust','#D9C98A']},
+ 'Goblin-made':{base:['Dirty Scrap','#3F3A32'],mid:['Rust Orange','#A6502B'],accent:['Warning Paint','#E6C23E'],glow:['Unstable Green','#A5E35A']},
+ Clockwork:{base:['Oiled Iron','#2B2A27'],mid:['Brass Gear','#B1843B'],accent:['Copper Edge','#D0783E'],glow:['Ticking Blue','#7CC7E8']},
+ Swamp:{base:['Bog Mud','#3E3828'],mid:['Reed Green','#637443'],accent:['Murky Lime','#9FB85A'],glow:['Will-o-Wisp','#B9EFA9']},
+ Desert:{base:['Red Sand','#9B6543'],mid:['Sunbaked Clay','#C58A58'],accent:['Glass Highlight','#E7D3A2'],glow:['Heat Haze','#FFD98C']},
+ Ocean:{base:['Deep Tide','#123B4A'],mid:['Sea Glass','#3A91A0'],accent:['Coral Pink','#E2847A'],glow:['Pearl Light','#E8F7F2']},
+ Celestial:{base:['Midnight Blue','#18264D'],mid:['Moon Silver','#AAB8D8'],accent:['Star Gold','#F1D36B'],glow:['Astral White','#F6FAFF']},
+ Insect:{base:['Dark Chitin','#272019'],mid:['Shell Brown','#73512D'],accent:['Pheromone Amber','#D99833'],glow:['Compound Green','#9BD35E']},
+ 'Rune-carved':{base:['Rune Stone','#49495A'],mid:['Carved Slate','#2F3340'],accent:['Glyph Blue','#63C9F2'],glow:['Etched Light','#D7F6FF']},
+ Moonlit:{base:['Moonshadow','#20263A'],mid:['Silver Fur','#A9AFC2'],accent:['Pale Blue','#88B9DF'],glow:['Moon Halo','#E9F1FF']},
+ Sunken:{base:['Wet Stone','#253C42'],mid:['Rusted Chain','#8A5634'],accent:['Kelp Green','#5F8B63'],glow:['Abyssal Pearl','#A9E5DD']}
+};
+Object.assign(themePalettes,{
+ Eldritch:{base:['Old Ink','#171A26'],mid:['Unseen Violet','#42315B'],accent:['Madness Green','#8BD879'],glow:['Forbidden Star','#D8FFF0']},
+ Infernal:{base:['Coal Black','#231510'],mid:['Demon Red','#7D241C'],accent:['Hellfire Orange','#F06A2A'],glow:['Sulfur Glow','#FFD15B']},
+ Wildwood:{base:['Old Bark','#2D3A25'],mid:['Moss Velvet','#62784B'],accent:['Leaf Gold','#C2B85E'],glow:['Firefly Green','#CFFFA1']},
+ Faerie:{base:['Twilight Plum','#2D2440'],mid:['Petal Pink','#B66FA5'],accent:['Glamour Mint','#8CE7C5'],glow:['Pixie Glow','#F4D6FF']},
+ Draconic:{base:['Scale Black','#241B18'],mid:['Wyrm Scale','#6E3424'],accent:['Hoard Gold','#E0A93F'],glow:['Dragon Breath','#FFB76B']},
+ Dwarven:{base:['Deep Granite','#2F2E2C'],mid:['Iron Beard','#68605A'],accent:['Forge Gold','#C18B38'],glow:['Rune Ember','#FFBF66']},
+ Elven:{base:['Green Shadow','#223629'],mid:['Silver Leaf','#9BAF9D'],accent:['Moon Gold','#D6C882'],glow:['Elder Light','#E8FFE2']},
+ Orcish:{base:['Warhide Green','#2E3A27'],mid:['Dark Leather','#5A3B2A'],accent:['War Paint Red','#B33A2E'],glow:['Battle Fire','#FF9A45']},
+ Graveyard:{base:['Wet Grave','#252C32'],mid:['Tombstone Grey','#70736B'],accent:['Candle Bone','#D8CBA3'],glow:['Ghost Blue','#A8D7FF']},
+ Ashen:{base:['Ash Grey','#3B3835'],mid:['Cinder Brown','#6C4B39'],accent:['Dull Ember','#D6763D'],glow:['Coal Glow','#F7B15E']},
+ Thorned:{base:['Briar Dark','#283322'],mid:['Rosewood','#6F3B3E'],accent:['Thorn Green','#7FA653'],glow:['Blood Rose','#FF8090']},
+ Alchemical:{base:['Bottle Green','#243D34'],mid:['Copper Tube','#A66A35'],accent:['Acid Yellow','#BFD84E'],glow:['Vial Glow','#8BFFB3']},
+ Astral:{base:['Starless Blue','#17213D'],mid:['Nebula Violet','#5C4A88'],accent:['Comet White','#DFE9FF'],glow:['Astral Cyan','#9FEAFF']},
+ Pirate:{base:['Tar Navy','#172331'],mid:['Salted Brown','#795337'],accent:['Sailcloth Cream','#D2C0A0'],glow:['Lantern Rum','#FFBE65']},
+ Cultist:{base:['Hood Black','#19151C'],mid:['Ritual Maroon','#5A2130'],accent:['Wax Seal','#C89957'],glow:['Forbidden Red','#FF667A']},
+ Scholarly:{base:['Ink Navy','#1F2638'],mid:['Old Paper','#B39D76'],accent:['Book Gold','#C89B42'],glow:['Blue Ink Glow','#88CFFF']},
+ Mirror:{base:['Black Glass','#171923'],mid:['Silver Backing','#909AA5'],accent:['Cracked Cyan','#7AD9E8'],glow:['Mirror Shine','#F1FBFF']},
+ Timeworn:{base:['Old Bronze','#4A3D2C'],mid:['Dust Tan','#9B845E'],accent:['Clock Gold','#D6A94F'],glow:['Hourglass Light','#FFE29B']},
+ 'Deep Sea':{base:['Abyss Blue','#0E2634'],mid:['Pressure Teal','#245B61'],accent:['Angler Gold','#D9B35E'],glow:['Abyss Lantern','#8DF2E5']},
+ Underground:{base:['Cave Black','#202225'],mid:['Wet Stone','#56534C'],accent:['Mineral Ochre','#B68645'],glow:['Glow Lichen','#A8E080']},
+ Cathedral:{base:['Cathedral Blue','#202C42'],mid:['Old Stone','#716A63'],accent:['Stained Gold','#D8A84E'],glow:['Window Light','#DDEBFF']},
+ Forge:{base:['Iron Black','#252222'],mid:['Hot Steel','#6E5C4F'],accent:['Molten Edge','#D97835'],glow:['Forge Fire','#FFB85B']},
+ Library:{base:['Dark Shelf','#2A211C'],mid:['Old Leather','#6E432D'],accent:['Page Gold','#C9A765'],glow:['Ink Blue','#8EC9FF']},
+ Carnival:{base:['Night Tent','#271B2F'],mid:['Faded Stripe','#91495B'],accent:['Lantern Gold','#E3B04E'],glow:['Jester Glow','#B9F27D']},
+ Serpent:{base:['Scale Green','#1F382B'],mid:['Serpent Bronze','#7A6641'],accent:['Venom Lime','#A8DC4A'],glow:['Emerald Eye','#8BFFC8']},
+ Raven:{base:['Raven Black','#17181C'],mid:['Feather Blue','#29364E'],accent:['Bone Charm','#C8B995'],glow:['Omen Blue','#8BB8FF']},
+ Spider:{base:['Web Black','#1B1C20'],mid:['Silk Grey','#767A7F'],accent:['Venom Purple','#8D5BB2'],glow:['Egg Glow','#D7C8FF']},
+ Wolf:{base:['Winter Fur','#38424A'],mid:['Pelt Grey','#8A8D86'],accent:['Fang Ivory','#E2D8C1'],glow:['Moon Eye','#BFE4FF']},
+ Machine:{base:['Oiled Metal','#24282C'],mid:['Brass Plate','#9B743C'],accent:['Warning Copper','#D0833F'],glow:['Arc Lamp','#8BDFFF']}
+});
+const neutralPalettes={
+ Weapon:['Dark Grip','#2A2020'], Armour:['Underlayer Cloth','#282634'], Relic:['Aged Parchment','#BFA774'], Potion:['Glass Shadow','#243342'], 'Crafting Material':['Raw Material','#5B5143'], Currency:['Stamped Metal','#B7934B'], Monster:['Body Mass','#3D3A32'], Boss:['Boss Mass','#2B2235'], Spell:['Magic Core','#1D2444'], Skill:['Motion Trail','#383040'], NPC:['Cloth Base','#50433C'], Quest:['Quest Parchment','#8F7954'], Vendor:['Shop Cloth','#5A3B31'], Biome:['Ground Base','#4E493B'], 'Dungeon Room':['Dungeon Stone','#45414A'], 'Random Event':['Event Smoke','#393246']
+};
+function paletteEntry(role,name,hex){return {role,name,hex};}
+function makePalette(ts,cat,identity=null){
+  const primary=themePalettes[ts[0]]||themePalettes.Arcane;
+  const secondary=themePalettes[ts[1]]||primary;
+  const neutral=neutralPalettes[cat]||['Neutral Base','#3E3942'];
+  const materialName=identity?.materials?capitalize(identity.materials):neutral[0];
+  return [
+    paletteEntry('Base', primary.base[0], primary.base[1]),
+    paletteEntry('Material', materialName, neutral[1]),
+    paletteEntry('Secondary', secondary.mid[0], secondary.mid[1]),
+    paletteEntry('Accent', primary.accent[0], primary.accent[1]),
+    paletteEntry('Glow', (secondary.glow||primary.glow)[0], (secondary.glow||primary.glow)[1])
+  ];
+}
+function renderPalette(palette){
+  return (palette||[]).map(s=>`<div class="swatch" style="background:${s.hex}"><div class="swatch-info"><div class="swatch-role">${escapeHtml(s.role)}</div><div class="swatch-name">${escapeHtml(s.name)}</div><div class="swatch-hex">${escapeHtml(s.hex)}</div></div></div>`).join('');
+}
+function paletteText(palette){return (palette||[]).map(s=>`${s.role}: ${s.name} ${s.hex}`).join(' • ');}
+function palettePrompt(palette){return (palette||[]).map(s=>`${s.role.toLowerCase()} ${s.name} (${s.hex})`).join(', ');}
+
+function itemIdentity(cat,rar,ts){
+ const materials={Fire:['charred iron','smoked leather','ember glass'],Frost:['pale steel','frosted hide','cold crystal'],Rot:['rotting bark','blackened leather','sickly bronze'],Fungal:['mushroom leather','soft bark','spore-stained cloth'],Crystal:['cut crystal','polished stone','silver fittings'],Nature:['living wood','woven vines','leaf-dyed cloth'],Shadow:['dark cloth','black iron','smoky gems'],Holy:['bright steel','white cloth','gold trim']};
+ const mats=materials[ts[0]]||['worked iron','aged leather','simple cloth','carved wood'];
+ return {materials:R(mats), construction:R(['crude','sturdy','elegant','old','patched','ceremonial','practical']), wear:R(['new','worn','battle-scarred','ancient','well-kept']), visual:R(itemVisualDetails)};
+}
+
+function genItemName(cat,rar,ts,role,identity){
+  const base=(role||cat).replace('One-handed ','').replace('Two-handed ','');
+  const matAdj=(identity?.materials||R(['Iron','Leather','Oak'])).split(' ')[0];
+  const theme=ts[0];
+  if(rar==='Common') return `${capitalize(matAdj)} ${base}`;
+  if(rar==='Uncommon') return `${theme} ${base}`;
+  if(rar==='Rare') return `${R(["Knight\'s","Seeker\'s","Warden\'s","Hermit\'s","Raider\'s","Pilgrim\'s"])} ${theme}${R(['brand','guard','grip','fang','ward','mark'])}`;
+  if(rar==='Epic') return `${R(prefixes)}${R(['fang','bloom','aegis','mantle','edge','crown'])}, ${R(['Oath','Gift','Burden','Echo','Prize'])} ${R(suffixes)}`;
+  if(rar==='Legendary') return `The ${R(["Sun-Eater\'s","Old King\'s","Hollow Saint\'s","Glass Moon\'s","Drowned Oracle\'s","Last Warden\'s"])} ${R(['Fang','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])}`;
+  return `${R(['Mythic','Forgotten','Impossible','World-Bent'])} ${theme} ${R(['Relic','Edge','Crown','Heart','Seal'])}`;
+}
+function capitalize(s){return (s||'').charAt(0).toUpperCase()+(s||'').slice(1);}
+
+function itemDesignFocus(rar){
+ if(['Common','Uncommon','Rare'].includes(rar)) return 'No special mechanics. This item should be judged quickly by its name, silhouette, material theme, and stat package.';
+ if(rar==='Epic') return 'One signature mechanic only. The item may ask the player to build around one clear idea.';
+ if(rar==='Legendary') return 'Build-defining item. One or two linked rules are acceptable, but the core idea must remain readable.';
+ return 'Special item rarity. Keep it memorable, but avoid noise unless it serves a clear build purpose.';
+}
+
+
+function isNarrativeCategory(cat){
+  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Random Event'].includes(cat);
+}
+function categorySpecificContent(cat,ts,rar,role,att,info){
+  const themeText=ts.join(', ').toLowerCase();
+  const location=R(['sunken ruins','forgotten shrine','cracked mountain pass','moss-choked battlefield','flooded crypt','ancient observatory','haunted forest road','buried temple','moonlit marsh','collapsed royal archive','abandoned witch road','goblin toll bridge','glass desert shrine','dwarven undergate','elven watch platform','orc war camp','storm-broken lighthouse','candlelit graveyard','ruined cathedral square','buried clock tower','foggy fishing hamlet','deep mushroom cavern','pirate wreck cove','sealed library wing','ash-choked village','thorn-choked manor','mirror hall beneath the palace']);
+  const antagonist=R(['lost cult','restless guardian','rival scavengers','cursed noble','ancient beast','void-touched hermit','desperate villagers','corrupted wildlife','wandering warband','sealed spirit','witch coven','goblin debt collectors','orc raiding party','dwarven automaton','elven ghost patrol','hungry shadow','pirate revenants','royal inquisitor','faerie tricksters','graveyard choir','mirror duplicate','demon-bound knight','spider brood','serpent oracle','raven omen-flock']);
+  const mystery=R(['a missing relic','a spreading curse','a broken pact','a forbidden map','a vanished caravan','a silent village','a sealed door','a drowned bell','a stolen offering','a strange celestial omen','a stolen royal signet','a talking skull','a broken lighthouse lens','a clock that stopped at midnight','a child with no shadow','a chest that keeps returning','a book written tomorrow','a well full of stars','a bridge that appears at dusk','a crown buried under roots','a forge that burns cold','a ship found miles inland']);
+  const reward=R([`${ts[0]}-marked equipment`,`${ts[0]} crafting materials`,`access to a hidden area`,`a new vendor unlock`,`a faction favor token`,`a rare cosmetic trophy`,`a unique relic clue`,`a shrine blessing`]);
+  let signature='',desc='',why='',detailRows=[],structureRows=[];
+  if(cat==='Quest'){
+    const objective=R(['hunt down','recover','investigate','escort','cleanse','track','negotiate with','break the curse on','protect','search for']);
+    const complication=R(['the target is not truly evil','the trail leads through dangerous terrain','the client is hiding part of the truth','the reward is cursed','the enemy is guarding something innocent','the location changes at night','a rival faction arrives first','the solution requires restraint instead of violence']);
+    const hook=`${capitalize(objective)} ${mystery} near the ${location}, but ${complication}.`;
+    signature=`Quest Hook: ${hook}`;
+    desc=`A ${rar.toLowerCase()} quest built around ${themeText} fantasy. It functions as a ${role.toLowerCase()} focused on a clear objective, a memorable location, and a twist that can drive exploration or combat.`;
+    why='This gives the player a readable goal first, then adds one twist so the quest feels authored instead of randomly mechanical.';
+    detailRows=[['Quest Type',role],['Primary Objective',`${objective} ${mystery}`],['Location',location],['Complication',complication]];
+    structureRows=[['Main Opposition',antagonist],['Reward Fantasy',reward],['Player Fantasy',R(['monster hunter','ruin explorer','curse-breaker','reluctant negotiator','treasure seeker','protector','investigator'])],['Best Used As',R(['side quest','zone intro quest','rare encounter chain','faction errand','breadcrumb to a dungeon','boss unlock quest'])]];
+  } else if(cat==='Biome'){
+    const landmark=R(['giant broken statues','glowing root bridges','half-submerged towers','crystal-lit caverns','ancient machines','bone-white trees','floating stone arches','burned pilgrim roads','black obelisks','lantern forests','dwarven aqueducts','elven moon gates','goblin scrap pyramids','shipwreck graveyards','mirror lakes','cathedral ribs','spider-web canopies','dragon skeleton ridges','clockwork windmills','serpent-shaped canals','raven watchtowers','mushroom mesas','golden wheat ruins']);
+    const atmosphere=R(['misty and quiet','humid and overgrown','cold and echoing','bright but dangerous','storm-lit','dreamlike','oppressive and ancient','warm and magical','solemn and sacred','playful but unsettling','salt-wet and haunted','dry and glittering','smoky and war-torn','softly moonlit','claustrophobic and earthy','wide open and lonely','golden but decayed','ink-dark and scholarly','festival-like with a sinister edge']);
+    const traversal=R(['narrow paths','open clearings','vertical ledges','flooded crossings','hidden tunnels','dangerous bridges','large readable landmarks','safe pockets between threats','rope bridges','stepping stones','climbable ruins','minecart tracks','root tunnels','collapsed streets','windy cliff paths','mirror portals','drawbridges','slow swamp channels','spiral stair ruins']);
+    signature=`Biome Identity: ${capitalize(themeText)} landscape with ${landmark}, ${atmosphere} atmosphere, and ${traversal}.`;
+    desc=`A ${rar.toLowerCase()} biome built around ${themeText} fantasy. It is defined by its landscape shape, atmosphere, traversal style, and strong environmental landmarks.`;
+    why='A biome should sell mood and navigation first. The generator now focuses on what the player sees, remembers, and moves through.';
+    detailRows=[['Biome Type',role],['Atmosphere',atmosphere],['Major Landmark',landmark],['Traversal Feel',traversal]];
+    structureRows=[['Common Threats',R(['ambush predators','roaming packs','environmental hazards','territorial guardians','wandering elites','hidden traps'])],['Resources',R([`${ts[0]} herbs`,`${ts[0]} ore`,`${ts[0]} timber`,`${ts[0]} relic fragments`,`rare fishing pools`,`ancient salvage`])],['Settlement Cue',R(['lonely outpost','abandoned camp','hidden hermit hut','ruined watchtower','small vendor shrine'])],['Visual Priority','Scenic landscape and readable terrain shapes']];
+  } else if(cat==='Dungeon Room'){
+    const layout=R(['circular arena','split-level chamber','long bridge room','flooded crossing','small shrine alcove','collapsed hall','four-corner ritual room','narrow ambush corridor','cross-shaped chapel room','minecart junction','broken library balcony','spiral stair chamber','sunken throne room','mirror-lined hall','forge platform','beast pen pit','crypt crossroads','clockwork gear room','root-choked tunnel','pirate treasure hold']);
+    const feature=R(['central altar','broken mechanism','sealed treasure gate','glowing pool','hanging chains','giant cracked statue','moving platforms','ancient rune floor','bell tower crank','dragon skull brazier','living root door','orb pedestal','blood-stained lectern','giant mirror','molten anvil','sunken sarcophagus','clockwork heart','caged spirit','faerie ring','webbed egg mound']);
+    const hazard=R(['patrolling enemies','timed floor traps','line-of-sight blockers','rising water','collapsing stones','curse zones','hidden pressure plates','summoning circles','swinging blades','poison vents','falling chandeliers','rotating laser runes','spider webs','explosive barrels','unstable bridges','haunting bells','flood valves','rolling boulders','gear crushers']);
+    signature=`Room Concept: ${capitalize(layout)} with a ${feature} and ${hazard}.`;
+    desc=`A ${rar.toLowerCase()} dungeon room built around ${themeText} fantasy. It functions as a ${role.toLowerCase()} with a clear room shape, focal feature, and encounter purpose.`;
+    why='Dungeon rooms need readable layout more than abstract mechanics. This gives the room a physical structure a level designer can actually build.';
+    detailRows=[['Room Type',role],['Layout',layout],['Focal Feature',feature],['Hazard / Pressure',hazard]];
+    structureRows=[['Reward Hook',R(['visible chest behind danger','shortcut unlock','lore object','rare resource node','mini-boss key','hidden side path'])],['Best Camera Read','Angled or isometric room concept'],['Player Decision',R(['rush the objective','clear enemies first','disable hazard','search for hidden path','kite around central feature'])]];
+  } else if(cat==='Vendor'){
+    const wares=R([`${ts[0]} potions and charms`,`${ts[0]} weapons`,`${ts[0]} salvage`,`${ts[0]} maps and keys`,`monster trophies`,`strange currencies`,`camp supplies`,`enchanted trinkets`,`questionable relics`,`forged documents`,`rare bait and traps`,`festival masks`,`clockwork parts`,`grave candles`,`dragon-scale polish`,`rune ink`,`pirate maps`,`dwarven tools`,`faerie bargains`]);
+    const stall=R(['folding market stall','backpack shop','wagon full of junk','tiny shrine counter','black-market tent','floating lantern cart','smithing tarp','half-sunken boat shop','walking chest on legs','mushroom-roofed kiosk','armored caravan wagon','bell-covered pushcart','bookshop tent','fishbone booth','clockwork vending shrine','portable forge','graveyard blanket stall','hanging birdcage shop']);
+    const quirk=R(['only trades at night','speaks through a mask','accepts odd tokens','hates haggling','knows dangerous rumors','moves between zones','is followed by tiny helpers','claims every item is cursed','never sells the same thing twice','prices items by riddles','refuses royal coins','keeps a pet mimic','sings every transaction','insists the customer sign a ledger','believes every buyer is doomed','wraps items in prayer cloth','trades discounts for monster parts']);
+    signature=`Vendor Identity: Sells ${wares} from a ${stall}, and ${quirk}.`;
+    desc=`A ${rar.toLowerCase()} vendor built around ${themeText} fantasy. It is defined by what it sells, how it looks, and the memorable service fantasy it brings to the world.`;
+    why='A vendor should be useful and recognizable at a glance. The concept focuses on profession, wares, silhouette, and shop personality.';
+    detailRows=[['Vendor Role',role],['Wares',wares],['Shop Setup',stall],['Quirk',quirk]];
+    structureRows=[['Service',R(['buy/sell','crafting conversion','repairs','special currency exchange','gambling inventory','quest turn-ins','rare material trade'])],['Faction Link',R(['local villagers','wandering merchants','ruin scavengers','monster hunters','royal remnant','cult defectors'])],['Visual Priority','Character plus clear wares/props']];
+  } else if(cat==='NPC'){
+    const motivation=R(['wants protection','seeks forbidden knowledge','is hiding guilt','needs a rare ingredient','wants revenge','guards an old secret','studies local monsters','is trying to leave the region','wants to restore their family name','is searching for a missing sibling','is cursed to forget names','protects a forbidden book','owes a debt to a monster','wants to prove a wild theory','fears an old prophecy','is secretly testing the player','needs help burying the dead']);
+    const prop=R(['lantern staff','worn journal','bundle of charms','cracked mask','oversized backpack','rusted keyring','strange pet','weathered map','silver pocket watch','bone abacus','talking raven','sealed scroll tube','broken crown','fishhook necklace','clockwork hand','stained-glass monocle','tiny shrine box','dragon-tooth cane','ink-stained satchel']);
+    const secret=R(['knows a hidden route','caused the local problem','is cursed','is not who they claim to be','has seen the boss lair','owes a debt to the enemy','protects a monster','carries a relic fragment','is royalty in exile','was once part of the cult','can read dead languages','has a map tattooed under their sleeve','is followed by a familiar','remembers a previous apocalypse','made a bargain with faeries','is slowly turning into stone','owns the key but fears using it']);
+    signature=`NPC Identity: A ${role.toLowerCase()} who ${motivation}, carries a ${prop}, and ${secret}.`;
+    desc=`A ${rar.toLowerCase()} NPC built around ${themeText} fantasy. The concept focuses on personality, silhouette, motivation, and story usefulness rather than combat mechanics.`;
+    why='NPC concepts become stronger when they have a motive and a secret. That gives them a reason to exist in quests or towns.';
+    detailRows=[['NPC Role',role],['Motivation',motivation],['Signature Prop',prop],['Secret',secret]];
+    structureRows=[['Likely Use',R(['quest giver','vendor unlock','dungeon clue','faction contact','comic relief','tragic lore source','crafting trainer'])],['Attitude',att],['Visual Priority','Full-body character concept with props']];
+  } else {
+    const eventMoment=R(['a caravan is attacked','a shrine awakens','a meteor falls','ghost lights cross the road','a cursed chest appears','a faction patrol clashes with monsters','a bridge collapses','a traveling vendor is surrounded','a funeral procession is interrupted','a golem breaks loose','a witch trial turns violent','a flock of omen ravens gathers','a well begins singing','a pirate map burns itself into stone','a market stall transforms into a mimic','a clock tower rings thirteen times','a child chases a glowing animal','a ghost asks for directions','a monster migration crosses the road']);
+    const playerChoice=R(['fight immediately','save someone','loot quickly before danger grows','choose a side','follow the strange trail','interrupt a ritual','escort survivors','investigate the aftermath','protect the guilty person','return a stolen object','break or preserve the relic','pay the toll or refuse','help the monster or the villagers','chase the fleeing thief','stabilize the portal','free the trapped spirit','decide which NPC to trust']);
+    signature=`Event Moment: ${capitalize(eventMoment)} and the player must ${playerChoice}.`;
+    desc=`A ${rar.toLowerCase()} random event built around ${themeText} fantasy. It is a short readable world moment with an immediate visual hook and a simple player decision.`;
+    why='Random events work best when the player understands the situation instantly and has one clear decision to make.';
+    detailRows=[['Event Type',role],['Opening Moment',eventMoment],['Player Choice',playerChoice],['Visual Hook',R(info.visual||['glowing runes'])]];
+    structureRows=[['Possible Outcome',R(['small reward cache','rescued NPC','temporary buff','ambush reveal','new map clue','vendor discount','faction reputation'])],['Best Placement',R(['roadside','near dungeon entrance','inside biome landmark','between combat packs','near shrine','at night'])],['Visual Priority','Dynamic scene with readable story action']];
+  }
+  return {signature,desc,why,detailRows,structureRows};
+}
+
+function standardConcept(forceReroll=false){
+  const old=state.current||{};
+  const cat=state.locks.category&&old.category?old.category:categoryEl.value;
+  const rar=state.locks.rarity&&old.rarity&&!old.creatureMode?old.rarity:R(rarity);
+  const ts=state.locks.themes&&old.themes?old.themes:weightedThemes(rar);
+  const att=state.locks.attitude&&old.attitude?old.attitude:R(attitudes);
+  const role=state.locks.role&&old.role?old.role:R(roles[cat]||roles.Monster);
+  const info=themeInfo(ts);
+  const itemMode=isItemCategory(cat);
+  const narrativeMode=isNarrativeCategory(cat);
+  const allowItemMechanic=itemCanHaveMechanic(cat,rar);
+  const mechanicsMode=(cat==='Spell'||cat==='Skill'||allowItemMechanic) && !narrativeMode;
+  const tech=mechanicsMode ? (state.locks.mechanic&&old.tech?old.tech:technical(cat,ts,rar)) : null;
+  const identity=itemMode?itemIdentity(cat,rar,ts):null;
+  const name=itemMode?genItemName(cat,rar,ts,role,identity):genName(cat,ts,role);
+  const itemStats=itemMode?itemStatPackage(cat,rar,ts,role):null;
+  const narrative=narrativeMode?categorySpecificContent(cat,ts,rar,role,att,info):null;
+  let signature='', desc='', why='';
+  if(narrativeMode){
+    signature=narrative.signature;
+    desc=narrative.desc;
+    why=narrative.why;
+  } else if(itemMode && !allowItemMechanic){
+    signature=`${rar} item rule: ${itemDesignFocus(rar)}`;
+    desc=`A ${rar.toLowerCase()} ${cat.toLowerCase()} built around ${ts.join(', ').toLowerCase()} fantasy. It functions as a ${role.toLowerCase()} with clean ARPG itemization: readable stats, strong naming, and clear visual identity instead of special mechanics.`;
+    why=`Lower-rarity items should keep the game readable. This gives players progression through understandable stats and a memorable look, while preserving mechanical surprises for Epic and Legendary drops.`;
+  } else {
+    signature=tech.sentence;
+    desc=`A ${rar.toLowerCase()} ${cat.toLowerCase()} built around ${ts.join(', ').toLowerCase()} fantasy. It functions as a ${role.toLowerCase()} with a clear gameplay identity: ${signature}`;
+    why=`${tech.profileWhy} In play, the mechanic should target the correct side of combat: harmful effects pressure enemies/players, helpful effects support self/allies, and reward triggers pay the owner. The validator helps avoid nonsense ally/enemy pairings.`;
+  }
+  const loot=[`${ts[0]} ${R(['Core','Shard','Essence','Fang','Bloom','Rune'])}`,`${R(prefixes)} ${R(['Dust','Token','Fragment','Sap','Scale'])}`,`${R(['Cracked','Living','Ancient','Polished'])} ${R(['Gem','Bone','Medal','Spore','Sigil'])}`];
+  const visual=itemMode?[`${identity.wear} ${identity.materials}`,`${identity.construction} construction`,identity.visual]:[R(info.visual||['glowing runes']),R(['large readable silhouette','broad simple shapes','clear fantasy colors','chunky hand-painted forms']),R(['flat colored background','isolated game concept','low visual noise'])];
+  const palette=makePalette(ts,cat,identity);
+  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null}; state.current=c; render(c);
+}
+function concept(forceReroll=false){
+  if(isCreatureCategory(categoryEl.value) || (state.locks.category && state.current && state.current.creatureMode)) return creatureConcept(forceReroll);
+  return standardConcept(forceReroll);
+}
+function dna(ts){const labels=['Warcraft readability','D&D archetype','Diablo affix logic','Warhammer weirdness','PoE conditionals','Original mix']; let vals=[20,16,18,12,16,18].map(v=>clamp(v+Math.floor(Math.random()*13-6),5,40)); let sum=vals.reduce((a,b)=>a+b,0); return labels.map((l,i)=>({l,v:Math.round(vals[i]/sum*100)}));}
+function kv(k,v){return `<div class="kv"><div class="k">${k}</div><div class="v">${v}</div></div>`}
+function spellVisualIntent(c){
+  const role=(c.role||'').toLowerCase();
+  const family=(c.tech&&c.tech.family?c.tech.family:'').toLowerCase();
+  const valid=(c.tech&&c.tech.validTarget?c.tech.validTarget:'').toLowerCase();
+  const action=(c.tech&&c.tech.action?c.tech.action:'').toLowerCase();
+  const target=(c.tech&&c.tech.target?c.tech.target:'').toLowerCase();
+  const lines=[];
+  let intent='neutral magical effect';
+  if(role.includes('buff')||role.includes('defensive stance')) intent='beneficial support magic: protective, empowering, calm, controlled, and non-aggressive';
+  else if(role.includes('curse')) intent='hostile curse magic: ominous, binding, weakening, ritualistic, and debuff-focused';
+  else if(role.includes('summon')||role.includes('totem')) intent='summoning magic: portal, conjuration circle, forming spirit or construct silhouette';
+  else if(role.includes('mobility')||role.includes('dash')) intent='mobility magic: motion streaks, afterimages, directional energy trail, no impact explosion unless subtle';
+  else if(role.includes('trap')) intent='trap magic: placed rune, hidden trigger circle, dormant magical device, readable danger shape';
+  else if(role.includes('channeled')||role.includes('channel')) intent='channeled magic: sustained aura or stream, caster maintaining focus, steady held energy';
+  else if(role.includes('area')) intent='area spell: clear ground shape, readable radius, magical field or zone, not a narrow projectile';
+  else if(role.includes('projectile')||role.includes('ranged shot')) intent='projectile spell: focused missile, bolt, lance, or arcing shot with clean directionality';
+  else if(role.includes('melee cleave')) intent='melee skill magic: broad weapon arc, close-range slash trail, physical impact shape';
+  lines.push(`Visual intent: ${intent}.`);
+  if(family==='defensive'||family==='reward'||valid.includes('ally')||valid.includes('self')){
+    lines.push('Mood: helpful or protective first; use halos, wards, orbiting glyphs, soft aura shells, empowering runes, or gentle magical reinforcement rather than attack impact.');
+  }
+  if(family==='offensive'||valid.includes('enemy')){
+    lines.push('Mood: hostile or pressure-focused; use sharper shapes, warning glyphs, curse marks, striking trails, or danger zones while keeping the form readable.');
+  }
+  if(family==='retaliation'||action.includes('curse')||action.includes('drain')||target.includes('attacker')){
+    lines.push('Retaliation cue: show the spell as a defensive enchantment that answers aggression, such as a shield-ring, echo glyph, thorned ward, or reflected curse mark. Do not turn it into a primary attack beam unless the role is projectile or area damage.');
+  }
+  if(role.includes('buff')){
+    lines.push('For the in-world example, show a caster or ally silhouette being empowered by the magic; any curse or backlash element should appear as a secondary visual motif around the ward, not as the main composition.');
+  }
+  return lines;
+}
+
+function buildVisualPrompt(c,palette,rarityText){
+ const baseParts=[
+   'Hand-painted fantasy RPG concept art inspired by Warcraft, Torchlight and WildStar, optimized for gameplay readability.',
+   'Large readable shapes, broad forms, low visual noise, stylized painterly brushwork.',
+   `Use this defining colour palette: ${palettePrompt(palette)}.`,
+   `Concept: ${c.name}, ${rarityText} ${c.category}.`,
+   `Themes: ${c.themes.join(', ')}.`
+ ];
+ const cat=c.category;
+ if(cat==='Spell' || cat==='Skill'){
+   baseParts.push('Create one concept sheet with two clearly separated visual parts.');
+   baseParts.push('Left side: one square game icon only, centered, icon-ready, readable at 64x64, bold silhouette, fully contained, no text, no numbers, no UI labels.');
+   baseParts.push('Right side: one clean in-world visual example of the spell or skill effect, showing the VFX shape, motion path, aura/zone/impact shape, and emotional intent. Use a tiny neutral caster or target silhouette only if it helps show scale.');
+   baseParts.push(`Spell category and role: ${c.category}, ${c.role}.`);
+   spellVisualIntent(c).forEach(line=>baseParts.push(line));
+   baseParts.push(`Spell visual identity: ${c.visual.join(', ')}.`);
+   baseParts.push('Do not include stat text, cooldowns, damage numbers, technical mechanics, ability descriptions, captions, UI frames, or interface elements.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Biome'){
+   baseParts.push('Create a scenic landscape concept of the biome rather than an isolated object.');
+   baseParts.push('Show the terrain, vegetation, atmosphere, landmarks, and overall environmental mood clearly.');
+   baseParts.push('Compose it like a readable game environment vista or key art environment shot.');
+   baseParts.push(`Biome identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Biome type: ${c.role}.`);
+   const bAtmosphere=(c.detailRows||[]).find(r=>r[0]==='Atmosphere');
+   const bLandmark=(c.detailRows||[]).find(r=>r[0]==='Major Landmark');
+   const bTraversal=(c.detailRows||[]).find(r=>r[0]==='Traversal Feel');
+   const bThreats=(c.structureRows||[]).find(r=>r[0]==='Common Threats');
+   const bResources=(c.structureRows||[]).find(r=>r[0]==='Resources');
+   if(bAtmosphere) baseParts.push(`Atmosphere: ${bAtmosphere[1]}.`);
+   if(bLandmark) baseParts.push(`Major landmark: ${bLandmark[1]}.`);
+   if(bTraversal) baseParts.push(`Traversal feel: ${bTraversal[1]}.`);
+   if(bThreats) baseParts.push(`Common threats or pressures in the biome: ${bThreats[1]}.`);
+   if(bResources) baseParts.push(`Notable natural resources or points of interest: ${bResources[1]}.`);
+   baseParts.push('Make the landscape itself the hero, while hinting at its dangers and opportunities through environmental storytelling.');
+   baseParts.push('Do not include UI text, stat text, or technical mechanics. Focus only on environmental visuals.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Dungeon Room'){
+   baseParts.push('Create an in-world environment concept of a single fantasy dungeon room.');
+   baseParts.push('Show the room layout, architecture, focal feature, traversal space, and main interactive or dangerous element.');
+   baseParts.push('Use a clear angled/isometric-style or gameplay-friendly perspective that communicates the room function at a glance.');
+   baseParts.push(`Room identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Room type: ${c.role}.`);
+   baseParts.push('No UI text, no technical notes, just the room concept.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Quest'){
+   baseParts.push('Create a narrative quest illustration rather than a UI scroll or text card.');
+   baseParts.push('Show the key visual premise of the quest: the setting, the central problem, and a strong story hook in one readable scene.');
+   baseParts.push('It should feel like key art or a codex illustration for the quest.');
+   baseParts.push(`Quest visual identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Quest type: ${c.role}.`);
+   const qLocation=(c.detailRows||[]).find(r=>r[0]==='Location');
+   const qObjective=(c.detailRows||[]).find(r=>r[0]==='Primary Objective');
+   const qComplication=(c.detailRows||[]).find(r=>r[0]==='Complication');
+   const qOpposition=(c.structureRows||[]).find(r=>r[0]==='Main Opposition');
+   if(qLocation) baseParts.push(`Quest location: ${qLocation[1]}.`);
+   if(qObjective) baseParts.push(`Central objective: ${qObjective[1]}.`);
+   if(qOpposition) baseParts.push(`Main opposition or opposing force: ${qOpposition[1]}.`);
+   if(qComplication) baseParts.push(`Story complication or twist: ${qComplication[1]}.`);
+   baseParts.push('Compose the scene so the location, threat, and objective are all visually understandable at a glance.');
+   baseParts.push('Do not include quest text, stat text, or UI interface elements.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Vendor'){
+   baseParts.push('Create a full character concept of the vendor with clear service identity.');
+   baseParts.push('Show the vendor standing with a few representative wares, tools, or merchandise cues that communicate what they sell or do.');
+   baseParts.push('The character should remain the main focus, with small supporting props only.');
+   baseParts.push(`Vendor visual identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Vendor profession: ${c.role}.`);
+   baseParts.push('Use a simple or lightly suggested background, no UI text or price tags.');
+   return baseParts.join(' ');
+ }
+ if(cat==='NPC'){
+   baseParts.push('Create a full-body NPC character concept.');
+   baseParts.push('Show clothing, silhouette, props, and posture that clearly communicate the NPC role and personality.');
+   baseParts.push('The character should be the clear focus, with only light environmental hints if needed.');
+   baseParts.push(`NPC visual identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`NPC role: ${c.role}.`);
+   baseParts.push('No dialogue text, UI text, or technical mechanics.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Monster' || cat==='Boss'){
+   baseParts.push('Create a full creature concept focused on the monster itself.');
+   baseParts.push('Show the silhouette, body language, materials, and threat fantasy clearly.');
+   if(c.category==='Boss') baseParts.push('Make it feel more imposing and encounter-defining than a normal monster.');
+   if(c.habitat && c.habitat.length) baseParts.push(`Use subtle environmental cues from its habitat: ${c.habitat.join(', ')}.`);
+   if(c.family && c.family.name) baseParts.push(`Belongs to the ${c.family.name} family.`);
+   baseParts.push(`Creature appearance and silhouette: ${c.visual.join(', ')}.`);
+   baseParts.push('Use a simple backdrop or lightly suggested habitat, and avoid UI text or technical notes.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Weapon' || cat==='Armour' || cat==='Relic' || cat==='Potion' || cat==='Crafting Material' || cat==='Currency'){
+   baseParts.push('Create a clean isolated item concept on a simple flat background, with no cast shadow.');
+   baseParts.push('Show a single clear object or a small tidy grouped set only if needed for readability.');
+   if(c.role) baseParts.push(`Item type: ${c.role}.`);
+   if(c.identity) baseParts.push(`Materials and construction: ${c.identity.materials}; ${c.identity.construction}; ${c.identity.wear}.`);
+   baseParts.push(`Visual identity: ${c.visual.join(', ')}.`);
+   baseParts.push('No stat text, no labels, and no technical mechanics. Prioritize silhouette and material readability.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Random Event'){
+   baseParts.push('Create a dynamic event scene rather than an isolated object.');
+   baseParts.push('Show the central event moment clearly, with readable environmental storytelling and a strong sense of what is happening.');
+   if(c.role) baseParts.push(`Event type: ${c.role}.`);
+   baseParts.push(`Event visual identity: ${c.visual.join(', ')}.`);
+   const eMoment=(c.detailRows||[]).find(r=>r[0]==='Opening Moment');
+   const eChoice=(c.detailRows||[]).find(r=>r[0]==='Player Choice');
+   const eOutcome=(c.structureRows||[]).find(r=>r[0]==='Possible Outcome');
+   const ePlacement=(c.structureRows||[]).find(r=>r[0]==='Best Placement');
+   if(eMoment) baseParts.push(`Opening moment: ${eMoment[1]}.`);
+   if(eChoice) baseParts.push(`Core player decision: ${eChoice[1]}.`);
+   if(eOutcome) baseParts.push(`Possible reward or outcome: ${eOutcome[1]}.`);
+   if(ePlacement) baseParts.push(`Typical placement or context: ${ePlacement[1]}.`);
+   baseParts.push('Compose the scene so the event trigger and the player decision are both visually understandable at a glance.');
+   baseParts.push('No UI text, captions, or technical mechanics.');
+   return baseParts.join(' ');
+ }
+ baseParts.push(`Visual identity: ${c.visual.join(', ')}.`);
+ baseParts.push('Focus only on visual design. Do not depict stats, abilities, actions, combat effects, UI text, or technical mechanics.');
+ return baseParts.join(' ');
+}
+function render(c){
+ document.getElementById('name').textContent=c.name;
+ const kindLabel=c.creatureMode?'Encounter Tier':(c.itemMode?'Item Rarity':'Rarity');
+ document.getElementById('meta').innerHTML=`<span class="pill gold">${c.category}</span><span class="pill">${kindLabel}: ${c.creatureMode?c.encounterTier:c.rarity}</span><span class="pill ${c.attitude=='Friendly'?'good':c.attitude=='Hostile'||c.attitude=='Corrupted'?'bad':''}">${c.attitude}</span>`+c.themes.map(t=>`<span class="pill">${t}</span>`).join('');
+ document.getElementById('desc').textContent=c.desc;
+ const palette=c.palette||makePalette(c.themes||['Arcane'],c.category,c.identity||null);
+ document.getElementById('palette').innerHTML=renderPalette(palette);
+ document.getElementById('paletteNote').textContent=`Palette use: ${paletteText(palette)}.`;
+ if(c.creatureMode){
+   document.getElementById('details').innerHTML=
+     kv('Monster Role',c.monsterRole)+kv('Encounter Use',c.encounterUse)+kv('Threat Budget',`${c.threatBudget.points} points • ${c.threatBudget.label}`)+kv('Core Abilities',c.abilities.join(', '))+
+     kv('Combat Rotation',c.rotation.join(' → '))+kv('Weakness / Counterplay',c.weakness)+kv('Habitat Intelligence',c.habitat.join(', '))+kv('Monster Family',`${c.family.name}: ${c.family.variants.join(', ')}`);
+   document.querySelector('#signature').parentElement.querySelector('h2').textContent=(c.encounterTier==='Boss'||c.encounterTier==='Champion'||c.encounterTier==='Elite')?'Signature Encounter Mechanic':'Encounter Design Focus';
+   document.getElementById('signature').textContent=c.signature;
+   document.querySelector('#tech').parentElement.querySelector('h2').textContent=c.phases?'Boss / Creature Brain':'Creature Brain';
+   let brainRows=kv('Role',c.monsterRole)+kv('Combat Personality',c.combatPersonality)+kv('Purpose',c.purpose)+kv('AI Sanity Check',c.brainValidation);
+   if(c.tech){
+     const techLabels={name:'Mechanic Name',complexity:'Complexity',family:'Mechanic Family',validTarget:'Valid Target Type',trigger:'Trigger',action:'Action',target:'Target',effect:'Effect',chance:'Chance',duration:'Duration',cooldown:'Cooldown',radius:'Radius / Shape',power:'Power',stacks:'Stacks',scaling:'Scaling',counterplay:'Counterplay',validation:'Logic Validator',phaseRule:'Phase Rule',riskReward:'Risk / Reward'};
+     const rows=['name','complexity','family','validTarget','trigger','action','target',...(c.tech.technicalRows||[]),'validation'];
+     brainRows += rows.map(key=>kv(techLabels[key]||key,c.tech[key])).join('');
+   }
+   if(c.phases) brainRows += kv('Boss Phases',c.phases.join(' | '));
+   document.getElementById('tech').innerHTML=brainRows;
+ } else if(c.narrativeMode){
+   document.getElementById('details').innerHTML=(c.detailRows||[]).map(r=>kv(r[0],r[1])).join('');
+   document.querySelector('#signature').parentElement.querySelector('h2').textContent=c.category+' Focus';
+   document.getElementById('signature').textContent=c.signature;
+   document.querySelector('#tech').parentElement.querySelector('h2').textContent=c.category+' Structure';
+   document.getElementById('tech').innerHTML=(c.structureRows||[]).map(r=>kv(r[0],r[1])).join('')+kv('Design Rule','No combat proc mechanics for this category; keep it visual, narrative, or structural.');
+ } else if(c.itemMode && !c.allowItemMechanic){
+   document.getElementById('details').innerHTML=kv('Slot / Type',c.role)+kv('Affix Count',c.affixCount)+kv('Stat Package',c.itemStats.join(', '))+kv('Item Rule','No special mechanics below Epic/Legendary');
+   document.querySelector('#signature').parentElement.querySelector('h2').textContent='Item Design Focus';
+   document.getElementById('signature').textContent=c.signature;
+   document.querySelector('#tech').parentElement.querySelector('h2').textContent='Item Stats & Identity';
+   document.getElementById('tech').innerHTML=kv('Stats',c.itemStats.join(', '))+kv('Slot Group',c.itemSlot)+kv('Materials',c.identity.materials)+kv('Construction',c.identity.construction)+kv('Wear State',c.identity.wear)+kv('Complexity Budget','0 special mechanics');
+ } else {
+   document.getElementById('details').innerHTML=kv('Role',c.role)+kv('Loot / Rewards',c.loot.join(', '))+kv('Visual Identity',c.visual.join(', '))+kv('Counterplay',c.tech.counterplay);
+   document.querySelector('#signature').parentElement.querySelector('h2').textContent=c.itemMode&&c.rarity==='Legendary'?'Legendary Effect':'Signature Mechanic';
+   document.getElementById('signature').textContent=c.signature;
+   document.querySelector('#tech').parentElement.querySelector('h2').textContent='Technical Mechanics';
+   const techLabels={name:'Mechanic Name',complexity:'Complexity',family:'Mechanic Family',validTarget:'Valid Target Type',trigger:'Trigger',action:'Action',target:'Target',effect:'Effect',chance:'Chance',duration:'Duration',cooldown:'Cooldown',radius:'Radius / Shape',power:'Power',stacks:'Stacks',scaling:'Scaling',counterplay:'Counterplay',validation:'Logic Validator',phaseRule:'Phase Rule',riskReward:'Risk / Reward'};
+   const rows=['name','complexity','family','validTarget','trigger','action','target',...(c.tech.technicalRows||[]),'validation'];
+   document.getElementById('tech').innerHTML=rows.map(key=>kv(techLabels[key]||key,c.tech[key])).join('');
+ }
+ document.getElementById('why').textContent=c.why;
+ const colors=['#f2c46d','#8dd8ff','#ff8d9e','#b48cff','#8cffb0','#ffffff']; document.getElementById('dna').innerHTML=c.dna.map((d,i)=>`<span style="width:${d.v}%;background:${colors[i]}"></span>`).join('');
+ document.getElementById('dnaText').textContent=c.dna.map(d=>`${d.l} ${d.v}%`).join(' • ');
+ const rarityText=c.creatureMode?`${c.encounterTier} encounter-tier`:c.rarity;
+ const prompt=buildVisualPrompt(c,palette,rarityText);
+ document.getElementById('prompt').value=prompt;
+ document.getElementById('stub').textContent=JSON.stringify(exportData(c),null,2);
+}
+function exportData(c){
+ if(c.creatureMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,encounterTier:c.encounterTier,themes:c.themes,palette:c.palette,monsterRole:c.monsterRole,combatPersonality:c.combatPersonality,threatBudget:c.threatBudget,abilities:c.abilities,rotation:c.rotation,habitat:c.habitat,encounterUse:c.encounterUse,weakness:c.weakness,family:c.family,phases:c.phases||undefined,mechanic:c.tech||null,brainValidation:c.brainValidation,why:c.why};}
+ if(c.narrativeMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,concept:c.signature,details:c.detailRows,structure:c.structureRows,visualIdentity:c.visual,mechanic:null,designRule:'No combat proc mechanics for narrative/environment categories.',why:c.why};}
+ return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,itemSlot:c.itemSlot||undefined,affixCount:c.affixCount||undefined,itemStats:c.itemStats||undefined,visualIdentity:c.visual,mechanic:(c.itemMode&&!c.allowItemMechanic)?null:c.tech,designRule:c.itemMode?itemDesignFocus(c.rarity):undefined,why:c.why};}
+function markdownNote(c){
+ if(c.creatureMode){
+   let out = '# '+c.name+'\n\n';
+   out += '**'+c.encounterTier+' '+c.category+'** • '+c.monsterRole+' • '+c.themes.join(', ')+'\n\n';
+   out += '## Concept\n'+c.desc+'\n\n';
+   out += '## Combat Brain\n';
+   out += '- Personality: '+c.combatPersonality+'\n';
+   out += '- Purpose: '+c.purpose+'\n';
+   out += '- Encounter Use: '+c.encounterUse+'\n';
+   out += '- Abilities: '+c.abilities.join(', ')+'\n';
+   out += '- Rotation: '+c.rotation.join(' → ')+'\n';
+   out += '- Weakness: '+c.weakness+'\n\n';
+   out += '## Family\n'+c.family.name+': '+c.family.variants.join(', ')+'\n\n';
+   if(c.phases){ out += '## Boss Phases\n'+c.phases.map(x=>'- '+x).join('\n')+'\n\n'; }
+   out += '## Why This Encounter Works\n'+c.why+'\n';
+   return out;
+ }
+ let out = '# '+c.name+'\n\n';
+ out += '**'+c.rarity+' '+c.category+'** • '+c.themes.join(', ')+'\n\n';
+ out += '## Concept\n'+c.desc+'\n\n';
+ if(c.narrativeMode){
+   out += '## '+c.category+' Focus\n'+c.signature+'\n\n';
+   if(c.detailRows) out += c.detailRows.map(r=>'- '+r[0]+': '+r[1]).join('\n')+'\n\n';
+   if(c.structureRows) out += '## Structure\n'+c.structureRows.map(r=>'- '+r[0]+': '+r[1]).join('\n')+'\n\n';
+ } else {
+   out += '## '+(c.itemMode&&!c.allowItemMechanic?'Item Stats & Identity':'Mechanic')+'\n';
+   if(c.itemStats) out += c.itemStats.map(x=>'- '+x).join('\n')+'\n';
+   out += (c.itemMode&&!c.allowItemMechanic?'No special mechanic below Epic/Legendary.':c.signature)+'\n\n';
+ }
+ out += '## Visual Identity\n'+c.visual.map(x=>'- '+x).join('\n')+'\n\n';
+ out += '## Why This Is Fun\n'+c.why+'\n';
+ return out;
+}
+const SAVE_KEY='worldsmithFavsV1';
+function favs(){
+  try{return JSON.parse(localStorage.getItem(SAVE_KEY)||localStorage.getItem('forgeFavsV095')||localStorage.getItem('forgeFavsV09')||'[]')}catch(e){return []}
+}
+function setFavs(f){localStorage.setItem(SAVE_KEY,JSON.stringify(f)); renderFavs()}
+function renderFavs(){
+ const q=(document.getElementById('favSearch')?.value||'').toLowerCase(); const fc=favCatEl.value; const fr=favRarityEl.value;
+ const all=favs(); const f=all.map((x,i)=>({...x,_i:i})).filter(x=>(!fc||x.category===fc)&&(!fr||(x.encounterTier||x.rarity)===fr)&&(!q||(x.name+' '+x.category+' '+(x.encounterTier||x.rarity)+' '+(x.themes||[]).join(' ')).toLowerCase().includes(q)));
+ document.getElementById('favs').innerHTML=f.length?f.map(x=>`<div class="fav" data-i="${x._i}"><b>${x.name}</b><br><span class="small">${x.encounterTier||x.rarity} ${x.category} • ${(x.themes||[]).join(', ')}</span></div>`).join(''):'No saved ideas match.';
+ document.querySelectorAll('.fav').forEach(el=>el.onclick=()=>{state.current=all[+el.dataset.i];render(state.current)})
+}
+
+function escapeHtml(x){return String(x).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function auditConcept(c){
+  const issues=[];
+  const lowItem=c.itemMode && ['Common','Uncommon','Rare'].includes(c.rarity);
+  if(lowItem && c.tech) issues.push('Low-rarity item has a technical mechanic.');
+  if(lowItem && c.allowItemMechanic) issues.push('Low-rarity item incorrectly unlocks special mechanics.');
+  if(c.itemMode && !c.allowItemMechanic && /\b(when|after|on hit|on kill|chance|cooldown|stack|trigger)\b/i.test(c.signature||'')) issues.push('Low-rarity item signature reads like a special mechanic.');
+  if(c.category==='Weapon' && c.itemSlot!=='shield' && (c.itemStats||[]).some(s=>/\bArmour\b|Block Chance/i.test(s))) issues.push('Non-shield weapon rolled defensive armour/block stats.');
+  if(c.category==='Armour' && c.itemSlot && (c.itemStats||[]).some(s=>/Projectile Speed|Spell Damage/i.test(s))) issues.push('Armour rolled weapon/caster-only stat.');
+  if(c.narrativeMode && c.tech) issues.push('Narrative/environment category generated a combat mechanic.');
+  if(c.narrativeMode && /\b(chance|on hit|on kill|when you kill|cooldown|damage number|cast speed|attack speed)\b/i.test((c.signature||'')+' '+(c.desc||''))) issues.push('Narrative/environment category reads like a combat proc.');
+  if(c.creatureMode){
+    if(c.encounterTier==='Boss' && (!c.phases || c.phases.length<4)) issues.push('Boss generated without full phase structure.');
+    if(c.monsterRole==='Support' && !(c.abilities||[]).some(a=>/heal|barrier|cleanse|chant|revive|ward|haste|tether/i.test(a))) issues.push('Support monster lacks support behavior.');
+    if(c.monsterRole==='Tank' && (c.abilities||[]).some(a=>/blink|vanish|dash|teleport/i.test(a))) issues.push('Tank rolled mobility/vanish behavior that undermines anchoring.');
+    if(['Normal','Veteran'].includes(c.encounterTier) && c.tech) issues.push('Normal/Veteran creature has a signature mechanic despite low threat budget.');
+    if(c.encounterTier==='Champion' && (!c.abilities || c.abilities.length<3)) issues.push('Champion has too few abilities.');
+  }
+  if(c.tech){
+    const v=validateMechanic(c.tech);
+    if(!v.ok) issues.push(v.note);
+    const target=String(c.tech.target||'').toLowerCase();
+    const action=String(c.tech.action||'').toLowerCase();
+    if(/curse|burn|chill|silence|weaken|poison|blind|drain|reduce|strike|knock/.test(action) && /ally|minion|self/.test(target)) issues.push('Harmful mechanic targets allies/self.');
+    if(/heal|shield|restore|cleanse|empower|grant/.test(action) && /enemy|attacker|player/.test(target)) issues.push('Helpful mechanic targets enemies/players.');
+  }
+  return issues;
+}
+function runRollTest(count=120){
+  const oldCurrent=state.current?JSON.parse(JSON.stringify(state.current)):null;
+  const oldCat=categoryEl.value;
+  const oldLocks=JSON.parse(JSON.stringify(state.locks));
+  Object.keys(state.locks).forEach(k=>state.locks[k]=false);
+  const bucket={}; let total=0, bad=0;
+  for(let i=0;i<count;i++){
+    const cat=categories[i%categories.length];
+    categoryEl.value=cat;
+    concept();
+    const c=state.current;
+    const issues=auditConcept(c);
+    total++;
+    if(issues.length){bad++; issues.forEach(x=>bucket[x]=(bucket[x]||0)+1);}
+  }
+  state.locks=oldLocks;
+  categoryEl.value=oldCat;
+  if(oldCurrent){state.current=oldCurrent;render(state.current);} else concept();
+  const rows=Object.entries(bucket).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div><span class="warn">${v}×</span> ${escapeHtml(k)}</div>`).join('');
+  const passed=total-bad;
+  document.getElementById('testReport').innerHTML=`<b>Roll Test:</b> ${total} concepts<br><span class="ok">${passed} passed</span> • <span class="warn">${bad} flagged</span>${rows?'<hr style="border-color:var(--line)">'+rows:'<br><span class="ok">No suspicious outputs found.</span>'}`;
+}
+function exportSaves(){
+  const payload={app:'Worldsmith',version:'1.7',exportedAt:new Date().toISOString(),items:favs()};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='worldsmith_saves_v17.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importSavesFromFile(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=JSON.parse(reader.result);
+      const incoming=Array.isArray(parsed)?parsed:(parsed.items||[]);
+      if(!Array.isArray(incoming)) throw new Error('No items array found.');
+      const merged=[...incoming,...favs()];
+      const seen=new Set();
+      const dedup=merged.filter(x=>{const key=(x.name||'')+'|'+(x.category||'')+'|'+(x.encounterTier||x.rarity||''); if(seen.has(key))return false; seen.add(key); return true;});
+      setFavs(dedup.slice(0,500));
+      document.getElementById('testReport').innerHTML=`<b>Import:</b> <span class="ok">${incoming.length} ideas imported/merged.</span>`;
+    }catch(e){document.getElementById('testReport').innerHTML=`<b>Import:</b> <span class="warn">Failed — ${escapeHtml(e.message)}</span>`;}
+  };
+  reader.readAsText(file);
+}
+function copyAllSaves(){
+  const data=favs().map(markdownNote).join('\\n\\n---\\n\\n');
+  navigator.clipboard.writeText(data || 'No saved ideas.');
+}
+document.getElementById('conjure').onclick=()=>concept(); document.getElementById('reroll').onclick=()=>concept(true);
+document.getElementById('save').onclick=()=>{if(!state.current)return; const f=favs(); f.unshift(state.current); setFavs(f.slice(0,100))};
+document.getElementById('clearFavs').onclick=()=>{if(confirm('Clear saved ideas?'))setFavs([])};
+document.getElementById('runTest').onclick=()=>runRollTest(120);
+document.getElementById('exportSaves').onclick=()=>exportSaves();
+document.getElementById('importSavesBtn').onclick=()=>document.getElementById('importSaves').click();
+document.getElementById('importSaves').addEventListener('change',e=>importSavesFromFile(e.target.files[0]));
+document.getElementById('copyAllSaves').onclick=()=>copyAllSaves();
+document.getElementById('copyPrompt').onclick=()=>navigator.clipboard.writeText(document.getElementById('prompt').value);
+document.getElementById('copyJson').onclick=()=>state.current&&navigator.clipboard.writeText(JSON.stringify(exportData(state.current),null,2));
+document.getElementById('copyMarkdown').onclick=()=>state.current&&navigator.clipboard.writeText(markdownNote(state.current));
+['favSearch','favCat','favRarity'].forEach(id=>document.getElementById(id).addEventListener('input',renderFavs));
+renderFavs(); concept();
+</script>
+</body>
+</html>
