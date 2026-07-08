@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.8.4.1</title>
+<title>Worldsmith v1.8.5.1</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -660,9 +660,9 @@ roles.Armour.push('Shoulder guard','Round shield','Kite shield','Robe','Mask','H
 
 const encounterUses=['pack filler','elite escort','corridor ambusher','treasure guardian','patrol encounter','rare spawn','dungeon-room anchor','event encounter','support unit in mixed packs'];
 const familyRoots=['Thornling','Mireborn','Ashkin','Crystal Brood','Hollowhide','Moonfang','Rotcap','Stormclaw','Bonebound','Sunken'];
-const familyRanks=['Hatchling','Skitterer','Stalker','Brute','Warden','Seer','Caller','Matriarch'];
+const familyRanks=['Hatchling','Skitterer','Stalker','Brute','Warden','Seer','Caller','Matriarch','Broodling','Ravager','Shellback','Spitter','Mender','Hexer','Lurker','Lasher','Burrower','Harvester','Watcher','Nestguard','Oracle','Gnasher','Rootbinder','Shardback','Prowler','Gatekeeper','Clutchmother','Old One'];
 encounterUses.push('resource-node defender','shrine protector','bridge blocker','roaming pack leader','camp alarm unit','ritual guard','terrain hazard companion');
-familyRoots.push('Glasswing','Bogtooth','Ashroot','Runejaw','Pearlback','Sunscar','Deepcap','Gloomtail');
+familyRoots.push('Glasswing','Bogtooth','Ashroot','Runejaw','Pearlback','Sunscar','Deepcap','Gloomtail','Ironhide','Riftclaw','Thornmaw','Moonspine','Cinderjaw','Murktooth','Frostbelly','Hollowhorn','Sporehide','Belljaw','Ravenback','Serpentcoil','Webgloom','Stargrub','Cryptshell','Witchfang');
 // ---------- v1.7 World Depth Pass ----------
 Object.assign(byTheme,{
  Eldritch:{effects:['Mind Fray','Forbidden Whisper','Tentacle Snare','Sanity Crack'],visual:['many small eyes','impossible angles','ink-black tendrils','glowing sigil mouths'],biome:['starless libraries','cyclopean ruins','foggy coastal shrines'],counter:['break line of sight','use grounding wards','interrupt the whisper']},
@@ -722,12 +722,29 @@ function tierRoll(cat){return cat==='Boss'?'Boss':R(encounterTiers.filter(t=>t!=
 function roleRoll(cat,tier){ if(cat==='Boss'||tier==='Boss') return R(['Bruiser','Mage','Summoner','Controller','Tank']); return R(monsterRoles); }
 function rangeCount([a,b]){return a+Math.floor(Math.random()*(b-a+1));}
 function makeMonsterName(ts,role,tier){
-  const base=R(['Warden','Howler','Stalker','Brute','Caller','Seer','Maw','Sentinel','Crawler','Matriarch','Skitterer','Gorger']);
+  const typePools={
+    Swarm:['Broodling','Nibbler','Gnawer','Scuttler','Hatcher','Spawn','Whelp','Mite','Creeplet','Fledgling','Screecher','Grub','Larva','Impkin','Needler'],
+    Bruiser:['Ravager','Mauler','Crusher','Breaker','Brawler','Ripper','Pounder','Gnasher','Tusker','Bonecrush','Fleshrend','Grond','Batterhorn','Clobberer','Fangmaul'],
+    Tank:['Shellback','Bulwark','Hornplate','Stonehide','Ironback','Bastion','Plated One','Thickhide','Gatebeast','Shieldhorn','Aegis Beast','Wallhide','Carapace','Anvilback','Wardbeast'],
+    Assassin:['Lurker','Prowler','Shadeclaw','Nightfang','Knifetail','Ambusher','Silkstep','Razorback','Needlefang','Quickclaw','Gloomstalker','Hooktalon','Stingtail','Fellrunner','Ghostpaw'],
+    Archer:['Spitter','Darter','Quillshot','Needleback','Venomspine','Thornspitter','Shardflinger','Razorspine','Barbthrower','Boltmaw','Slingtail','Splinterback','Screecher','Longfang','Glasspike'],
+    Mage:['Oracle','Hexer','Binder','Whisperer','Runemouth','Chanter','Dreamseer','Spellgullet','Sigilborn','Glyphmaw','Stormsayer','Mooncaller','Covenbeast','Voidtongue','Star-Eye'],
+    Support:['Mender','Bloomkeeper','Nursebeast','Wardling','Tetherer','Choirbeast','Sap-Singer','Broodmother','Totemkin','Bellbearer','Rootmender','Lanternback','Hearthbeast','Pulsekeeper','Veilbearer'],
+    Summoner:['Broodcaller','Eggkeeper','Nestwitch','Gateborn','Totembinder','Riftkeeper','Grubmother','Puppeteer','Idolmouth','Hivekeeper','Spawnlord','Wombseer','Caller-Beast','Den-Maker','Clutchlord'],
+    Controller:['Snarer','Rootbinder','Webweaver','Trapjaw','Mudgrip','Briarlock','Chainmaw','Fogbelcher','Netcaster','Ringmaker','Stonebinder','Tanglehorn','Lockjaw','Gloomweaver','Zonekeeper']
+  };
+  const generic=['Aberration','Beast','Fiend','Horror','Husk','Chimera','Crawler','Stalker','Skitterer','Warden','Seer','Brute','Maw','Gorger','Sentinel','Caller','Howler','Matriarch','Leaper','Burrower','Lasher','Devourer','Harvester','Watcher','Strider','Drifter','Colossus','Terror','Basilisk','Mandrake','Gargoyle','Banshee','Wraith','Ghoul','Dryad','Treant','Djinn','Golem','Automaton','Familiar','Leviathan','Kraken','Wyvern','Owlbear','Imp','Gremlin','Sludge','Bogbeast','Cryptid','Carrion','Parasite','Hiveborn','Frostling','Ashling','Cinderbeast','Murkfin','Ridgeback','Tuskling','Clawbeast','Sporeback','Fangtoad','Bonejack','Palejaw','Shardhide'];
+  const pool=[...(typePools[role]||[]),...generic];
+  const base=R(pool);
+  const veteranAdj=['Dire','Elder','Scarred','Hungry','Wild','Feral','Grizzled','Pale','Ravenous','Old','Vicious','Mottled','Cave-born','Thorned','Iron-scarred','Moon-touched'];
+  const elitePlaces=['of the Pack','of the Deep Root','of the Old Path','of the Mire','of the Black Stair','of the Broken Den','of the Thorn Nest','of the Hollow Gate','of the Ash Road','of the Drowned Pit','of the Glass Burrow','of the Raven Watch'];
+  const champTitles=['Packbreaker','Rootlord','Oath-Eater','Cave Tyrant','Nest-King','Bell-Eater','Gate-Cracker','Moonhowl','Bone-Sovereign','Thornfather','Mire Queen','Starved Saint','Woundmother','Old Hunger'];
+  const bossOpeners=['The Drowned','The Hollow','The Glass','The Last','The Old','The Nameless','The Starved','The Black','The Pale','The Gilded','The Buried','The Unspoken','The Thorn-Crowned','The Bell-Dead','The Deep'];
   if(tier==='Normal') return `${ts[0]} ${base}`;
-  if(tier==='Veteran') return `${R(['Dire','Elder','Scarred','Hungry','Wild'])} ${ts[0]} ${base}`;
-  if(tier==='Elite') return `${R(prefixes)} ${base} ${R(['of the Pack','of the Deep Root','of the Old Path','of the Mire'])}`;
-  if(tier==='Champion') return `${R(['Grim','Ancient','Blooded','Crowned','Hollow'])} ${base}, ${R(['Packbreaker','Rootlord','Oath-Eater','Cave Tyrant'])}`;
-  return `${R(['The Drowned','The Hollow','The Glass','The Last','The Old'])} ${base} ${R(suffixes)}`;
+  if(tier==='Veteran') return `${R(veteranAdj)} ${ts[0]} ${base}`;
+  if(tier==='Elite') return `${R(prefixes)} ${base} ${R(elitePlaces)}`;
+  if(tier==='Champion') return `${R(['Grim','Ancient','Blooded','Crowned','Hollow','Feral','Pale','Rotten','Gilded','Starved','Witchborn','Oathbound'])} ${base}, ${R(champTitles)}`;
+  return `${R(bossOpeners)} ${base} ${R(suffixes)}`;
 }
 function makeAbilities(role,tier,ts){
   const budget=threatBudgets[tier]||threatBudgets.Normal;
