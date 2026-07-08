@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.8.5.1</title>
+<title>Worldsmith v1.8.6.1</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -401,6 +401,7 @@
     <div class="section"><h2>Why This Is Fun</h2><p id="why"></p></div>
     <div class="section"><h2>Design DNA</h2><div class="dna" id="dna"></div><p class="small" id="dnaText" style="margin-top:8px"></p></div>
     <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Image Prompt</h2><button class="btn" id="copyPromptInline">📋 Copy Entire Prompt</button></div><textarea id="prompt" readonly></textarea></div>
+    <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Animation Follow-up Prompt</h2><button class="btn" id="copyFollowupPrompt">📋 Copy Follow-up Prompt</button></div><textarea id="followupPrompt" readonly placeholder="Generated for Monster, Boss, NPC, and Vendor concepts."></textarea></div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith v1.7 Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
 • Added palette data to prompts, markdown notes, and implementation JSON.
@@ -1334,9 +1335,39 @@ function render(c){
  document.getElementById('dnaText').textContent=c.dna.map(d=>`${d.l} ${d.v}%`).join(' • ');
  const rarityText=c.creatureMode?`${c.encounterTier} encounter-tier`:c.rarity;
  const prompt=buildVisualPrompt(c,palette,rarityText);
+ const followupPrompt=buildFollowupPrompt(c,palette,rarityText);
  document.getElementById('prompt').value=prompt;
+ document.getElementById('followupPrompt').value=followupPrompt;
  document.getElementById('stub').textContent=JSON.stringify(exportData(c),null,2);
 }
+
+function buildFollowupPrompt(c,palette,rarityText){
+ const cat=c.category;
+ if(!['Monster','Boss','NPC','Vendor'].includes(cat)) return 'Follow-up animation prompt is only generated for Monster, Boss, NPC, and Vendor concepts.';
+ const lines=[];
+ lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
+ lines.push('Create a follow-up stylized 3D game model reference sheet for animation exploration, not a painterly illustration.');
+ lines.push('Show the same exact '+cat.toLowerCase()+' performing a few key movement snapshots rather than a full frame-by-frame sheet.');
+ lines.push('Include 2 to 3 key poses from a walk cycle and 2 to 3 key poses from an attack animation, for a total maximum of 6 poses. Fewer high-quality poses are better than many small poses.');
+ lines.push('Prefer one larger main pose plus a few supporting action poses. Do not create 8 or 9 tiny frames.');
+ lines.push('Keep the background simple and neutral, with no environment, no cast shadow, and no cinematic scene.');
+ lines.push('Maintain the same clean stylized 3D model look: large readable shapes, simple geometric forms, broad planes, low visual noise, crisp edges, clear material separation, and polished readable textures.');
+ lines.push('Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged.');
+ if(cat==='Monster' || cat==='Boss'){
+   lines.push('The attack motion should fit the creature body plan and identity, such as a claw swipe, pounce, bite, slam, charge, or magical body-driven attack.');
+   lines.push('Do not add any new equipped weapons or props.');
+ }
+ if(cat==='NPC' || cat==='Vendor'){
+   lines.push('Keep the same exact character design and clothing silhouette.');
+   lines.push('The walk poses should show readable body mechanics. The attack poses should be simple key action poses that fit the character identity, such as an unarmed strike, magical gesture, shove, or body-driven attack.');
+   lines.push('Do not add new equipped weapons, tools, or props into the hands unless they already existed as a defined separate prop and are essential to the action.');
+ }
+ lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+ lines.push(`Themes: ${c.themes.join(', ')}.`);
+ lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+ return lines.join(' ');
+}
+
 function exportData(c){
  if(c.creatureMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,encounterTier:c.encounterTier,themes:c.themes,palette:c.palette,monsterRole:c.monsterRole,combatPersonality:c.combatPersonality,threatBudget:c.threatBudget,abilities:c.abilities,rotation:c.rotation,habitat:c.habitat,encounterUse:c.encounterUse,weakness:c.weakness,family:c.family,phases:c.phases||undefined,mechanic:c.tech||null,brainValidation:c.brainValidation,why:c.why};}
  if(c.narrativeMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,concept:c.signature,details:c.detailRows,structure:c.structureRows,visualIdentity:c.visual,mechanic:null,designRule:'No combat proc mechanics for narrative/environment categories.',why:c.why};}
@@ -1475,8 +1506,10 @@ document.getElementById('importSavesBtn').onclick=()=>document.getElementById('i
 document.getElementById('importSaves').addEventListener('change',e=>importSavesFromFile(e.target.files[0]));
 document.getElementById('copyAllSaves').onclick=()=>copyAllSaves();
 function copyCurrentPrompt(){navigator.clipboard.writeText(document.getElementById('prompt').value);}
+function copyCurrentFollowupPrompt(){navigator.clipboard.writeText(document.getElementById('followupPrompt').value);}
 document.getElementById('copyPrompt').onclick=copyCurrentPrompt;
 document.getElementById('copyPromptInline').onclick=copyCurrentPrompt;
+document.getElementById('copyFollowupPrompt').onclick=copyCurrentFollowupPrompt;
 document.getElementById('copyJson').onclick=()=>state.current&&navigator.clipboard.writeText(JSON.stringify(exportData(state.current),null,2));
 document.getElementById('copyMarkdown').onclick=()=>state.current&&navigator.clipboard.writeText(markdownNote(state.current));
 ['favSearch','favCat','favRarity'].forEach(id=>document.getElementById(id).addEventListener('input',renderFavs));
