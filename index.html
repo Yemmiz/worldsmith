@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.8.2.1</title>
+<title>Worldsmith v1.8.3.1</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -1117,7 +1117,8 @@ function buildVisualPrompt(c,palette,rarityText){
  const baseParts=isModelSubject?[
    'Stylized fantasy 3D game model reference for asset creation, not a painterly illustration or splash art.',
    'Use neutral studio presentation, even lighting, large readable shapes, simple geometric forms, broad planes, minimal surface noise, chunky stylized proportions, and model-friendly construction.',
-   'Low-detail sculptable look: reduce tiny surface details, reduce texture noise, and prefer a clean game-ready 3D model aesthetic.',
+   'Keep the shapes simplified and sculptable, but maintain high-quality game-ready surface treatment: crisp edges, clean material separation, clear forms, and polished readable textures.',
+   'Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged. This should feel like a clean stylized 3D model with good texture clarity rather than a painterly drawing.',
    `Use this defining colour palette: ${palettePrompt(palette)}.`,
    `Concept: ${c.name}, ${rarityText} ${c.category}.`,
    `Themes: ${c.themes.join(', ')}.`
@@ -1188,8 +1189,8 @@ function buildVisualPrompt(c,palette,rarityText){
  if(cat==='Vendor'){
    baseParts.push('Create a full-body vendor character model reference designed for 3D model generation.');
    baseParts.push('The vendor must stand alone on a simple flat background with no environment, no stall behind them, no crowd, no market scene, and no cast shadow.');
-   baseParts.push('Keep the character simple and model-friendly: broad clothing layers, clear silhouette, limited accessories, and large readable material regions.');
-   baseParts.push('Avoid painterly rendering, ornate micro-detail, realistic cloth folds, tiny buckles everywhere, or noisy decoration.');
+   baseParts.push('Keep the character simple and model-friendly: broad clothing layers, clear silhouette, limited accessories, and large readable material regions. Textures should still be polished and intentional, with crisp edge definition and clean surface breakup.');
+   baseParts.push('Avoid painterly rendering, ornate micro-detail, realistic cloth folds, tiny buckles everywhere, or noisy decoration. Avoid blurry or muddy textures; prefer crisp, hand-authored game texture clarity.');
    baseParts.push('Empty hands: do not place weapons, tools, bags, lanterns, books, staffs, mugs, signs, or merchandise in the character\'s hands.');
    baseParts.push('If wares, tools, bags, weapons, books, potions, or shop props are important, render them as a small separate tidy prop set beside the character, clearly not held and not attached to the body.');
    baseParts.push('Keep the pose relaxed, neutral, and easy to model.');
@@ -1199,15 +1200,15 @@ function buildVisualPrompt(c,palette,rarityText){
    const vShop=(c.detailRows||[]).find(r=>r[0]==='Shop Setup');
    if(vWares) baseParts.push(`Separate prop set suggestion: ${vWares[1]}.`);
    if(vShop) baseParts.push(`Do not render the full shop setup; only hint at it with separate loose props if needed: ${vShop[1]}.`);
-   baseParts.push('Important: this must resemble a stylized 3D game character model reference, not an illustration.');
+   baseParts.push('Important: this must resemble a stylized 3D game character model reference, not an illustration. The result should feel like a polished in-engine asset presentation with clean readable textures.');
    baseParts.push('No UI text, no price tags, no labels, no speech bubbles.');
    return baseParts.join(' ');
  }
  if(cat==='NPC'){
    baseParts.push('Create a full-body NPC character model reference designed for 3D model generation.');
    baseParts.push('The NPC must stand alone on a simple flat background with no environment, no scene dressing, no furniture, and no cast shadow.');
-   baseParts.push('Keep the character simple and model-friendly: broad clothing shapes, clear silhouette, limited accessories, and low visual noise.');
-   baseParts.push('Avoid painterly rendering, ornate micro-detail, realistic cloth complexity, or busy layered props.');
+   baseParts.push('Keep the character simple and model-friendly: broad clothing shapes, clear silhouette, limited accessories, and low visual noise. Textures should still be polished and intentional, with crisp edge definition and clean material breakup.');
+   baseParts.push('Avoid painterly rendering, ornate micro-detail, realistic cloth complexity, or busy layered props. Avoid blurry or muddy textures; prefer crisp, hand-authored game texture clarity.');
    baseParts.push('Empty hands: do not place weapons, staffs, lanterns, books, maps, tools, bags, pets, mugs, scrolls, or props in the character\'s hands.');
    baseParts.push('If a prop is important to the character identity, render it separately beside the NPC as a small loose prop, clearly not held and not attached to the body.');
    baseParts.push('Keep the pose neutral and easy to model; prioritize silhouette, outfit, body shape, and materials.');
@@ -1215,7 +1216,7 @@ function buildVisualPrompt(c,palette,rarityText){
    if(c.role) baseParts.push(`NPC role: ${c.role}.`);
    const nProp=(c.detailRows||[]).find(r=>r[0]==='Signature Prop');
    if(nProp) baseParts.push(`Optional separate prop beside character: ${nProp[1]}.`);
-   baseParts.push('Important: this must resemble a stylized 3D game character model reference, not an illustration.');
+   baseParts.push('Important: this must resemble a stylized 3D game character model reference, not an illustration. The result should feel like a polished in-engine asset presentation with clean readable textures.');
    baseParts.push('No dialogue text, UI text, labels, or technical mechanics.');
    return baseParts.join(' ');
  }
@@ -1225,14 +1226,14 @@ function buildVisualPrompt(c,palette,rarityText){
    baseParts.push('Isolated creature only: simple flat background, no environment, no terrain, no dramatic scene, no extra enemies, no victims, no spell effects, and no cast shadow.');
    baseParts.push('No equipped or held gear: do not put weapons, shields, torches, staffs, lanterns, banners, tools, books, trophies, or props in its hands/claws/mouth.');
    baseParts.push('If a weapon, shield, banner, tool, or other prop is important to the identity, render it separately beside the creature as a loose object, clearly not held and not attached.');
-   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, only a few secondary shapes, broad surfaces, simplified anatomy, and minimal tiny detail.');
-   baseParts.push('Avoid painterly rendering, smoky illustration effects, fur strand detail, micro cracks, excessive spikes, tiny surface ornaments, or highly detailed textures. If crystals, spikes, claws, fur, or armor plates appear, keep them fewer, larger, and chunkier.');
+   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, only a few secondary shapes, broad surfaces, simplified anatomy, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
+   baseParts.push('Avoid painterly rendering, smoky illustration effects, fur strand detail, micro cracks, excessive spikes, tiny surface ornaments, or noisy over-detail. If crystals, spikes, claws, fur, or armor plates appear, keep them fewer, larger, and chunkier. However, keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
    baseParts.push('Keep the pose readable and model-friendly: mostly full-body, clear limbs, clear front or three-quarter silhouette, not hidden by smoke, environment, or overlapping props.');
    if(c.category==='Boss') baseParts.push('Make it feel larger and more imposing through silhouette, anatomy, posture, and a few bold standout features rather than extra environment or dense detail.');
    if(c.family && c.family.name) baseParts.push(`Belongs to the ${c.family.name} family.`);
    baseParts.push(`Creature appearance and silhouette: ${c.visual.join(', ')}.`);
    if(c.habitat && c.habitat.length) baseParts.push(`Use only tiny optional habitat cues as separate motifs, not a full environment: ${c.habitat.join(', ')}.`);
-   baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration.');
+   baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. The result should feel like a polished game asset with clean readable textures and crisp forms.');
    baseParts.push('Avoid UI text, labels, technical notes, action scenes, and cinematic backgrounds.');
    return baseParts.join(' ');
  }
