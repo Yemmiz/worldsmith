@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.8.6.1</title>
+<title>Worldsmith v1.9.1</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -373,6 +373,8 @@
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
+    <label>Directed idea</label><input id="ideaInput" type="text" placeholder="e.g. Raven Statue, Goblin Chef, Frost Wolf" />
+    <label>Idea Drift: <span id="ideaChaosLabel">25</span>%</label><input id="ideaChaos" type="range" min="0" max="100" value="25" />
     <label>Chaos: <span id="chaosLabel">50</span>%</label><input id="chaos" type="range" min="0" max="100" value="50" />
     <button class="big" id="conjure">✦ Conjure Content</button>
     <div class="row"><button class="btn" id="reroll">🔁 Reroll Unlocked</button><button class="btn" id="save">⭐ Save</button></div>
@@ -403,10 +405,11 @@
     <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Image Prompt</h2><button class="btn" id="copyPromptInline">📋 Copy Entire Prompt</button></div><textarea id="prompt" readonly></textarea></div>
     <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Animation Follow-up Prompt</h2><button class="btn" id="copyFollowupPrompt">📋 Copy Follow-up Prompt</button></div><textarea id="followupPrompt" readonly placeholder="Generated for Monster, Boss, NPC, and Vendor concepts."></textarea></div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith v1.7 Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
 • Added palette data to prompts, markdown notes, and implementation JSON.
 • Pushed the concept card closer to a darker fantasy tool / item-card presentation.
-• Kept v1.0 layout improvements and v0.95 sanity validation intact.</div></div>
+• Kept v1.0 layout improvements and v0.95 sanity validation intact.
+• Added Directed Idea input with Idea Drift slider for seed-based generation.</div></div>
   </section>
 </main>
 <script>
@@ -414,6 +417,7 @@ const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
+const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
 const state={current:null, locks:{category:false,themes:false,rarity:false,attitude:false,role:false,mechanic:false}};
 const themes=['Fire','Frost','Storm','Fungal','Rot','Crystal','Holy','Shadow','Blood','Bone','Arcane','Void','Dream','Nature','Royal','Ancient','Goblin-made','Clockwork','Swamp','Desert','Ocean','Celestial','Insect','Rune-carved','Moonlit','Sunken','Eldritch','Infernal','Wildwood','Faerie','Draconic','Dwarven','Elven','Orcish','Graveyard','Ashen','Thorned','Alchemical','Astral','Pirate','Cultist','Scholarly','Mirror','Timeworn','Deep Sea','Underground','Cathedral','Forge','Library','Carnival','Serpent','Raven','Spider','Wolf','Machine'];
@@ -795,16 +799,16 @@ function validateMonsterBrain(role,personality,abilities,tier){
 }
 function creatureConcept(forceReroll=false){
   const old=state.current||{};
-  const cat=state.locks.category&&old.category?old.category:categoryEl.value;
+  const cat=ideaCategory(categoryEl.value, old);
   const tier=state.locks.rarity&&old.encounterTier?old.encounterTier:tierRoll(cat);
   const complexityRarity=tierToComplexity[tier]||'Rare';
-  const ts=state.locks.themes&&old.themes?old.themes:weightedThemes(complexityRarity);
+  const ts=state.locks.themes&&old.themes?old.themes:ideaThemes(weightedThemes(complexityRarity),complexityRarity);
   const role=state.locks.role&&old.monsterRole?old.monsterRole:roleRoll(cat,tier);
   const personality=state.locks.attitude&&old.combatPersonality?old.combatPersonality:R(rolePersonalities[role]||['Aggressive']);
   const budget=threatBudgets[tier]||threatBudgets.Normal;
   const abilities=makeAbilities(role,tier,ts);
   const tech=(budget.signature||cat==='Boss') ? (state.locks.mechanic&&old.tech?old.tech:technical('Monster',ts,complexityRarity)) : null;
-  const name=makeMonsterName(ts,role,tier);
+  const name=ideaName(cat,makeMonsterName(ts,role,tier),ts,tier);
   const info=themeInfo(ts);
   const family=makeFamily(ts);
   const rotation=makeRotation(role,abilities,tier);
@@ -815,11 +819,11 @@ function creatureConcept(forceReroll=false){
   const phases=(tier==='Boss'||cat==='Boss')?makeBossPhases(role,ts,abilities):null;
   const signature=tech?tech.sentence:`${tier} rule: no signature mechanic. The creature stays focused on its role, movement pattern, and one or two readable actions.`;
   const desc=`A ${tier.toLowerCase()} encounter-tier ${cat.toLowerCase()} built around ${ts.join(', ').toLowerCase()} fantasy. It acts as a ${role.toLowerCase()} with ${personality.toLowerCase()} combat behaviour and is mainly used as a ${encounterUse}.`;
-  const visual=[R(info.visual||['strong silhouette']),R(['large readable silhouette','broad simple shapes','chunky hand-painted forms','clear at small scale']),`${personality.toLowerCase()} movement style`,`${role.toLowerCase()} body language`];
+  const visual=[R(info.visual||['strong silhouette']),R(['large readable silhouette','broad simple shapes','chunky hand-painted forms','clear at small scale']),`${personality.toLowerCase()} movement style`,`${role.toLowerCase()} body language`].concat(ideaVisualBits());
   const loot=[`${ts[0]} ${R(['Fang','Core','Shard','Spore','Claw','Rune'])}`,`${R(['Cracked','Living','Ancient','Polished'])} ${R(['Scale','Bone','Gem','Hide','Sigil'])}`];
   const why=`This encounter works because it has a defined job: it ${purpose}. The threat budget keeps it from becoming overloaded, while the weakness gives players a practical answer: ${weakness}.`;
   const palette=makePalette(ts,cat,null);
-  const c={creatureMode:true,category:cat,themes:ts,rarity:tier,encounterTier:tier,attitude:personality,combatPersonality:personality,role:role,monsterRole:role,threatBudget:budget,abilities,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),family,rotation,habitat,weakness,purpose,encounterUse,phases,brainValidation:validateMonsterBrain(role,personality,abilities,tier)};
+  const c={creatureMode:true,category:cat,themes:ts,rarity:tier,encounterTier:tier,attitude:personality,combatPersonality:personality,role:role,monsterRole:role,threatBudget:budget,abilities,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),family,rotation,habitat,weakness,purpose,encounterUse,phases,brainValidation:validateMonsterBrain(role,personality,abilities,tier),directedIdea:directedIdea()};
   state.current=c; render(c);
 }
 
@@ -1054,11 +1058,124 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
   return {signature,desc,why,detailRows,structureRows};
 }
 
+
+function titleWords(s){return String(s||'').trim().replace(/\s+/g,' ').split(' ').filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');}
+function directedIdea(){
+  const raw=(ideaInputEl?.value||'').trim();
+  if(!raw) return null;
+  const chaos=+(ideaChaosEl?.value||0);
+  const lower=raw.toLowerCase();
+  const foundThemes=[];
+  const synonymThemes=[
+    [/raven|crow|rook|black bird|omen/, 'Raven'],
+    [/wolf|warg|hound|werewolf|lycan/, 'Wolf'],
+    [/spider|web|arachnid|silk/, 'Spider'],
+    [/serpent|snake|viper|cobra|coil/, 'Serpent'],
+    [/statue|idol|obelisk|monolith|old stone|ruin|ancient/, 'Ancient'],
+    [/sun|solar|golden|halo|radiant/, 'Holy'],
+    [/moon|lunar|silver|night/, 'Moonlit'],
+    [/void|abyss|starless|black hole/, 'Void'],
+    [/storm|thunder|lightning|tempest/, 'Storm'],
+    [/frost|ice|snow|winter|glacier/, 'Frost'],
+    [/fire|flame|ember|cinder|ash/, 'Fire'],
+    [/ash|ashen|cinder/, 'Ashen'],
+    [/rot|plague|disease|decay/, 'Rot'],
+    [/fungal|mushroom|spore|mycelium/, 'Fungal'],
+    [/crystal|gem|shard|glass/, 'Crystal'],
+    [/clock|gear|machine|automaton|mechanical/, 'Clockwork'],
+    [/goblin|scrap|junk/, 'Goblin-made'],
+    [/orc|orcish|warband/, 'Orcish'],
+    [/dwarf|dwarven|forge|anvil/, 'Dwarven'],
+    [/elf|elven|silver leaf/, 'Elven'],
+    [/cult|cultist|ritual|sacrifice/, 'Cultist'],
+    [/book|library|archive|scribe|scholar/, 'Library'],
+    [/pirate|sailor|ship|anchor|cannon/, 'Pirate'],
+    [/cathedral|chapel|church|bell|choir/, 'Cathedral'],
+    [/fae|faerie|fairy|glamour/, 'Faerie'],
+    [/demon|infernal|hell|sulfur/, 'Infernal'],
+    [/ocean|sea|tide|reef|coral/, 'Ocean'],
+    [/deep sea|abyssal|kraken/, 'Deep Sea'],
+    [/grave|tomb|crypt|cemetery|mausoleum/, 'Graveyard'],
+    [/dream|sleep|nightmare/, 'Dream'],
+    [/blood|crimson|gore/, 'Blood'],
+    [/bone|skull|skeleton/, 'Bone'],
+    [/royal|king|queen|crown|court/, 'Royal'],
+    [/forest|wood|wildwood|tree|root/, 'Wildwood'],
+    [/nature|leaf|vine|moss|briar|thorn/, 'Nature'],
+    [/thorn|briar|bramble/, 'Thorned'],
+    [/astral|star|comet|cosmic|constellation/, 'Astral']
+  ];
+  themes.forEach(t=>{ if(lower.includes(t.toLowerCase())) foundThemes.push(t); });
+  synonymThemes.forEach(([rx,t])=>{ if(rx.test(lower) && themes.includes(t) && !foundThemes.includes(t)) foundThemes.push(t); });
+  let inferred=null;
+  const catRules=[
+    [/boss|lord|queen|king|ancient one|god/, 'Boss'],
+    [/vendor|merchant|seller|trader|shop|blacksmith|apothecary|chef|cook/, 'Vendor'],
+    [/npc|villager|priest|scholar|guard|captain|farmer|hermit|jester|child|noble/, 'NPC'],
+    [/spell|magic|curse|blessing|ward|hex|nova|beam|bolt/, 'Spell'],
+    [/skill|attack|cleave|dash|shot|stance/, 'Skill'],
+    [/sword|axe|mace|dagger|bow|staff|wand|spear|hammer|blade|shield|hook/, 'Weapon'],
+    [/helmet|chest|armor|armour|boots|gloves|pants|cloak|belt|robe|bracer/, 'Armour'],
+    [/potion|flask|elixir|brew|tonic|vial/, 'Potion'],
+    [/coin|currency|token|medal|ticket|badge|seal|writ/, 'Currency'],
+    [/material|ore|dust|fang|scale|hide|silk|feather|root|gem|shard|core/, 'Crafting Material'],
+    [/statue|idol|relic|totem|altar|obelisk|monolith|compass|mirror|lantern|bell|book/, 'Relic'],
+    [/quest|hunt|rescue|recover|find|investigate|escort/, 'Quest'],
+    [/room|chamber|hall|dungeon|crypt|vault|arena|corridor/, 'Dungeon Room'],
+    [/biome|forest|swamp|desert|coast|mine|cavern|moor|wasteland|meadow|mountain|valley/, 'Biome'],
+    [/monster|creature|beast|goblin|wolf|spider|serpent|dragon|zombie|skeleton|demon|imp|troll|ogre/, 'Monster'],
+  ];
+  for(const [rx,cat] of catRules){ if(rx.test(lower)){ inferred=cat; break; } }
+  return {raw, title:titleWords(raw), lower, chaos, themes:foundThemes.slice(0,3), inferredCategory:inferred};
+}
+function ideaCategory(defaultCat, old){
+  const idea=directedIdea();
+  if(!idea) return defaultCat;
+  if(state.locks.category && old && old.category) return old.category;
+  return idea.inferredCategory || defaultCat;
+}
+function ideaThemes(defaultThemes, fallbackRarity){
+  const idea=directedIdea();
+  if(!idea) return defaultThemes;
+  const out=[...idea.themes];
+  const max=idea.chaos<25?1:(idea.chaos<65?2:3);
+  if(idea.chaos===0 && out.length) return out.slice(0,1);
+  while(out.length<max){
+    const t=R(weightedThemes(fallbackRarity||'Rare'));
+    if(!out.includes(t)) out.push(t);
+  }
+  return out.length?out.slice(0,max):defaultThemes;
+}
+function ideaName(cat, generatedName, ts, tierOrRarity){
+  const idea=directedIdea();
+  if(!idea) return generatedName;
+  const base=idea.title;
+  const c=idea.chaos;
+  if(c<=20) return base;
+  if(c<=45) return R([`${base} ${R(['of the Old Road','of the Broken Hall','of the Hidden Grove','of the Deep Root'])}`,`${ts[0]} ${base}`,`${base}, ${R(['Weathered','Awakened','Forgotten','Oathbound'])}`]);
+  if(c<=75) return R([`${R(['Ancient','Gilded','Hollow','Crowned','Witchborn','Moonlit','Ashen','Ravenous'])} ${base}`,`${base} ${R(suffixes)}`,`${R(prefixes)} ${base}, ${R(['Oath-Eater','Dawn-Touched','Rootbound','Night-Marked'])}`]);
+  return R([`${R(['Corrupted','Solar','Voidborn','Starved','Infernal','Dreaming','Thorn-Crowned','Deepborn','Glass'])} ${base} ${R(suffixes)}`,`${R(['The Hollow','The Last','The Black','The Pale','The Drowned','The Gilded'])} ${base} ${R(suffixes)}`,`${R(prefixes)} ${R(['Solar','Voidborn','Eldritch','Royal','Ashen','Clockwork'])} ${base}`]);
+}
+function ideaVisualBits(){
+  const idea=directedIdea();
+  if(!idea) return [];
+  if(idea.chaos<=20) return [`directed concept: ${idea.raw}`, 'stay close to the input idea'];
+  if(idea.chaos<=60) return [`directed concept: ${idea.raw}`, 'moderately remixed while keeping the original idea readable'];
+  return [`directed concept: ${idea.raw}`, 'highly remixed fantasy interpretation while preserving a recognizable core'];
+}
+function ideaPromptLine(){
+  const idea=directedIdea();
+  if(!idea) return '';
+  if(idea.chaos<=20) return `Directed idea: ${idea.raw}. Stay very close to this idea; add only light fantasy details.`;
+  if(idea.chaos<=60) return `Directed idea: ${idea.raw}. Keep the original idea recognizable, but allow moderate fantasy remixing.`;
+  return `Directed idea: ${idea.raw}. Use it as the seed for a wilder fantasy remix, while keeping the core concept still recognizable.`;
+}
+
 function standardConcept(forceReroll=false){
   const old=state.current||{};
-  const cat=state.locks.category&&old.category?old.category:categoryEl.value;
+  const cat=ideaCategory(categoryEl.value, old);
   const rar=state.locks.rarity&&old.rarity&&!old.creatureMode?old.rarity:R(rarity);
-  const ts=state.locks.themes&&old.themes?old.themes:weightedThemes(rar);
+  const ts=state.locks.themes&&old.themes?old.themes:ideaThemes(weightedThemes(rar),rar);
   const att=state.locks.attitude&&old.attitude?old.attitude:R(attitudes);
   const role=state.locks.role&&old.role?old.role:R(roles[cat]||roles.Monster);
   const info=themeInfo(ts);
@@ -1068,7 +1185,7 @@ function standardConcept(forceReroll=false){
   const mechanicsMode=(cat==='Spell'||cat==='Skill'||allowItemMechanic) && !narrativeMode;
   const tech=mechanicsMode ? (state.locks.mechanic&&old.tech?old.tech:technical(cat,ts,rar)) : null;
   const identity=itemMode?itemIdentity(cat,rar,ts):null;
-  const name=itemMode?genItemName(cat,rar,ts,role,identity):genName(cat,ts,role);
+  const name=ideaName(cat,itemMode?genItemName(cat,rar,ts,role,identity):genName(cat,ts,role),ts,rar);
   const itemStats=itemMode?itemStatPackage(cat,rar,ts,role):null;
   const narrative=narrativeMode?categorySpecificContent(cat,ts,rar,role,att,info):null;
   let signature='', desc='', why='';
@@ -1086,9 +1203,9 @@ function standardConcept(forceReroll=false){
     why=`${tech.profileWhy} In play, the mechanic should target the correct side of combat: harmful effects pressure enemies/players, helpful effects support self/allies, and reward triggers pay the owner. The validator helps avoid nonsense ally/enemy pairings.`;
   }
   const loot=[`${ts[0]} ${R(['Core','Shard','Essence','Fang','Bloom','Rune'])}`,`${R(prefixes)} ${R(['Dust','Token','Fragment','Sap','Scale'])}`,`${R(['Cracked','Living','Ancient','Polished'])} ${R(['Gem','Bone','Medal','Spore','Sigil'])}`];
-  const visual=itemMode?[`${identity.wear} ${identity.materials}`,`${identity.construction} construction`,identity.visual]:[R(info.visual||['glowing runes']),R(['large readable silhouette','broad simple shapes','clear fantasy colors','chunky hand-painted forms']),R(['flat colored background','isolated game concept','low visual noise'])];
+  const visual=(itemMode?[`${identity.wear} ${identity.materials}`,`${identity.construction} construction`,identity.visual]:[R(info.visual||['glowing runes']),R(['large readable silhouette','broad simple shapes','clear fantasy colors','chunky hand-painted forms']),R(['flat colored background','isolated game concept','low visual noise'])]).concat(ideaVisualBits());
   const palette=makePalette(ts,cat,identity);
-  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null}; state.current=c; render(c);
+  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea()}; state.current=c; render(c);
 }
 function concept(forceReroll=false){
   if(isCreatureCategory(categoryEl.value) || (state.locks.category && state.current && state.current.creatureMode)) return creatureConcept(forceReroll);
@@ -1148,6 +1265,8 @@ function buildVisualPrompt(c,palette,rarityText){
    `Concept: ${c.name}, ${rarityText} ${c.category}.`,
    `Themes: ${c.themes.join(', ')}.`
  ];
+ const directedLine=ideaPromptLine();
+ if(directedLine) baseParts.push(directedLine);
  if(cat==='Spell' || cat==='Skill'){
    baseParts.push('Create one concept sheet with two clearly separated visual parts.');
    baseParts.push('Left side: one square game icon only, centered, icon-ready, readable at 64x64, bold silhouette, fully contained, no text, no numbers, no UI labels.');
@@ -1512,6 +1631,7 @@ document.getElementById('copyPromptInline').onclick=copyCurrentPrompt;
 document.getElementById('copyFollowupPrompt').onclick=copyCurrentFollowupPrompt;
 document.getElementById('copyJson').onclick=()=>state.current&&navigator.clipboard.writeText(JSON.stringify(exportData(state.current),null,2));
 document.getElementById('copyMarkdown').onclick=()=>state.current&&navigator.clipboard.writeText(markdownNote(state.current));
+ideaChaosEl.addEventListener('input',()=>ideaChaosLabel.textContent=ideaChaosEl.value);
 ['favSearch','favCat','favRarity'].forEach(id=>document.getElementById(id).addEventListener('input',renderFavs));
 renderFavs(); concept();
 </script>
