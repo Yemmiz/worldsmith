@@ -403,19 +403,20 @@
     <div class="section"><h2>Why This Is Fun</h2><p id="why"></p></div>
     <div class="section"><h2>Design DNA</h2><div class="dna" id="dna"></div><p class="small" id="dnaText" style="margin-top:8px"></p></div>
     <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Image Prompt</h2><button class="btn" id="copyPromptInline">📋 Copy Entire Prompt</button></div><textarea id="prompt" readonly></textarea></div>
-    <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Animation Follow-up Prompt</h2><button class="btn" id="copyFollowupPrompt">📋 Copy Follow-up Prompt</button></div><textarea id="followupPrompt" readonly placeholder="Generated for Monster, Boss, NPC, and Vendor concepts."></textarea></div>
+    <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Follow-up Prompt</h2><button class="btn" id="copyFollowupPrompt">📋 Copy Follow-up Prompt</button></div><textarea id="followupPrompt" readonly placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea></div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
 • Added palette data to prompts, markdown notes, and implementation JSON.
 • Pushed the concept card closer to a darker fantasy tool / item-card presentation.
 • Kept v1.0 layout improvements and v0.95 sanity validation intact.
-• Added Directed Idea input with Idea Drift slider for seed-based generation.</div></div>
+• Added Directed Idea input with Idea Drift slider for seed-based generation.
+• Added Flora category and Flora follow-up prompt for growth stages and harvest yields.</div></div>
   </section>
 </main>
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Fauna','Companion','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
@@ -466,7 +467,7 @@ const roles={
  'Dungeon Room':['Trap room','Shrine room','Mini-boss room','Puzzle room','Treasure room','Ambush room'],
  Biome:['Forest','Swamp','Desert','Cave','Ruins','Snowfield','Coast','Sky island'],
  Vendor:['Potion vendor','Blacksmith','Curio trader','Event vendor','Beast tamer','Enchanter','Gem cutter'],
- Fauna:['Crop plant','Herb patch','Flowering plant','Mushroom cluster','Shrub','Sapling tree','Ancient tree','Vine cluster'],
+ Flora:['Crop plant','Herb patch','Flowering plant','Mushroom cluster','Shrub','Sapling tree','Ancient tree','Vine cluster'],
  Companion:['Pet critter','Faithful companion','Tiny helper','Mystic familiar','Calm grazer','Playful flier','Burrowing friend','Pack buddy'],
  'Random Event':['Traveling caravan','Meteor fall','Goblin raid','Haunted fog','Treasure goblin','Portal storm']
 };
@@ -539,7 +540,7 @@ function genName(cat,ts,role){
   const t=ts[0];
   if(['Spell','Skill'].includes(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
   if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
-  if(cat==='Fauna') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
+  if(cat==='Flora') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
   if(cat==='Companion') return R([`${t} ${R(['Pup','Sprite','Wisp','Totemkin','Nibbler','Scamper','Mite','Blinker','Sniffler','Hopper','Cubbie','Companion'])}`,`${R(prefixes)} ${R(['Familiar','Critter','Scoutling','Mote','Whisker','Buddy'])}`]);
   return `${t} ${R(nouns)} ${Math.random()<.45?R(suffixes):''}`.trim();
 }
@@ -996,7 +997,7 @@ function itemDesignFocus(rar){
 
 
 function isNarrativeCategory(cat){
-  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Fauna','Companion','Random Event'].includes(cat);
+  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Flora','Companion','Random Event'].includes(cat);
 }
 function categorySpecificContent(cat,ts,rar,role,att,info){
   const themeText=ts.join(', ').toLowerCase();
@@ -1050,15 +1051,15 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='NPC concepts become stronger when they have a motive and a secret. That gives them a reason to exist in quests or towns.';
     detailRows=[['NPC Role',role],['Motivation',motivation],['Signature Prop',prop],['Secret',secret]];
     structureRows=[['Likely Use',R(['quest giver','vendor unlock','dungeon clue','faction contact','comic relief','tragic lore source','crafting trainer'])],['Attitude',att],['Visual Priority','Full-body character concept with props']];
-  } else if(cat==='Fauna'){
+  } else if(cat==='Flora'){
     const growth=R(['low creeping growth','upright clustered stalks','broad layered leaves','hanging vine drape','mushroom shelf formation','root-heavy trunk form','spiral flower structure','tufted field-crop silhouette','thick bulbous base','thorned branching shape']);
     const habitat=R(['old farm edges','moonlit forest floors','damp cave beds','ruined gardens','windswept cliffs','bog margins','sunlit terraces','graveyard soil','ancient temple cracks','riverbank reeds']);
     const use=R(['alchemy ingredient','cooking crop','healing herb','dye source','ritual flower','poison component','campfire seasoning','beast feed','rare trade good','quest harvest']);
     const quirk=R(['opens only at night','sways away from touch','glows faintly at dusk','sheds shimmering spores','stores water in thick leaves','grows around old stones','twists toward moonlight','has protective thorns','rings softly in the wind','changes colour with the season']);
-    signature=`Fauna Identity: A ${role.toLowerCase()} with ${growth}, found around ${habitat}, mainly valued as a ${use}, and it ${quirk}.`;
+    signature=`Flora Identity: A ${role.toLowerCase()} with ${growth}, found around ${habitat}, mainly valued as a ${use}, and it ${quirk}.`;
     desc=`A ${rar.toLowerCase()} fauna concept built around ${themeText} fantasy. It focuses on a readable plant-life identity, strong silhouette, clear natural materials, and useful world-building detail rather than combat mechanics.`;
     why='This category is for crops, plants, trees, flowers, and other natural growth. It should produce concepts that feel useful for world-building, harvesting, decoration, and environmental storytelling.';
-    detailRows=[['Fauna Type',role],['Habitat',habitat],['Primary Use',use],['Growth Pattern',growth]];
+    detailRows=[['Flora Type',role],['Habitat',habitat],['Primary Use',use],['Growth Pattern',growth]];
     structureRows=[['Natural Quirk',quirk],['Best Used As',R(['harvestable resource','decorative world prop','rare herb find','zone-specific plant','crafting ingredient source','quest collectible'])],['Mood',R(['calm and natural','mystical and ancient','lush and inviting','strange but beautiful','slightly ominous'])],['Prompt Note','Treat it like a clean isolated 3D model subject, not a full landscape scene.']];
   } else if(cat==='Companion'){
     const temperament=R(['friendly and loyal','playful and curious','calm and sleepy','alert and protective','mischievous but harmless','shy but affectionate','eager to help','neutral but trainable']);
@@ -1146,7 +1147,7 @@ function directedIdea(){
     [/statue|idol|relic|totem|altar|obelisk|monolith|compass|mirror|lantern|bell|book/, 'Relic'],
     [/quest|hunt|rescue|recover|find|investigate|escort/, 'Quest'],
     [/room|chamber|hall|dungeon|crypt|vault|arena|corridor/, 'Dungeon Room'],
-    [/crop|plant|tree|flower|herb|mushroom|fungus|vine|bush|shrub|sapling|fern|reed|blossom/, 'Fauna'],
+    [/crop|plant|tree|flower|herb|mushroom|fungus|vine|bush|shrub|sapling|fern|reed|blossom/, 'Flora'],
     [/pet|companion|critter|familiar|cub|pup|kit|helper|friend/, 'Companion'],
     [/biome|forest|swamp|desert|coast|mine|cavern|moor|wasteland|meadow|mountain|valley/, 'Biome'],
     [/monster|creature|beast|goblin|wolf|spider|serpent|dragon|zombie|skeleton|demon|imp|troll|ogre/, 'Monster'],
@@ -1274,7 +1275,7 @@ function spellVisualIntent(c){
 
 function buildVisualPrompt(c,palette,rarityText){
  const cat=c.category;
- const isModelSubject=['Monster','Boss','NPC','Vendor','Fauna','Companion'].includes(cat);
+ const isModelSubject=['Monster','Boss','NPC','Vendor','Flora','Companion'].includes(cat);
  const baseParts=isModelSubject?[
    'Stylized fantasy 3D game model reference for asset creation, not a painterly illustration or splash art.',
    'Use neutral studio presentation, even lighting, large readable shapes, simple geometric forms, broad planes, minimal surface noise, chunky stylized proportions, and model-friendly construction.',
@@ -1350,17 +1351,17 @@ function buildVisualPrompt(c,palette,rarityText){
    baseParts.push('Do not include quest text, stat text, or UI interface elements.');
    return baseParts.join(' ');
  }
- if(cat==='Fauna'){
-   baseParts.push('Create a clean isolated flora model reference designed for 3D model generation.');
+ if(cat==='Flora'){
+   baseParts.push('Create a clean isolated flora model reference designed for 3D model generation, focused on the plant itself.');
    baseParts.push('This category covers crops, plants, trees, flowers, herbs, shrubs, mushrooms, and similar natural growth.');
    baseParts.push('Show the silhouette, structure, growth pattern, and material breakup clearly using simple sculptable forms.');
    baseParts.push('Isolated subject only: simple flat background, no environment, no terrain, no planter scene, no full biome, and no cast shadow.');
-   baseParts.push('Prefer one clear main flora subject, or a very small tidy grouped set only if needed for readability, such as a main plant plus a small leaf, fruit, flower, or mushroom callout.');
+   baseParts.push('Prefer one clear main mature flora subject, or a very small tidy grouped set only if needed for readability, such as a main plant plus a small leaf, fruit, flower, seed, or mushroom callout.');
    baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, readable leaf or petal groupings, simplified natural forms, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
    baseParts.push('Avoid painterly rendering, dense scenery, wild overgrowth, excessive tiny leaves, noisy grass clutter, or micro-detail. Keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
-   baseParts.push('If showing multiple views, use at most 3 total views or callouts; preferably one large main view and up to two small supporting views.');
-   baseParts.push(`Fauna visual identity: ${c.visual.join(', ')}.`);
-   if(c.role) baseParts.push(`Fauna type: ${c.role}.`);
+   baseParts.push('If showing multiple views, use at most 3 total views or callouts; preferably one large main mature view and up to two small supporting views. Use a separate follow-up prompt when you want growth stages.');
+   baseParts.push(`Flora visual identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Flora type: ${c.role}.`);
    baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. Fewer, larger views are better than many small ones.');
    baseParts.push('No UI text, labels, technical notes, or cinematic backgrounds.');
    return baseParts.join(' ');
@@ -1518,7 +1519,22 @@ function render(c){
 
 function buildFollowupPrompt(c,palette,rarityText){
  const cat=c.category;
- if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Follow-up animation prompt is only generated for Monster, Boss, NPC, Vendor, and Companion concepts.';
+ if(cat==='Flora'){
+   const lines=[];
+   lines.push('Use the previously generated flora image as the reference and keep the exact same plant identity, silhouette, species logic, palette, materials, and overall design language.');
+   lines.push('Create a follow-up stylized 3D game model reference sheet for growth-stage exploration, not a painterly illustration.');
+   lines.push('Show 3 clear growth stages of the same plant: an early seedling or sprout stage, a young mid-growth stage, and a mature fully grown stage.');
+   lines.push('If the plant is a crop or harvestable flora, also include one small separate harvested yield callout showing what the plant produces when gathered, such as fruit, seeds, grain, petals, herb bundle, mushroom caps, pods, roots, or similar material.');
+   lines.push('Prefer one larger mature stage plus two smaller earlier stages, and optionally one small harvest-yield callout. Do not create many tiny panels or a busy infographic.');
+   lines.push('Keep the background simple and neutral, with no environment, no cast shadow, and no cinematic scene.');
+   lines.push('Maintain the same clean stylized 3D model look: large readable shapes, simple geometric forms, broad planes, low visual noise, crisp edges, clear material separation, and polished readable textures.');
+   lines.push('Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged.');
+   lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+   lines.push(`Themes: ${c.themes.join(', ')}.`);
+   lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+   return lines.join(' ');
+ }
+ if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
  lines.push('Create a follow-up stylized 3D game model reference sheet for animation exploration, not a painterly illustration.');
