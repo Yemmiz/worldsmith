@@ -415,7 +415,7 @@
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Fauna','Companion','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
@@ -466,6 +466,8 @@ const roles={
  'Dungeon Room':['Trap room','Shrine room','Mini-boss room','Puzzle room','Treasure room','Ambush room'],
  Biome:['Forest','Swamp','Desert','Cave','Ruins','Snowfield','Coast','Sky island'],
  Vendor:['Potion vendor','Blacksmith','Curio trader','Event vendor','Beast tamer','Enchanter','Gem cutter'],
+ Fauna:['Crop plant','Herb patch','Flowering plant','Mushroom cluster','Shrub','Sapling tree','Ancient tree','Vine cluster'],
+ Companion:['Pet critter','Faithful companion','Tiny helper','Mystic familiar','Calm grazer','Playful flier','Burrowing friend','Pack buddy'],
  'Random Event':['Traveling caravan','Meteor fall','Goblin raid','Haunted fog','Treasure goblin','Portal storm']
 };
 const nouns=['Warden','Seer','Maw','Keeper','Bloom','Sentinel','Hermit','Crown','Idol','Shard','Howler','Caller','Binder','Root','Glaive','Lantern','Oracle','Mire','Fang','Monolith'];
@@ -537,6 +539,8 @@ function genName(cat,ts,role){
   const t=ts[0];
   if(['Spell','Skill'].includes(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
   if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
+  if(cat==='Fauna') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
+  if(cat==='Companion') return R([`${t} ${R(['Pup','Sprite','Wisp','Totemkin','Nibbler','Scamper','Mite','Blinker','Sniffler','Hopper','Cubbie','Companion'])}`,`${R(prefixes)} ${R(['Familiar','Critter','Scoutling','Mote','Whisker','Buddy'])}`]);
   return `${t} ${R(nouns)} ${Math.random()<.45?R(suffixes):''}`.trim();
 }
 function mechanicName(effect,ts){return R([`${ts[0]} ${R(['Brand','Bloom','Oath','Echo','Hex','Pulse','Ward','Bite'])}`,`${effect} ${R(['Sigil','Mark','Curse','Resonance','Pact','Thorn'])}`,`${R(prefixes)} ${R(['Reprisal','Bloom','Judgement','Snare','Backlash'])}`]);}
@@ -992,7 +996,7 @@ function itemDesignFocus(rar){
 
 
 function isNarrativeCategory(cat){
-  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Random Event'].includes(cat);
+  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Fauna','Companion','Random Event'].includes(cat);
 }
 function categorySpecificContent(cat,ts,rar,role,att,info){
   const themeText=ts.join(', ').toLowerCase();
@@ -1028,7 +1032,37 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='Dungeon rooms need readable layout more than abstract mechanics. This gives the room a physical structure a level designer can actually build.';
     detailRows=[['Room Type',role],['Layout',layout],['Focal Feature',feature],['Hazard / Pressure',hazard]];
     structureRows=[['Reward Hook',R(['visible chest behind danger','shortcut unlock','lore object','rare resource node','mini-boss key','hidden side path'])],['Best Camera Read','Angled or isometric room concept'],['Player Decision',R(['rush the objective','clear enemies first','disable hazard','search for hidden path','kite around central feature'])]];
-  } else if(cat==='Vendor'){
+  } else if(cat==='Fauna'){
+   baseParts.push('Create a clean isolated flora model reference designed for 3D model generation.');
+   baseParts.push('This category covers crops, plants, trees, flowers, herbs, shrubs, mushrooms, and similar natural growth.');
+   baseParts.push('Show the silhouette, structure, growth pattern, and material breakup clearly using simple sculptable forms.');
+   baseParts.push('Isolated subject only: simple flat background, no environment, no terrain, no planter scene, no full biome, and no cast shadow.');
+   baseParts.push('Prefer one clear main flora subject, or a very small tidy grouped set only if needed for readability, such as a main plant plus a small leaf, fruit, flower, or mushroom callout.');
+   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, readable leaf or petal groupings, simplified natural forms, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
+   baseParts.push('Avoid painterly rendering, dense scenery, wild overgrowth, excessive tiny leaves, noisy grass clutter, or micro-detail. Keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
+   baseParts.push('If showing multiple views, use at most 3 total views or callouts; preferably one large main view and up to two small supporting views.');
+   baseParts.push(`Fauna visual identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Fauna type: ${c.role}.`);
+   baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. Fewer, larger views are better than many small ones.');
+   baseParts.push('No UI text, labels, technical notes, or cinematic backgrounds.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Companion'){
+   baseParts.push('Create a friendly or neutral companion creature model reference designed for 3D model generation, focused on the companion itself.');
+   baseParts.push('Show the silhouette, body language, anatomy, and material breakup clearly using simple sculptable forms.');
+   baseParts.push('Isolated creature only: simple flat background, no environment, no terrain, no dramatic scene, no extra characters, no spell effects, and no cast shadow.');
+   baseParts.push('No equipped or held gear: do not put weapons, shields, tools, bags, lanterns, books, trophies, or props in its paws/claws/mouth. If a collar, satchel, charm, or small prop is important, render it separately beside the companion as a loose object, clearly not held and not attached.');
+   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, simplified anatomy, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
+   baseParts.push('Avoid painterly rendering, smoky illustration effects, excessive spikes, grotesque horror detail, dense fur strand rendering, or noisy over-detail. Keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
+   baseParts.push('Keep the body language approachable, readable, and suitable for a pet, familiar, critter, or helper creature rather than a hostile monster.');
+   baseParts.push('Keep the pose readable and model-friendly: mostly full-body, clear limbs, clear front or three-quarter silhouette, and use at most 3 views total; preferably one large main render, or one main render plus up to two supporting views.');
+   baseParts.push(`Companion appearance and silhouette: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Companion type: ${c.role}.`);
+   baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. The result should feel like a polished game asset with clean readable textures and crisp forms. Fewer, larger views are better than many small ones.');
+   baseParts.push('Avoid UI text, labels, technical notes, action scenes, and cinematic backgrounds.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Vendor'){
     const wares=R([`${ts[0]} potions and charms`,`${ts[0]} weapons`,`${ts[0]} salvage`,`${ts[0]} maps and keys`,`monster trophies`,`strange currencies`,`camp supplies`,`enchanted trinkets`,`questionable relics`,`forged documents`,`rare bait and traps`,`festival masks`,`clockwork parts`,`grave candles`,`dragon-scale polish`,`rune ink`,`pirate maps`,`dwarven tools`,`faerie bargains`]);
     const stall=R(['folding market stall','backpack shop','wagon full of junk','tiny shrine counter','black-market tent','floating lantern cart','smithing tarp','half-sunken boat shop','walking chest on legs','mushroom-roofed kiosk','armored caravan wagon','bell-covered pushcart','bookshop tent','fishbone booth','clockwork vending shrine','portable forge','graveyard blanket stall','hanging birdcage shop']);
     const quirk=R(['only trades at night','speaks through a mask','accepts odd tokens','hates haggling','knows dangerous rumors','moves between zones','is followed by tiny helpers','claims every item is cursed','never sells the same thing twice','prices items by riddles','refuses royal coins','keeps a pet mimic','sings every transaction','insists the customer sign a ledger','believes every buyer is doomed','wraps items in prayer cloth','trades discounts for monster parts']);
@@ -1046,6 +1080,26 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='NPC concepts become stronger when they have a motive and a secret. That gives them a reason to exist in quests or towns.';
     detailRows=[['NPC Role',role],['Motivation',motivation],['Signature Prop',prop],['Secret',secret]];
     structureRows=[['Likely Use',R(['quest giver','vendor unlock','dungeon clue','faction contact','comic relief','tragic lore source','crafting trainer'])],['Attitude',att],['Visual Priority','Full-body character concept with props']];
+  } else if(cat==='Fauna'){
+    const growth=R(['low creeping growth','upright clustered stalks','broad layered leaves','hanging vine drape','mushroom shelf formation','root-heavy trunk form','spiral flower structure','tufted field-crop silhouette','thick bulbous base','thorned branching shape']);
+    const habitat=R(['old farm edges','moonlit forest floors','damp cave beds','ruined gardens','windswept cliffs','bog margins','sunlit terraces','graveyard soil','ancient temple cracks','riverbank reeds']);
+    const use=R(['alchemy ingredient','cooking crop','healing herb','dye source','ritual flower','poison component','campfire seasoning','beast feed','rare trade good','quest harvest']);
+    const quirk=R(['opens only at night','sways away from touch','glows faintly at dusk','sheds shimmering spores','stores water in thick leaves','grows around old stones','twists toward moonlight','has protective thorns','rings softly in the wind','changes colour with the season']);
+    signature=`Fauna Identity: A ${role.toLowerCase()} with ${growth}, found around ${habitat}, mainly valued as a ${use}, and it ${quirk}.`;
+    desc=`A ${rar.toLowerCase()} fauna concept built around ${themeText} fantasy. It focuses on a readable plant-life identity, strong silhouette, clear natural materials, and useful world-building detail rather than combat mechanics.`;
+    why='This category is for crops, plants, trees, flowers, and other natural growth. It should produce concepts that feel useful for world-building, harvesting, decoration, and environmental storytelling.';
+    detailRows=[['Fauna Type',role],['Habitat',habitat],['Primary Use',use],['Growth Pattern',growth]];
+    structureRows=[['Natural Quirk',quirk],['Best Used As',R(['harvestable resource','decorative world prop','rare herb find','zone-specific plant','crafting ingredient source','quest collectible'])],['Mood',R(['calm and natural','mystical and ancient','lush and inviting','strange but beautiful','slightly ominous'])],['Prompt Note','Treat it like a clean isolated 3D model subject, not a full landscape scene.']];
+  } else if(cat==='Companion'){
+    const temperament=R(['friendly and loyal','playful and curious','calm and sleepy','alert and protective','mischievous but harmless','shy but affectionate','eager to help','neutral but trainable']);
+    const utility=R(['scouts ahead','carries small items','finds resources','comforts the player','warns about danger','lights dark paths','sniffs out secrets','helps gather materials','acts as a magical familiar','keeps camp company']);
+    const quirk=R(['collects shiny things','tilts its head at magic','hides in backpacks','follows bells and music','dislikes open sunlight','sleeps in odd places','chirps when danger is near','mimics simple sounds','guards food aggressively','insists on staying close']);
+    const bond=R(['adopted wilderness pet','village-raised helper','ritual-bound familiar','rescued critter','heirloom family companion','wandering camp friend','small guardian beast','gentle pack animal']);
+    signature=`Companion Identity: A ${role.toLowerCase()} that is ${temperament}, ${utility}, and ${quirk}. It is best imagined as a ${bond}.`;
+    desc=`A ${rar.toLowerCase()} companion concept built around ${themeText} fantasy. It is defined by friendly or neutral behaviour, readable silhouette, charming identity, and a practical support or pet fantasy rather than monster aggression.`;
+    why='Companions should feel attachable, memorable, and usable in the world. This category aims for pets, critters, familiars, and helper creatures rather than hostile enemies.';
+    detailRows=[['Companion Type',role],['Temperament',temperament],['Utility Fantasy',utility],['Bond Fantasy',bond]];
+    structureRows=[['Signature Quirk',quirk],['Best Used As',R(['pet collectible','starter companion','ambient critter with personality','summoned familiar concept','town companion','light utility helper'])],['Body Language',R(['upright and attentive','low and scampering','soft and rounded','nimble and springy','perched and observant'])],['Prompt Note','Treat it like a friendly/neutral creature model reference, not a monster battle scene.']];
   } else {
     const eventMoment=R(['a caravan is attacked','a shrine awakens','a meteor falls','ghost lights cross the road','a cursed chest appears','a faction patrol clashes with monsters','a bridge collapses','a traveling vendor is surrounded','a funeral procession is interrupted','a golem breaks loose','a witch trial turns violent','a flock of omen ravens gathers','a well begins singing','a pirate map burns itself into stone','a market stall transforms into a mimic','a clock tower rings thirteen times','a child chases a glowing animal','a ghost asks for directions','a monster migration crosses the road']);
     const playerChoice=R(['fight immediately','save someone','loot quickly before danger grows','choose a side','follow the strange trail','interrupt a ritual','escort survivors','investigate the aftermath','protect the guilty person','return a stolen object','break or preserve the relic','pay the toll or refuse','help the monster or the villagers','chase the fleeing thief','stabilize the portal','free the trapped spirit','decide which NPC to trust']);
@@ -1122,6 +1176,8 @@ function directedIdea(){
     [/statue|idol|relic|totem|altar|obelisk|monolith|compass|mirror|lantern|bell|book/, 'Relic'],
     [/quest|hunt|rescue|recover|find|investigate|escort/, 'Quest'],
     [/room|chamber|hall|dungeon|crypt|vault|arena|corridor/, 'Dungeon Room'],
+    [/crop|plant|tree|flower|herb|mushroom|fungus|vine|bush|shrub|sapling|fern|reed|blossom/, 'Fauna'],
+    [/pet|companion|critter|familiar|cub|pup|kit|helper|friend/, 'Companion'],
     [/biome|forest|swamp|desert|coast|mine|cavern|moor|wasteland|meadow|mountain|valley/, 'Biome'],
     [/monster|creature|beast|goblin|wolf|spider|serpent|dragon|zombie|skeleton|demon|imp|troll|ogre/, 'Monster'],
   ];
@@ -1248,7 +1304,7 @@ function spellVisualIntent(c){
 
 function buildVisualPrompt(c,palette,rarityText){
  const cat=c.category;
- const isModelSubject=['Monster','Boss','NPC','Vendor'].includes(cat);
+ const isModelSubject=['Monster','Boss','NPC','Vendor','Fauna','Companion'].includes(cat);
  const baseParts=isModelSubject?[
    'Stylized fantasy 3D game model reference for asset creation, not a painterly illustration or splash art.',
    'Use neutral studio presentation, even lighting, large readable shapes, simple geometric forms, broad planes, minimal surface noise, chunky stylized proportions, and model-friendly construction.',
@@ -1462,7 +1518,7 @@ function render(c){
 
 function buildFollowupPrompt(c,palette,rarityText){
  const cat=c.category;
- if(!['Monster','Boss','NPC','Vendor'].includes(cat)) return 'Follow-up animation prompt is only generated for Monster, Boss, NPC, and Vendor concepts.';
+ if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Follow-up animation prompt is only generated for Monster, Boss, NPC, Vendor, and Companion concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
  lines.push('Create a follow-up stylized 3D game model reference sheet for animation exploration, not a painterly illustration.');
@@ -1474,6 +1530,11 @@ function buildFollowupPrompt(c,palette,rarityText){
  lines.push('Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged.');
  if(cat==='Monster' || cat==='Boss'){
    lines.push('The attack motion should fit the creature body plan and identity, such as a claw swipe, pounce, bite, slam, charge, or magical body-driven attack.');
+   lines.push('Do not add any new equipped weapons or props.');
+ }
+ if(cat==='Companion'){
+   lines.push('The walk poses should feel lively and readable. The action poses can be playful or utility-based, such as a hop, alert stance, paw swipe, little pounce, chirp/bark gesture, or magical familiar motion.');
+   lines.push('Keep it friendly or neutral in tone, not a violent monster attack sheet.');
    lines.push('Do not add any new equipped weapons or props.');
  }
  if(cat==='NPC' || cat==='Vendor'){
