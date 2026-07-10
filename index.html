@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.1</title>
+<title>Worldsmith v1.9.2</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -1032,37 +1032,7 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='Dungeon rooms need readable layout more than abstract mechanics. This gives the room a physical structure a level designer can actually build.';
     detailRows=[['Room Type',role],['Layout',layout],['Focal Feature',feature],['Hazard / Pressure',hazard]];
     structureRows=[['Reward Hook',R(['visible chest behind danger','shortcut unlock','lore object','rare resource node','mini-boss key','hidden side path'])],['Best Camera Read','Angled or isometric room concept'],['Player Decision',R(['rush the objective','clear enemies first','disable hazard','search for hidden path','kite around central feature'])]];
-  } else if(cat==='Fauna'){
-   baseParts.push('Create a clean isolated flora model reference designed for 3D model generation.');
-   baseParts.push('This category covers crops, plants, trees, flowers, herbs, shrubs, mushrooms, and similar natural growth.');
-   baseParts.push('Show the silhouette, structure, growth pattern, and material breakup clearly using simple sculptable forms.');
-   baseParts.push('Isolated subject only: simple flat background, no environment, no terrain, no planter scene, no full biome, and no cast shadow.');
-   baseParts.push('Prefer one clear main flora subject, or a very small tidy grouped set only if needed for readability, such as a main plant plus a small leaf, fruit, flower, or mushroom callout.');
-   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, readable leaf or petal groupings, simplified natural forms, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
-   baseParts.push('Avoid painterly rendering, dense scenery, wild overgrowth, excessive tiny leaves, noisy grass clutter, or micro-detail. Keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
-   baseParts.push('If showing multiple views, use at most 3 total views or callouts; preferably one large main view and up to two small supporting views.');
-   baseParts.push(`Fauna visual identity: ${c.visual.join(', ')}.`);
-   if(c.role) baseParts.push(`Fauna type: ${c.role}.`);
-   baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. Fewer, larger views are better than many small ones.');
-   baseParts.push('No UI text, labels, technical notes, or cinematic backgrounds.');
-   return baseParts.join(' ');
- }
- if(cat==='Companion'){
-   baseParts.push('Create a friendly or neutral companion creature model reference designed for 3D model generation, focused on the companion itself.');
-   baseParts.push('Show the silhouette, body language, anatomy, and material breakup clearly using simple sculptable forms.');
-   baseParts.push('Isolated creature only: simple flat background, no environment, no terrain, no dramatic scene, no extra characters, no spell effects, and no cast shadow.');
-   baseParts.push('No equipped or held gear: do not put weapons, shields, tools, bags, lanterns, books, trophies, or props in its paws/claws/mouth. If a collar, satchel, charm, or small prop is important, render it separately beside the companion as a loose object, clearly not held and not attached.');
-   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, simplified anatomy, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
-   baseParts.push('Avoid painterly rendering, smoky illustration effects, excessive spikes, grotesque horror detail, dense fur strand rendering, or noisy over-detail. Keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
-   baseParts.push('Keep the body language approachable, readable, and suitable for a pet, familiar, critter, or helper creature rather than a hostile monster.');
-   baseParts.push('Keep the pose readable and model-friendly: mostly full-body, clear limbs, clear front or three-quarter silhouette, and use at most 3 views total; preferably one large main render, or one main render plus up to two supporting views.');
-   baseParts.push(`Companion appearance and silhouette: ${c.visual.join(', ')}.`);
-   if(c.role) baseParts.push(`Companion type: ${c.role}.`);
-   baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. The result should feel like a polished game asset with clean readable textures and crisp forms. Fewer, larger views are better than many small ones.');
-   baseParts.push('Avoid UI text, labels, technical notes, action scenes, and cinematic backgrounds.');
-   return baseParts.join(' ');
- }
- if(cat==='Vendor'){
+  } else if(cat==='Vendor'){
     const wares=R([`${ts[0]} potions and charms`,`${ts[0]} weapons`,`${ts[0]} salvage`,`${ts[0]} maps and keys`,`monster trophies`,`strange currencies`,`camp supplies`,`enchanted trinkets`,`questionable relics`,`forged documents`,`rare bait and traps`,`festival masks`,`clockwork parts`,`grave candles`,`dragon-scale polish`,`rune ink`,`pirate maps`,`dwarven tools`,`faerie bargains`]);
     const stall=R(['folding market stall','backpack shop','wagon full of junk','tiny shrine counter','black-market tent','floating lantern cart','smithing tarp','half-sunken boat shop','walking chest on legs','mushroom-roofed kiosk','armored caravan wagon','bell-covered pushcart','bookshop tent','fishbone booth','clockwork vending shrine','portable forge','graveyard blanket stall','hanging birdcage shop']);
     const quirk=R(['only trades at night','speaks through a mask','accepts odd tokens','hates haggling','knows dangerous rumors','moves between zones','is followed by tiny helpers','claims every item is cursed','never sells the same thing twice','prices items by riddles','refuses royal coins','keeps a pet mimic','sings every transaction','insists the customer sign a ledger','believes every buyer is doomed','wraps items in prayer cloth','trades discounts for monster parts']);
@@ -1378,6 +1348,36 @@ function buildVisualPrompt(c,palette,rarityText){
    if(qComplication) baseParts.push(`Story complication or twist: ${qComplication[1]}.`);
    baseParts.push('Compose the scene so the location, threat, and objective are all visually understandable at a glance.');
    baseParts.push('Do not include quest text, stat text, or UI interface elements.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Fauna'){
+   baseParts.push('Create a clean isolated flora model reference designed for 3D model generation.');
+   baseParts.push('This category covers crops, plants, trees, flowers, herbs, shrubs, mushrooms, and similar natural growth.');
+   baseParts.push('Show the silhouette, structure, growth pattern, and material breakup clearly using simple sculptable forms.');
+   baseParts.push('Isolated subject only: simple flat background, no environment, no terrain, no planter scene, no full biome, and no cast shadow.');
+   baseParts.push('Prefer one clear main flora subject, or a very small tidy grouped set only if needed for readability, such as a main plant plus a small leaf, fruit, flower, or mushroom callout.');
+   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, readable leaf or petal groupings, simplified natural forms, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
+   baseParts.push('Avoid painterly rendering, dense scenery, wild overgrowth, excessive tiny leaves, noisy grass clutter, or micro-detail. Keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
+   baseParts.push('If showing multiple views, use at most 3 total views or callouts; preferably one large main view and up to two small supporting views.');
+   baseParts.push(`Fauna visual identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Fauna type: ${c.role}.`);
+   baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. Fewer, larger views are better than many small ones.');
+   baseParts.push('No UI text, labels, technical notes, or cinematic backgrounds.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Companion'){
+   baseParts.push('Create a friendly or neutral companion creature model reference designed for 3D model generation, focused on the companion itself.');
+   baseParts.push('Show the silhouette, body language, anatomy, and material breakup clearly using simple sculptable forms.');
+   baseParts.push('Isolated creature only: simple flat background, no environment, no terrain, no dramatic scene, no extra characters, no spell effects, and no cast shadow.');
+   baseParts.push('No equipped or held gear: do not put weapons, shields, tools, bags, lanterns, books, trophies, or props in its paws/claws/mouth. If a collar, satchel, charm, or small prop is important, render it separately beside the companion as a loose object, clearly not held and not attached.');
+   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, simplified anatomy, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
+   baseParts.push('Avoid painterly rendering, smoky illustration effects, excessive spikes, grotesque horror detail, dense fur strand rendering, or noisy over-detail. Keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
+   baseParts.push('Keep the body language approachable, readable, and suitable for a pet, familiar, critter, or helper creature rather than a hostile monster.');
+   baseParts.push('Keep the pose readable and model-friendly: mostly full-body, clear limbs, clear front or three-quarter silhouette, and use at most 3 views total; preferably one large main render, or one main render plus up to two supporting views.');
+   baseParts.push(`Companion appearance and silhouette: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Companion type: ${c.role}.`);
+   baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. The result should feel like a polished game asset with clean readable textures and crisp forms. Fewer, larger views are better than many small ones.');
+   baseParts.push('Avoid UI text, labels, technical notes, action scenes, and cinematic backgrounds.');
    return baseParts.join(' ');
  }
  if(cat==='Vendor'){
