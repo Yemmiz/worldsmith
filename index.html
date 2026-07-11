@@ -404,13 +404,15 @@
     <div class="section"><h2>Design DNA</h2><div class="dna" id="dna"></div><p class="small" id="dnaText" style="margin-top:8px"></p></div>
     <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Image Prompt</h2><button class="btn" id="copyPromptInline">📋 Copy Entire Prompt</button></div><textarea id="prompt" readonly></textarea></div>
     <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Follow-up Prompt</h2><button class="btn" id="copyFollowupPrompt">📋 Copy Follow-up Prompt</button></div><textarea id="followupPrompt" readonly placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea></div>
+    <div class="section"><div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Portrait / Icon Prompt</h2><button class="btn" id="copyPortraitPrompt">📋 Copy Portrait/Icon Prompt</button></div><textarea id="portraitPrompt" readonly placeholder="Generated for all categories with category-specific icon directions."></textarea></div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
 • Added palette data to prompts, markdown notes, and implementation JSON.
 • Pushed the concept card closer to a darker fantasy tool / item-card presentation.
 • Kept v1.0 layout improvements and v0.95 sanity validation intact.
 • Added Directed Idea input with Idea Drift slider for seed-based generation.
-• Added Flora category and Flora follow-up prompt for growth stages and harvest yields.</div></div>
+• Added Flora category and Flora follow-up prompt for growth stages and harvest yields.
+• Added Portrait / Icon Prompt generation for all categories.</div></div>
   </section>
 </main>
 <script>
@@ -1545,9 +1547,90 @@ function render(c){
  const rarityText=c.creatureMode?`${c.encounterTier} encounter-tier`:c.rarity;
  const prompt=buildVisualPrompt(c,palette,rarityText);
  const followupPrompt=buildFollowupPrompt(c,palette,rarityText);
+ const portraitPrompt=buildPortraitPrompt(c,palette,rarityText);
  document.getElementById('prompt').value=prompt;
  document.getElementById('followupPrompt').value=followupPrompt;
+ document.getElementById('portraitPrompt').value=portraitPrompt;
  document.getElementById('stub').textContent=JSON.stringify(exportData(c),null,2);
+}
+
+
+function buildPortraitPrompt(c,palette,rarityText){
+ const cat=c.category;
+ const parts=[];
+ const squareBase=[
+   'Create a square game-ready icon or portrait prompt, designed for readability at small size.',
+   `Use this defining colour palette: ${palettePrompt(palette)}.`,
+   `Concept: ${c.name}, ${rarityText} ${c.category}.`,
+   `Themes: ${c.themes.join(', ')}.`
+ ];
+ parts.push(...squareBase);
+ if(['Monster','Boss','NPC','Vendor','Companion'].includes(cat)){
+   parts.push('Create a portrait icon of the subject, focused on the face, head, and upper torso rather than a full-body scene.');
+   parts.push('Show a clear readable face, expression, and silhouette, with the head large in frame and easy to recognize at a glance.');
+   parts.push('Use a simple front or three-quarter portrait view. Keep the portrait centered and not too zoomed out.');
+   parts.push('Keep the background extremely simple and not busy: use a flat cutout-friendly background color, a soft gradient, or a clean chroma-style backdrop. Do not create a full environment.');
+   parts.push('Do not place equipped weapons, tools, staffs, lanterns, books, or other held props in the hands or across the portrait unless absolutely essential to identity.');
+   parts.push('Prioritize a clean stylized fantasy game portrait icon feel: large readable shapes, low visual noise, crisp edges, clear materials, and strong readability at small size.');
+   parts.push('Avoid full-body scenes, action scenes, crowded composition, tiny background details, UI text, borders, labels, or cinematic storytelling.');
+   return parts.join(' ');
+ }
+ if(['Weapon','Potion','Armour','Relic','Decoration','Crafting Material','Currency'].includes(cat)){
+   parts.push('Create a square item icon showing the full object clearly.');
+   parts.push('Show the subject in a full-item view, slightly angled, centered, and clearly separated from the background.');
+   parts.push('Use a flat easily cut-out background color or chroma-like backdrop. Do not create an environment or scene.');
+   parts.push('Keep the silhouette clean and readable, with one main object or a very small tidy grouped set only if the item naturally requires it.');
+   parts.push('Prioritize a clean fantasy RPG icon feel: crisp edges, strong material definition, polished textures, low visual noise, and clear readability at small size.');
+   if(cat==='Armour') parts.push('If the armor piece is wearable gear, show the entire piece cleanly and fully within frame.');
+   if(cat==='Decoration') parts.push('For decoration props, show the full prop cleanly, centered, and isolated, as a usable object icon rather than a scenic prop illustration.');
+   parts.push('Avoid background clutter, cast shadows, scenic context, UI text, labels, or extra effects that make cutout difficult.');
+   return parts.join(' ');
+ }
+ if(cat==='Flora'){
+   parts.push('Create a square flora icon sheet with 3 clearly separated icons on the same canvas.');
+   parts.push('Icon 1: the main mature plant shown clearly in full, slightly angled or front-facing, centered, and easy to read.');
+   parts.push('Icon 2: the harvested yield from the plant, such as fruit, herb bundle, grain, seeds, petals, root, mushroom cap, pod, or other gathered resource.');
+   parts.push('Icon 3: the seed, sprout, sapling, or young starting stage of the same flora.');
+   parts.push('Use a simple flat cutout-friendly background color or chroma-like backdrop, and keep all three icons separated and easy to cut out.');
+   parts.push('Keep the icons clean, readable, and not busy, with crisp edges, clear material definition, and strong small-scale readability.');
+   parts.push('Avoid scenic environment, full biome background, UI text, labels, or infographic styling.');
+   return parts.join(' ');
+ }
+ if(cat==='Biome'){
+   parts.push('Create a square biome icon that captures the feeling and identity of the biome in one simplified readable image.');
+   parts.push('Treat it like a stylized environment icon or tile: a compact scenic glimpse with large readable forms, clear mood, and a strong sense of place.');
+   parts.push('Keep composition simple and iconic rather than detailed or panoramic. The biome should be readable at a glance and at small size.');
+   parts.push('Avoid tiny clutter, UI text, labels, or an overly detailed landscape painting.');
+   return parts.join(' ');
+ }
+ if(cat==='Spell' || cat==='Skill'){
+   parts.push('Create a square spell/skill icon that clearly communicates the magical or combat identity at a glance.');
+   parts.push('Use one centered readable motif, strong silhouette, bold shape language, and clean contrast.');
+   parts.push('Keep the icon simple, readable, and suitable for a fantasy ARPG hotbar or ability panel.');
+   parts.push('Avoid UI text, borders, or an overly busy composition.');
+   return parts.join(' ');
+ }
+ if(cat==='Quest'){
+   parts.push('Create a square quest icon or illustrated emblem that captures the quest premise in one readable image.');
+   parts.push('Focus on one strong story hook, symbolic object, or simplified scene that represents the quest.');
+   parts.push('Keep it readable and iconic, not a complex storytelling painting. Avoid UI text and labels.');
+   return parts.join(' ');
+ }
+ if(cat==='Dungeon Room'){
+   parts.push('Create a square icon representing the dungeon room identity, focusing on the room’s main feature or mechanic in a compact readable composition.');
+   parts.push('Use a simplified miniature scene or emblematic room slice with clear shapes and strong readability.');
+   parts.push('Avoid a huge environment painting, tiny clutter, UI text, or labels.');
+   return parts.join(' ');
+ }
+ if(cat==='Random Event'){
+   parts.push('Create a square icon representing the random event through one compact readable scene or symbolic setup.');
+   parts.push('Show the event trigger or mood clearly, but keep the composition simple and icon-like rather than cinematic.');
+   parts.push('Avoid UI text, labels, and overly detailed background clutter.');
+   return parts.join(' ');
+ }
+ parts.push('Create a square icon or portrait prompt that keeps the subject centered, readable, and easy to recognize at small size.');
+ parts.push('Use a simple clean background, avoid busy environment details, and focus on crisp shapes and strong readability.');
+ return parts.join(' ');
 }
 
 function buildFollowupPrompt(c,palette,rarityText){
@@ -1736,9 +1819,11 @@ document.getElementById('importSaves').addEventListener('change',e=>importSavesF
 document.getElementById('copyAllSaves').onclick=()=>copyAllSaves();
 function copyCurrentPrompt(){navigator.clipboard.writeText(document.getElementById('prompt').value);}
 function copyCurrentFollowupPrompt(){navigator.clipboard.writeText(document.getElementById('followupPrompt').value);}
+function copyCurrentPortraitPrompt(){navigator.clipboard.writeText(document.getElementById('portraitPrompt').value);}
 document.getElementById('copyPrompt').onclick=copyCurrentPrompt;
 document.getElementById('copyPromptInline').onclick=copyCurrentPrompt;
 document.getElementById('copyFollowupPrompt').onclick=copyCurrentFollowupPrompt;
+document.getElementById('copyPortraitPrompt').onclick=copyCurrentPortraitPrompt;
 document.getElementById('copyJson').onclick=()=>state.current&&navigator.clipboard.writeText(JSON.stringify(exportData(state.current),null,2));
 document.getElementById('copyMarkdown').onclick=()=>state.current&&navigator.clipboard.writeText(markdownNote(state.current));
 ideaChaosEl.addEventListener('input',()=>ideaChaosLabel.textContent=ideaChaosEl.value);
