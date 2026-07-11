@@ -1053,27 +1053,7 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='NPC concepts become stronger when they have a motive and a secret. That gives them a reason to exist in quests or towns.';
     detailRows=[['NPC Role',role],['Motivation',motivation],['Signature Prop',prop],['Secret',secret]];
     structureRows=[['Likely Use',R(['quest giver','vendor unlock','dungeon clue','faction contact','comic relief','tragic lore source','crafting trainer'])],['Attitude',att],['Visual Priority','Full-body character concept with props']];
-  } else if(cat==='Decoration'){
-   baseParts.push('Create a clean isolated decoration/object prop model reference designed for 3D model generation.');
-   baseParts.push('This category covers world props and set dressing such as fences, signs, statues, lamps, carpets, chairs, tables, crates, barrels, banners, shelves, torches, road markers, and shrine objects.');
-   baseParts.push('Show the object silhouette, construction, scale, material breakup, and readable prop function clearly using simple sculptable forms.');
-   baseParts.push('Isolated object only: simple flat background, no environment, no room scene, no terrain, no extra clutter, no dramatic lighting, and no cast shadow.');
-   baseParts.push('Prefer one clear main prop. If useful, show a small tidy grouped set of up to 3 related variants or separate parts, but avoid a busy prop sheet.');
-   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, chunky construction, clear edges, readable material regions, and minimal tiny detail.');
-   baseParts.push('Surface treatment should still feel polished, with clean edge definition, crisp textures, and clear material separation. Avoid blurry, muddy, mushy, low-resolution, or overly smudged textures.');
-   baseParts.push('Avoid painterly rendering, scenic environment, excessive ornaments, tiny scratches everywhere, dense clutter, or cinematic prop illustration. If decoration appears, keep it fewer, larger, and chunkier.');
-   baseParts.push('If showing multiple views, use at most 3 total views or variants; preferably one large main view and up to two small supporting views.');
-   baseParts.push(`Decoration visual identity: ${c.visual.join(', ')}.`);
-   if(c.role) baseParts.push(`Decoration object type: ${c.role}.`);
-   const dMaterial=(c.detailRows||[]).find(r=>r[0]==='Main Material');
-   const dForm=(c.detailRows||[]).find(r=>r[0]==='Form Language');
-   if(dMaterial) baseParts.push(`Main material: ${dMaterial[1]}.`);
-   if(dForm) baseParts.push(`Form language: ${dForm[1]}.`);
-   baseParts.push('Important: this must resemble a stylized 3D game prop model reference or model sheet, not a painted concept illustration. Fewer, larger views are better than many small ones.');
-   baseParts.push('No UI text, labels, technical notes, action scenes, or cinematic backgrounds.');
-   return baseParts.join(' ');
- }
- if(cat==='Flora'){
+  } else if(cat==='Flora'){
     const growth=R(['low creeping growth','upright clustered stalks','broad layered leaves','hanging vine drape','mushroom shelf formation','root-heavy trunk form','spiral flower structure','tufted field-crop silhouette','thick bulbous base','thorned branching shape']);
     const habitat=R(['old farm edges','moonlit forest floors','damp cave beds','ruined gardens','windswept cliffs','bog margins','sunlit terraces','graveyard soil','ancient temple cracks','riverbank reeds']);
     const use=R(['alchemy ingredient','cooking crop','healing herb','dye source','ritual flower','poison component','campfire seasoning','beast feed','rare trade good','quest harvest']);
@@ -1382,6 +1362,26 @@ function buildVisualPrompt(c,palette,rarityText){
    if(qComplication) baseParts.push(`Story complication or twist: ${qComplication[1]}.`);
    baseParts.push('Compose the scene so the location, threat, and objective are all visually understandable at a glance.');
    baseParts.push('Do not include quest text, stat text, or UI interface elements.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Decoration'){
+   baseParts.push('Create a clean isolated decoration/object prop model reference designed for 3D model generation.');
+   baseParts.push('This category covers world props and set dressing such as fences, signs, statues, lamps, carpets, chairs, tables, crates, barrels, banners, shelves, torches, road markers, and shrine objects.');
+   baseParts.push('Show the object silhouette, construction, scale, material breakup, and readable prop function clearly using simple sculptable forms.');
+   baseParts.push('Isolated object only: simple flat background, no environment, no room scene, no terrain, no extra clutter, no dramatic lighting, and no cast shadow.');
+   baseParts.push('Prefer one clear main prop. If useful, show a small tidy grouped set of up to 3 related variants or separate parts, but avoid a busy prop sheet.');
+   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, chunky construction, clear edges, readable material regions, and minimal tiny detail.');
+   baseParts.push('Surface treatment should still feel polished, with clean edge definition, crisp textures, and clear material separation. Avoid blurry, muddy, mushy, low-resolution, or overly smudged textures.');
+   baseParts.push('Avoid painterly rendering, scenic environment, excessive ornaments, tiny scratches everywhere, dense clutter, or cinematic prop illustration. If decoration appears, keep it fewer, larger, and chunkier.');
+   baseParts.push('If showing multiple views, use at most 3 total views or variants; preferably one large main view and up to two small supporting views.');
+   baseParts.push(`Decoration visual identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Decoration object type: ${c.role}.`);
+   const dMaterial=(c.detailRows||[]).find(r=>r[0]==='Main Material');
+   const dForm=(c.detailRows||[]).find(r=>r[0]==='Form Language');
+   if(dMaterial) baseParts.push(`Main material: ${dMaterial[1]}.`);
+   if(dForm) baseParts.push(`Form language: ${dForm[1]}.`);
+   baseParts.push('Important: this must resemble a stylized 3D game prop model reference or model sheet, not a painted concept illustration. Fewer, larger views are better than many small ones.');
+   baseParts.push('No UI text, labels, technical notes, action scenes, or cinematic backgrounds.');
    return baseParts.join(' ');
  }
  if(cat==='Flora'){
