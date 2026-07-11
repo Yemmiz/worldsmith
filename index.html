@@ -416,7 +416,7 @@
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
@@ -469,6 +469,7 @@ const roles={
  Vendor:['Potion vendor','Blacksmith','Curio trader','Event vendor','Beast tamer','Enchanter','Gem cutter'],
  Flora:['Crop plant','Herb patch','Flowering plant','Mushroom cluster','Shrub','Sapling tree','Ancient tree','Vine cluster'],
  Companion:['Pet critter','Faithful companion','Tiny helper','Mystic familiar','Calm grazer','Playful flier','Burrowing friend','Pack buddy'],
+ Decoration:['Fence','Signpost','Statue','Lamp post','Carpet','Chair','Table','Banner stand','Crate','Barrel','Torch stand','Bookshelf','Market stall','Road marker','Shrine prop','Wall ornament'],
  'Random Event':['Traveling caravan','Meteor fall','Goblin raid','Haunted fog','Treasure goblin','Portal storm']
 };
 const nouns=['Warden','Seer','Maw','Keeper','Bloom','Sentinel','Hermit','Crown','Idol','Shard','Howler','Caller','Binder','Root','Glaive','Lantern','Oracle','Mire','Fang','Monolith'];
@@ -542,6 +543,7 @@ function genName(cat,ts,role){
   if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
   if(cat==='Flora') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
   if(cat==='Companion') return R([`${t} ${R(['Pup','Sprite','Wisp','Totemkin','Nibbler','Scamper','Mite','Blinker','Sniffler','Hopper','Cubbie','Companion'])}`,`${R(prefixes)} ${R(['Familiar','Critter','Scoutling','Mote','Whisker','Buddy'])}`]);
+  if(cat==='Decoration') return R([`${t} ${R(['Fence','Signpost','Statue','Lamp','Carpet','Chair','Table','Banner','Crate','Barrel','Torch','Bookshelf','Marker','Shrine','Obelisk','Pillar'])}`,`${R(prefixes)} ${R(['Fence','Sign','Lantern','Seat','Stand','Idol','Carpet','Stool','Wardpost','Marker'])} ${R(suffixes)}`]);
   return `${t} ${R(nouns)} ${Math.random()<.45?R(suffixes):''}`.trim();
 }
 function mechanicName(effect,ts){return R([`${ts[0]} ${R(['Brand','Bloom','Oath','Echo','Hex','Pulse','Ward','Bite'])}`,`${effect} ${R(['Sigil','Mark','Curse','Resonance','Pact','Thorn'])}`,`${R(prefixes)} ${R(['Reprisal','Bloom','Judgement','Snare','Backlash'])}`]);}
@@ -997,7 +999,7 @@ function itemDesignFocus(rar){
 
 
 function isNarrativeCategory(cat){
-  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Flora','Companion','Random Event'].includes(cat);
+  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Flora','Companion','Decoration','Random Event'].includes(cat);
 }
 function categorySpecificContent(cat,ts,rar,role,att,info){
   const themeText=ts.join(', ').toLowerCase();
@@ -1051,7 +1053,27 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='NPC concepts become stronger when they have a motive and a secret. That gives them a reason to exist in quests or towns.';
     detailRows=[['NPC Role',role],['Motivation',motivation],['Signature Prop',prop],['Secret',secret]];
     structureRows=[['Likely Use',R(['quest giver','vendor unlock','dungeon clue','faction contact','comic relief','tragic lore source','crafting trainer'])],['Attitude',att],['Visual Priority','Full-body character concept with props']];
-  } else if(cat==='Flora'){
+  } else if(cat==='Decoration'){
+   baseParts.push('Create a clean isolated decoration/object prop model reference designed for 3D model generation.');
+   baseParts.push('This category covers world props and set dressing such as fences, signs, statues, lamps, carpets, chairs, tables, crates, barrels, banners, shelves, torches, road markers, and shrine objects.');
+   baseParts.push('Show the object silhouette, construction, scale, material breakup, and readable prop function clearly using simple sculptable forms.');
+   baseParts.push('Isolated object only: simple flat background, no environment, no room scene, no terrain, no extra clutter, no dramatic lighting, and no cast shadow.');
+   baseParts.push('Prefer one clear main prop. If useful, show a small tidy grouped set of up to 3 related variants or separate parts, but avoid a busy prop sheet.');
+   baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, broad surfaces, chunky construction, clear edges, readable material regions, and minimal tiny detail.');
+   baseParts.push('Surface treatment should still feel polished, with clean edge definition, crisp textures, and clear material separation. Avoid blurry, muddy, mushy, low-resolution, or overly smudged textures.');
+   baseParts.push('Avoid painterly rendering, scenic environment, excessive ornaments, tiny scratches everywhere, dense clutter, or cinematic prop illustration. If decoration appears, keep it fewer, larger, and chunkier.');
+   baseParts.push('If showing multiple views, use at most 3 total views or variants; preferably one large main view and up to two small supporting views.');
+   baseParts.push(`Decoration visual identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Decoration object type: ${c.role}.`);
+   const dMaterial=(c.detailRows||[]).find(r=>r[0]==='Main Material');
+   const dForm=(c.detailRows||[]).find(r=>r[0]==='Form Language');
+   if(dMaterial) baseParts.push(`Main material: ${dMaterial[1]}.`);
+   if(dForm) baseParts.push(`Form language: ${dForm[1]}.`);
+   baseParts.push('Important: this must resemble a stylized 3D game prop model reference or model sheet, not a painted concept illustration. Fewer, larger views are better than many small ones.');
+   baseParts.push('No UI text, labels, technical notes, action scenes, or cinematic backgrounds.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Flora'){
     const growth=R(['low creeping growth','upright clustered stalks','broad layered leaves','hanging vine drape','mushroom shelf formation','root-heavy trunk form','spiral flower structure','tufted field-crop silhouette','thick bulbous base','thorned branching shape']);
     const habitat=R(['old farm edges','moonlit forest floors','damp cave beds','ruined gardens','windswept cliffs','bog margins','sunlit terraces','graveyard soil','ancient temple cracks','riverbank reeds']);
     const use=R(['alchemy ingredient','cooking crop','healing herb','dye source','ritual flower','poison component','campfire seasoning','beast feed','rare trade good','quest harvest']);
@@ -1071,6 +1093,16 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='Companions should feel attachable, memorable, and usable in the world. This category aims for pets, critters, familiars, and helper creatures rather than hostile enemies.';
     detailRows=[['Companion Type',role],['Temperament',temperament],['Utility Fantasy',utility],['Bond Fantasy',bond]];
     structureRows=[['Signature Quirk',quirk],['Best Used As',R(['pet collectible','starter companion','ambient critter with personality','summoned familiar concept','town companion','light utility helper'])],['Body Language',R(['upright and attentive','low and scampering','soft and rounded','nimble and springy','perched and observant'])],['Prompt Note','Treat it like a friendly/neutral creature model reference, not a monster battle scene.']];
+  } else if(cat==='Decoration'){
+    const form=R(['sturdy blocky silhouette','tall readable vertical shape','low wide prop shape','arched frame construction','chunky carved form','simple modular construction','stacked plank design','rounded stone base','iron-banded wooden structure','cloth-and-pole construction','tileable repeated segment','single strong hero object']);
+    const material=R(['weathered wood','carved stone','worked iron','aged brass','painted cloth','old leather','worn bone','polished crystal','dwarven metalwork','goblin scrap','royal lacquered wood','sun-bleached timber','mossy stone','rune-carved slate']);
+    const placement=R(['town square','dungeon corridor','farm edge','forest path','market stall','tavern corner','shrine entrance','roadside','castle hallway','graveyard path','dockside','wizard study','orc camp','festival area','mine tunnel']);
+    const functionHint=R(['guides the player through a path','decorates a settlement','marks a point of interest','frames an entrance','breaks up an empty room','adds faction identity','works as modular set dressing','can be repeated in the world','supports readable level design','acts as a small landmark']);
+    signature=`Decoration Identity: A ${role.toLowerCase()} with ${form}, made from ${material}, usually placed around a ${placement}, and it ${functionHint}.`;
+    desc=`A ${rar.toLowerCase()} decoration/object concept built around ${themeText} fantasy. It focuses on a clean readable prop silhouette, strong material identity, and practical use as game-world set dressing rather than combat mechanics.`;
+    why='Decoration objects should be easy to model, easy to reuse, and instantly readable in the world. This category is for props like fences, signs, statues, lamps, carpets, chairs, tables, crates, banners, and similar world objects.';
+    detailRows=[['Object Type',role],['Form Language',form],['Main Material',material],['Typical Placement',placement]];
+    structureRows=[['World Use',functionHint],['Best Used As',R(['town decoration','dungeon prop','modular prop set','farm prop','quest landmark','vendor area dressing','environmental storytelling prop'])],['Scale Cue',R(['small handheld-size prop','waist-high prop','human-height prop','large room focal object','repeatable modular segment'])],['Prompt Note','Treat it like a clean isolated 3D prop/model reference, not a scenic environment.']];
   } else {
     const eventMoment=R(['a caravan is attacked','a shrine awakens','a meteor falls','ghost lights cross the road','a cursed chest appears','a faction patrol clashes with monsters','a bridge collapses','a traveling vendor is surrounded','a funeral procession is interrupted','a golem breaks loose','a witch trial turns violent','a flock of omen ravens gathers','a well begins singing','a pirate map burns itself into stone','a market stall transforms into a mimic','a clock tower rings thirteen times','a child chases a glowing animal','a ghost asks for directions','a monster migration crosses the road']);
     const playerChoice=R(['fight immediately','save someone','loot quickly before danger grows','choose a side','follow the strange trail','interrupt a ritual','escort survivors','investigate the aftermath','protect the guilty person','return a stolen object','break or preserve the relic','pay the toll or refuse','help the monster or the villagers','chase the fleeing thief','stabilize the portal','free the trapped spirit','decide which NPC to trust']);
@@ -1149,6 +1181,7 @@ function directedIdea(){
     [/room|chamber|hall|dungeon|crypt|vault|arena|corridor/, 'Dungeon Room'],
     [/crop|plant|tree|flower|herb|mushroom|fungus|vine|bush|shrub|sapling|fern|reed|blossom/, 'Flora'],
     [/pet|companion|critter|familiar|cub|pup|kit|helper|friend/, 'Companion'],
+    [/decoration|decor|object|prop|fence|sign|signpost|statue|lamp|lantern|carpet|rug|chair|table|crate|barrel|banner|torch|bookshelf|shelf|stool|bench|pillar|obelisk|marker/, 'Decoration'],
     [/biome|forest|swamp|desert|coast|mine|cavern|moor|wasteland|meadow|mountain|valley/, 'Biome'],
     [/monster|creature|beast|goblin|wolf|spider|serpent|dragon|zombie|skeleton|demon|imp|troll|ogre/, 'Monster'],
   ];
@@ -1275,7 +1308,7 @@ function spellVisualIntent(c){
 
 function buildVisualPrompt(c,palette,rarityText){
  const cat=c.category;
- const isModelSubject=['Monster','Boss','NPC','Vendor','Flora','Companion'].includes(cat);
+ const isModelSubject=['Monster','Boss','NPC','Vendor','Flora','Companion','Decoration'].includes(cat);
  const baseParts=isModelSubject?[
    'Stylized fantasy 3D game model reference for asset creation, not a painterly illustration or splash art.',
    'Use neutral studio presentation, even lighting, large readable shapes, simple geometric forms, broad planes, minimal surface noise, chunky stylized proportions, and model-friendly construction.',
