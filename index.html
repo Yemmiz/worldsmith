@@ -413,7 +413,8 @@
 • Added Directed Idea input with Idea Drift slider for seed-based generation.
 • Added Flora category and Flora follow-up prompt for growth stages and harvest yields.
 • Added Portrait / Icon Prompt generation for all categories.
-• Improved armour prompt positioning for body armour, pants, gloves, and boots.</div></div>
+• Improved armour prompt positioning for body armour, pants, gloves, and boots.
+• Refined sleeve/robe armour A-pose spacing: arms about 18–22° away from the torso with clear wrist/hip spacing.</div></div>
   </section>
 </main>
 <script>
@@ -871,21 +872,23 @@ function itemSlotGroup(cat,role){
 }
 function armourPresentationGuidance(role, forIcon=false){
   const r=(role||'').toLowerCase();
+  const aPoseSleeves = 'Use a game-rig A-pose matching the player base model: upper arms angled about 18–22 degrees away from the torso on each side, elbows only slightly bent, wrists relaxed downward, with a visible armpit gap and the sleeve cuffs/hands not touching the hips. Aim for roughly one fist-width to one forearm-width of empty space between the inner wrist/cuff and the side of the torso.';
+  const aPoseLegs = 'Use a game-rig A-pose lower-body stance: legs slightly apart, feet roughly shoulder-width, with a clear gap between the thighs so the pants silhouette is readable.';
   if(r.includes('helmet')) return forIcon
     ? 'Show the helmet by itself, centered and clearly readable, with the full helmet fully visible in frame.'
     : 'Presentation and positioning: show the helmet by itself as a clean isolated piece, fully visible and centered.';
   if(r.includes('chest')) return forIcon
-    ? 'Show the body armour in an A-pose mannequin presentation so the chest piece, shoulder area, and silhouette are clearly readable. Keep both arms slightly apart from the torso.'
-    : 'Presentation and positioning: show the body armour in an A-pose mannequin presentation so the chest piece, shoulder shape, and arm openings read clearly. Keep both arms slightly apart from the torso.';
+    ? 'Show the body armour on a simple headless mannequin or invisible-body A-pose. If it has sleeves, pauldrons, arm guards, or robe sleeves, '+aPoseSleeves+' If it is a sleeveless vest or torso-only chest piece, keep the arms optional or minimal so the torso shape stays clear.'
+    : 'Presentation and positioning: show the body armour on a simple headless mannequin or invisible-body A-pose. If it has sleeves, pauldrons, arm guards, or robe sleeves, '+aPoseSleeves+' If it is a sleeveless vest or torso-only chest piece, keep the arms optional or minimal so the torso shape stays clear.';
   if(r.includes('pants')) return forIcon
-    ? 'Show the pants in an A-pose mannequin presentation with the legs slightly apart so the full leg silhouette is readable.'
-    : 'Presentation and positioning: show the pants in an A-pose mannequin presentation with the legs slightly apart so the full silhouette, crotch area, and leg shapes are clearly readable.';
+    ? 'Show the pants on a simple lower-body mannequin in an A-pose stance. '+aPoseLegs
+    : 'Presentation and positioning: show the pants on a simple lower-body mannequin in an A-pose stance. '+aPoseLegs+' Keep the full silhouette, crotch area, knees, cuffs, and leg shapes clearly readable.';
   if(r.includes('gloves')) return forIcon
-    ? 'Show the gloves as a clearly separated pair, with both gloves fully visible and not overlapping.'
-    : 'Presentation and positioning: show the gloves as a clearly separated pair, with both gloves fully visible, not overlapping, and easy to model individually.';
+    ? 'Show the gloves as a clearly separated left-and-right pair, palms angled slightly inward or three-quarter view, with both gloves fully visible and not overlapping.'
+    : 'Presentation and positioning: show the gloves as a clearly separated left-and-right pair, palms angled slightly inward or three-quarter view, with both gloves fully visible, not overlapping, and easy to model individually.';
   if(r.includes('boots')) return forIcon
-    ? 'Show the boots as a clearly separated pair, with both boots fully visible and not merged together.'
-    : 'Presentation and positioning: show the boots as a clearly separated pair, with both boots fully visible, not merged together, and easy to model individually.';
+    ? 'Show the boots as a clearly separated left-and-right pair, toes angled slightly outward, with both boots fully visible and not merged together.'
+    : 'Presentation and positioning: show the boots as a clearly separated left-and-right pair, toes angled slightly outward, with both boots fully visible, not merged together, and easy to model individually.';
   if(r.includes('cloak')) return forIcon
     ? 'Show the cloak hanging clearly in full view so the full outer silhouette is readable.'
     : 'Presentation and positioning: show the cloak hanging clearly in full view so the full silhouette, drape, and edge shapes are readable.';
@@ -893,8 +896,8 @@ function armourPresentationGuidance(role, forIcon=false){
     ? 'Show the belt clearly by itself, laid out or slightly curved so the full shape and buckle area are readable.'
     : 'Presentation and positioning: show the belt clearly by itself, laid out or slightly curved so the full shape, buckle, and attachment details are readable.';
   return forIcon
-    ? 'Show the armour piece clearly, fully visible, centered, and easy to read.'
-    : 'Presentation and positioning: show the armour piece clearly, fully visible, centered, and easy to read.';
+    ? 'Show the armour piece clearly, fully visible, centered, and easy to read. If it includes sleeves or arm coverage, use a relaxed A-pose with arms about 18–22 degrees away from the torso.'
+    : 'Presentation and positioning: show the armour piece clearly, fully visible, centered, and easy to read. If it includes sleeves or arm coverage, use a relaxed A-pose with arms about 18–22 degrees away from the torso.';
 }
 
 function itemAffixCount(rar){
