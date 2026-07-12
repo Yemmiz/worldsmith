@@ -412,7 +412,8 @@
 • Kept v1.0 layout improvements and v0.95 sanity validation intact.
 • Added Directed Idea input with Idea Drift slider for seed-based generation.
 • Added Flora category and Flora follow-up prompt for growth stages and harvest yields.
-• Added Portrait / Icon Prompt generation for all categories.</div></div>
+• Added Portrait / Icon Prompt generation for all categories.
+• Improved armour prompt positioning for body armour, pants, gloves, and boots.</div></div>
   </section>
 </main>
 <script>
@@ -865,9 +866,37 @@ itemVisualDetails.push('oversized silhouette','clear icon-read shape','distinct 
 function itemSlotGroup(cat,role){
   const r=(role||'').toLowerCase();
   if(cat==='Weapon'){ if(r.includes('wand')||r.includes('staff')) return 'caster'; if(r.includes('bow')) return 'ranged'; if(r.includes('shield')) return 'shield'; return 'melee'; }
-  if(cat==='Armour'){ if(r.includes('helmet')) return 'helmet'; if(r.includes('chest')) return 'chest'; if(r.includes('gloves')) return 'gloves'; if(r.includes('boots')) return 'boots'; if(r.includes('belt')) return 'belt'; if(r.includes('cloak')) return 'cloak'; return 'chest'; }
+  if(cat==='Armour'){ if(r.includes('helmet')) return 'helmet'; if(r.includes('chest')) return 'chest'; if(r.includes('gloves')) return 'gloves'; if(r.includes('boots')) return 'boots'; if(r.includes('pants')) return 'pants'; if(r.includes('belt')) return 'belt'; if(r.includes('cloak')) return 'cloak'; return 'chest'; }
   return 'default';
 }
+function armourPresentationGuidance(role, forIcon=false){
+  const r=(role||'').toLowerCase();
+  if(r.includes('helmet')) return forIcon
+    ? 'Show the helmet by itself, centered and clearly readable, with the full helmet fully visible in frame.'
+    : 'Presentation and positioning: show the helmet by itself as a clean isolated piece, fully visible and centered.';
+  if(r.includes('chest')) return forIcon
+    ? 'Show the body armour in an A-pose mannequin presentation so the chest piece, shoulder area, and silhouette are clearly readable. Keep both arms slightly apart from the torso.'
+    : 'Presentation and positioning: show the body armour in an A-pose mannequin presentation so the chest piece, shoulder shape, and arm openings read clearly. Keep both arms slightly apart from the torso.';
+  if(r.includes('pants')) return forIcon
+    ? 'Show the pants in an A-pose mannequin presentation with the legs slightly apart so the full leg silhouette is readable.'
+    : 'Presentation and positioning: show the pants in an A-pose mannequin presentation with the legs slightly apart so the full silhouette, crotch area, and leg shapes are clearly readable.';
+  if(r.includes('gloves')) return forIcon
+    ? 'Show the gloves as a clearly separated pair, with both gloves fully visible and not overlapping.'
+    : 'Presentation and positioning: show the gloves as a clearly separated pair, with both gloves fully visible, not overlapping, and easy to model individually.';
+  if(r.includes('boots')) return forIcon
+    ? 'Show the boots as a clearly separated pair, with both boots fully visible and not merged together.'
+    : 'Presentation and positioning: show the boots as a clearly separated pair, with both boots fully visible, not merged together, and easy to model individually.';
+  if(r.includes('cloak')) return forIcon
+    ? 'Show the cloak hanging clearly in full view so the full outer silhouette is readable.'
+    : 'Presentation and positioning: show the cloak hanging clearly in full view so the full silhouette, drape, and edge shapes are readable.';
+  if(r.includes('belt')) return forIcon
+    ? 'Show the belt clearly by itself, laid out or slightly curved so the full shape and buckle area are readable.'
+    : 'Presentation and positioning: show the belt clearly by itself, laid out or slightly curved so the full shape, buckle, and attachment details are readable.';
+  return forIcon
+    ? 'Show the armour piece clearly, fully visible, centered, and easy to read.'
+    : 'Presentation and positioning: show the armour piece clearly, fully visible, centered, and easy to read.';
+}
+
 function itemAffixCount(rar){
   const table={Common:[1,2],Uncommon:[2,3],Rare:[4,5],Epic:[3,4],Legendary:[3,4],Mythic:[4,5],Unique:[4,5]};
   const range=table[rar]||[3,4]; return range[0]===range[1]?range[0]:range[0]+Math.floor(Math.random()*(range[1]-range[0]+1));
@@ -1472,6 +1501,7 @@ function buildVisualPrompt(c,palette,rarityText){
    baseParts.push('Show a single clear object or a small tidy grouped set only if needed for readability.');
    if(c.role) baseParts.push(`Item type: ${c.role}.`);
    if(c.identity) baseParts.push(`Materials and construction: ${c.identity.materials}; ${c.identity.construction}; ${c.identity.wear}.`);
+   if(cat==='Armour') baseParts.push(armourPresentationGuidance(c.role,false));
    baseParts.push(`Visual identity: ${c.visual.join(', ')}.`);
    baseParts.push('No stat text, no labels, and no technical mechanics. Prioritize silhouette and material readability.');
    return baseParts.join(' ');
@@ -1581,7 +1611,7 @@ function buildPortraitPrompt(c,palette,rarityText){
    parts.push('Use a flat easily cut-out background color or chroma-like backdrop. Do not create an environment or scene.');
    parts.push('Keep the silhouette clean and readable, with one main object or a very small tidy grouped set only if the item naturally requires it.');
    parts.push('Prioritize a clean fantasy RPG icon feel: crisp edges, strong material definition, polished textures, low visual noise, and clear readability at small size.');
-   if(cat==='Armour') parts.push('If the armor piece is wearable gear, show the entire piece cleanly and fully within frame.');
+   if(cat==='Armour'){ parts.push('If the armor piece is wearable gear, show the entire piece cleanly and fully within frame.'); parts.push(armourPresentationGuidance(c.role,true)); }
    if(cat==='Decoration') parts.push('For decoration props, show the full prop cleanly, centered, and isolated, as a usable object icon rather than a scenic prop illustration.');
    parts.push('Avoid background clutter, cast shadows, scenic context, UI text, labels, or extra effects that make cutout difficult.');
    return parts.join(' ');
