@@ -420,7 +420,7 @@
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
@@ -474,6 +474,7 @@ const roles={
  Flora:['Crop plant','Herb patch','Flowering plant','Mushroom cluster','Shrub','Sapling tree','Ancient tree','Vine cluster'],
  Companion:['Pet critter','Faithful companion','Tiny helper','Mystic familiar','Calm grazer','Playful flier','Burrowing friend','Pack buddy'],
  Decoration:['Fence','Signpost','Statue','Lamp post','Carpet','Chair','Table','Banner stand','Crate','Barrel','Torch stand','Bookshelf','Market stall','Road marker','Shrine prop','Wall ornament'],
+ Texture:['Castle wall bricks','Dungeon floor tiles','Cobblestone path','Wooden planks','Oak bark','Roof shingles','Tilled soil','Forest ground','Sand','Gravel','Mud','Moss ground','Lava rock','Cave wall rock','Carpet weave'],
  'Random Event':['Traveling caravan','Meteor fall','Goblin raid','Haunted fog','Treasure goblin','Portal storm']
 };
 const nouns=['Warden','Seer','Maw','Keeper','Bloom','Sentinel','Hermit','Crown','Idol','Shard','Howler','Caller','Binder','Root','Glaive','Lantern','Oracle','Mire','Fang','Monolith'];
@@ -545,6 +546,7 @@ function genName(cat,ts,role){
   const t=ts[0];
   if(['Spell','Skill'].includes(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
   if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
+  if(cat==='Texture') return R([`${t} ${role}`,`${capitalize(t)} ${role}`,`${R(prefixes)} ${role}`]);
   if(cat==='Flora') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
   if(cat==='Companion') return R([`${t} ${R(['Pup','Sprite','Wisp','Totemkin','Nibbler','Scamper','Mite','Blinker','Sniffler','Hopper','Cubbie','Companion'])}`,`${R(prefixes)} ${R(['Familiar','Critter','Scoutling','Mote','Whisker','Buddy'])}`]);
   if(cat==='Decoration') return R([`${t} ${R(['Fence','Signpost','Statue','Lamp','Carpet','Chair','Table','Banner','Crate','Barrel','Torch','Bookshelf','Marker','Shrine','Obelisk','Pillar'])}`,`${R(prefixes)} ${R(['Fence','Sign','Lantern','Seat','Stand','Idol','Carpet','Stool','Wardpost','Marker'])} ${R(suffixes)}`]);
@@ -1033,7 +1035,7 @@ function itemDesignFocus(rar){
 
 
 function isNarrativeCategory(cat){
-  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Flora','Companion','Decoration','Random Event'].includes(cat);
+  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Flora','Companion','Decoration','Texture','Random Event'].includes(cat);
 }
 function categorySpecificContent(cat,ts,rar,role,att,info){
   const themeText=ts.join(', ').toLowerCase();
@@ -1117,6 +1119,18 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='Decoration objects should be easy to model, easy to reuse, and instantly readable in the world. This category is for props like fences, signs, statues, lamps, carpets, chairs, tables, crates, banners, and similar world objects.';
     detailRows=[['Object Type',role],['Form Language',form],['Main Material',material],['Typical Placement',placement]];
     structureRows=[['World Use',functionHint],['Best Used As',R(['town decoration','dungeon prop','modular prop set','farm prop','quest landmark','vendor area dressing','environmental storytelling prop'])],['Scale Cue',R(['small handheld-size prop','waist-high prop','human-height prop','large room focal object','repeatable modular segment'])],['Prompt Note','Treat it like a clean isolated 3D prop/model reference, not a scenic environment.']];
+  } else if(cat==='Texture'){
+    const roleLower=(role||'texture').toLowerCase();
+    const useCase = roleLower.includes('wall') ? 'vertical wall surface' : roleLower.includes('floor') || roleLower.includes('path') || roleLower.includes('ground') ? 'walkable ground surface' : roleLower.includes('roof') ? 'roof covering material' : roleLower.includes('bark') ? 'tree or wood surface' : 'environment surface material';
+    const materialRead = roleLower.includes('brick') || roleLower.includes('stone') || roleLower.includes('cobblestone') || roleLower.includes('rock') ? R(['chunky carved stone','aged castle masonry','weathered stone blocks','broad rocky planes']) : roleLower.includes('plank') || roleLower.includes('bark') ? R(['painted wood grain','broad timber planks','simplified bark ridges','readable wood surface']) : roleLower.includes('soil') || roleLower.includes('sand') || roleLower.includes('gravel') || roleLower.includes('mud') || roleLower.includes('moss') ? R(['broad natural ground shapes','layered earth surface','chunky soil clumps','clean stylized ground breakup']) : roleLower.includes('carpet') ? R(['woven cloth surface','clean textile pattern','broad decorative weave','readable fabric material']) : R(['clean stylized surface breakup','broad material planes','readable environment material','game-friendly surface definition']);
+    const patternScale = roleLower.includes('brick') || roleLower.includes('plank') || roleLower.includes('tile') || roleLower.includes('cobblestone') ? R(['large readable shapes with fewer larger pieces','large and medium shapes only, with minimal tiny filler pieces','chunky repeating shapes that still read at low resolution']) : R(['broad simple patterning','large readable forms with low visual noise','clean repetition with minimal micro detail']);
+    const wearLevel = R(['slightly worn and aged','clean but natural','weathered but readable','used but not ruined']);
+    const tilingRule = R(['perfectly seamless on all edges','fully repeatable as a square tile','built to tile cleanly in every direction']);
+    signature=`Texture Identity: ${role.toLowerCase()} with ${materialRead}, ${patternScale}, and ${wearLevel}.`;
+    desc=`A ${rar.toLowerCase()} texture built around ${themeText} fantasy. It functions as a tileable environment material focused on seamless repetition, clear material identity, and readability at game scale.`;
+    why='Textures for an ARPG need to read quickly in repetition. This category focuses on tileability, large readable shapes, and clean material definition instead of scene composition or gameplay mechanics.';
+    detailRows=[['Surface Type',role],['Material Read',materialRead],['Pattern Scale',patternScale],['Wear Level',wearLevel]];
+    structureRows=[['Tiling Rule',tilingRule],['Use Case',useCase],['Readability Target','Must remain readable when scaled down to small game texture sizes such as 64x64 or 128x128'],['Composition Rule','No central focal point, no perspective, no cast shadow, and no directional scene lighting']];
   } else {
     const eventMoment=R(['a caravan is attacked','a shrine awakens','a meteor falls','ghost lights cross the road','a cursed chest appears','a faction patrol clashes with monsters','a bridge collapses','a traveling vendor is surrounded','a funeral procession is interrupted','a golem breaks loose','a witch trial turns violent','a flock of omen ravens gathers','a well begins singing','a pirate map burns itself into stone','a market stall transforms into a mimic','a clock tower rings thirteen times','a child chases a glowing animal','a ghost asks for directions','a monster migration crosses the road']);
     const playerChoice=R(['fight immediately','save someone','loot quickly before danger grows','choose a side','follow the strange trail','interrupt a ritual','escort survivors','investigate the aftermath','protect the guilty person','return a stolen object','break or preserve the relic','pay the toll or refuse','help the monster or the villagers','chase the fleeing thief','stabilize the portal','free the trapped spirit','decide which NPC to trust']);
@@ -1196,6 +1210,7 @@ function directedIdea(){
     [/crop|plant|tree|flower|herb|mushroom|fungus|vine|bush|shrub|sapling|fern|reed|blossom/, 'Flora'],
     [/pet|companion|critter|familiar|cub|pup|kit|helper|friend/, 'Companion'],
     [/decoration|decor|object|prop|fence|sign|signpost|statue|lamp|lantern|carpet|rug|chair|table|crate|barrel|banner|torch|bookshelf|shelf|stool|bench|pillar|obelisk|marker/, 'Decoration'],
+    [/texture|tile|tiling|uv|seamless|brick wall|wall brick|wall texture|floor tile|cobblestone|wood plank|wooden plank|roof shingle|ground texture|bark texture|stone bricks/, 'Texture'],
     [/biome|forest|swamp|desert|coast|mine|cavern|moor|wasteland|meadow|mountain|valley/, 'Biome'],
     [/monster|creature|beast|goblin|wolf|spider|serpent|dragon|zombie|skeleton|demon|imp|troll|ogre/, 'Monster'],
   ];
@@ -1509,6 +1524,27 @@ function buildVisualPrompt(c,palette,rarityText){
    baseParts.push('No stat text, no labels, and no technical mechanics. Prioritize silhouette and material readability.');
    return baseParts.join(' ');
  }
+ if(cat==='Texture'){
+   baseParts.push('Create a seamless tileable square environment texture intended for in-game use.');
+   baseParts.push('This category is for repeatable surfaces, tiles, and UV-style materials rather than props, characters, or scenes.');
+   baseParts.push('Texture requirements: square 1:1 texture, perfectly seamless and tileable on all sides, no borders, no frame, no vignette, and no central focal point.');
+   baseParts.push('Use a flat texture presentation: no perspective view, no cast shadows, no directional scene lighting, and no objects or props sitting on top of the surface unless they are inseparable parts of the material itself.');
+   baseParts.push('Keep the texture stylized and hand-painted, with large readable shapes, broad forms, low visual noise, and strong material readability. Avoid photorealism.');
+   baseParts.push('Important: prioritize readability in repetition and when scaled down to small game texture sizes such as 64x64 or 128x128. Favor fewer, larger shapes over many tiny noisy details.');
+   if(c.role) baseParts.push(`Texture type: ${c.role}.`);
+   baseParts.push(`Texture visual identity: ${c.visual.join(', ')}.`);
+   const tMaterial=(c.detailRows||[]).find(r=>r[0]==='Material Read');
+   const tScale=(c.detailRows||[]).find(r=>r[0]==='Pattern Scale');
+   const tWear=(c.detailRows||[]).find(r=>r[0]==='Wear Level');
+   const tUse=(c.structureRows||[]).find(r=>r[0]==='Use Case');
+   if(tMaterial) baseParts.push(`Material guidance: ${tMaterial[1]}.`);
+   if(tScale) baseParts.push(`Shape scale guidance: ${tScale[1]}.`);
+   if(tWear) baseParts.push(`Wear level: ${tWear[1]}.`);
+   if(tUse) baseParts.push(`Intended use: ${tUse[1]}.`);
+   baseParts.push('Keep edge definition clear and materials readable. Avoid muddy, blurry, mushy, noisy, or overly detailed surfaces.');
+   baseParts.push('Do not include UI text, labels, technical notes, or scene composition. Focus purely on a usable seamless texture tile.');
+   return baseParts.join(' ');
+ }
  if(cat==='Random Event'){
    baseParts.push('Create a dynamic event scene rather than an isolated object.');
    baseParts.push('Show the central event moment clearly, with readable environmental storytelling and a strong sense of what is happening.');
@@ -1598,6 +1634,15 @@ function buildPortraitPrompt(c,palette,rarityText){
    `Themes: ${c.themes.join(', ')}.`
  ];
  parts.push(...squareBase);
+ if(cat==='Texture'){
+   parts.push('Create a square preview swatch of the texture itself, designed like a clean in-game material thumbnail.');
+   parts.push('Show the texture as a flat seamless square tile sample rather than a scene or object.');
+   parts.push('Keep it repeatable in feel, readable at small size, and focused on the material pattern.');
+   parts.push('Use no perspective view, no cast shadow, no scene lighting gimmicks, and no extra environment.');
+   parts.push('Favor large readable shapes and low visual noise so the texture still reads well when reduced in size.');
+   parts.push('Avoid UI text, labels, or decorative borders.');
+   return parts.join(' ');
+ }
  if(['Monster','Boss','NPC','Vendor','Companion'].includes(cat)){
    parts.push('Create a portrait icon of the subject, focused on the face, head, and upper torso rather than a full-body scene.');
    parts.push('Show a clear readable face, expression, and silhouette, with the head large in frame and easy to recognize at a glance.');
