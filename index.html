@@ -416,7 +416,8 @@
 • Improved armour prompt positioning for body armour, pants, gloves, and boots.
 • Refined sleeve/robe armour A-pose spacing: arms about 18–22° away from the torso with clear wrist/hip spacing.
 • Refined texture prompts to avoid decorative inserts and keep textures as clean base materials.
-• Strengthened texture prompts further so concept/theme words are not interpreted as literal decorative motifs; textures now explicitly request only clean base materials.</div></div>
+• Strengthened texture prompts further so concept/theme words are not interpreted as literal decorative motifs; textures now explicitly request only clean base materials.
+• Expanded the texture type pool and pushed texture prompts harder toward fewer, bigger repeating shapes for better readability at small sizes.</div></div>
   </section>
 </main>
 <script>
@@ -476,7 +477,7 @@ const roles={
  Flora:['Crop plant','Herb patch','Flowering plant','Mushroom cluster','Shrub','Sapling tree','Ancient tree','Vine cluster'],
  Companion:['Pet critter','Faithful companion','Tiny helper','Mystic familiar','Calm grazer','Playful flier','Burrowing friend','Pack buddy'],
  Decoration:['Fence','Signpost','Statue','Lamp post','Carpet','Chair','Table','Banner stand','Crate','Barrel','Torch stand','Bookshelf','Market stall','Road marker','Shrine prop','Wall ornament'],
- Texture:['Castle wall bricks','Dungeon floor tiles','Cobblestone path','Wooden planks','Oak bark','Roof shingles','Tilled soil','Forest ground','Sand','Gravel','Mud','Moss ground','Lava rock','Cave wall rock','Carpet weave'],
+ Texture:['Castle wall bricks','Cut stone blocks','Dungeon floor tiles','Flagstone floor','Cobblestone path','Brick pathway','Marble floor tiles','Ancient mosaic floor','Rough cave wall rock','Cliff rock face','Sewer bricks','Fortress stone floor','Wooden planks','Weathered dock planks','Oak bark','Pine bark','Roof shingles','Thatch roofing','Tilled soil','Farmland rows','Forest ground','Mossy forest floor','Sand','Dunes sand','Gravel','Muddy ground','Snowy ground','Icy ground','Ashen ground','Moss ground','Lava rock','Cracked obsidian floor','Volcanic basalt tiles','Cave wall rock','Carpet weave','Woven cloth texture','Red carpet texture'],
  'Random Event':['Traveling caravan','Meteor fall','Goblin raid','Haunted fog','Treasure goblin','Portal storm']
 };
 const nouns=['Warden','Seer','Maw','Keeper','Bloom','Sentinel','Hermit','Crown','Idol','Shard','Howler','Caller','Binder','Root','Glaive','Lantern','Oracle','Mire','Fang','Monolith'];
@@ -1125,7 +1126,7 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     const roleLower=(role||'texture').toLowerCase();
     const useCase = roleLower.includes('wall') ? 'vertical wall surface' : roleLower.includes('floor') || roleLower.includes('path') || roleLower.includes('ground') ? 'walkable ground surface' : roleLower.includes('roof') ? 'roof covering material' : roleLower.includes('bark') ? 'tree or wood surface' : 'environment surface material';
     const materialRead = roleLower.includes('brick') || roleLower.includes('stone') || roleLower.includes('cobblestone') || roleLower.includes('rock') ? R(['chunky carved stone','aged castle masonry','weathered stone blocks','broad rocky planes']) : roleLower.includes('plank') || roleLower.includes('bark') ? R(['painted wood grain','broad timber planks','simplified bark ridges','readable wood surface']) : roleLower.includes('soil') || roleLower.includes('sand') || roleLower.includes('gravel') || roleLower.includes('mud') || roleLower.includes('moss') ? R(['broad natural ground shapes','layered earth surface','chunky soil clumps','clean stylized ground breakup']) : roleLower.includes('carpet') ? R(['woven cloth surface','clean textile pattern','broad decorative weave','readable fabric material']) : R(['clean stylized surface breakup','broad material planes','readable environment material','game-friendly surface definition']);
-    const patternScale = roleLower.includes('brick') || roleLower.includes('plank') || roleLower.includes('tile') || roleLower.includes('cobblestone') ? R(['large readable shapes with fewer larger pieces','large and medium shapes only, with minimal tiny filler pieces','chunky repeating shapes that still read at low resolution']) : R(['broad simple patterning','large readable forms with low visual noise','clean repetition with minimal micro detail']);
+    const patternScale = roleLower.includes('brick') || roleLower.includes('plank') || roleLower.includes('tile') || roleLower.includes('cobblestone') || roleLower.includes('flagstone') || roleLower.includes('block') ? R(['very large readable shapes with fewer bigger pieces','large and medium shapes only, with no tiny filler pieces','chunky repeating shapes that still read clearly at low resolution']) : R(['broad simple patterning with mostly large shapes','large readable forms with low visual noise and minimal tiny breakup','clean repetition built from a few big shapes, not many small ones']);
     const wearLevel = R(['slightly worn and aged','clean but natural','weathered but readable','used but not ruined']);
     const tilingRule = R(['perfectly seamless on all edges','fully repeatable as a square tile','built to tile cleanly in every direction']);
     signature=`Texture Identity: ${role.toLowerCase()} with ${materialRead}, ${patternScale}, and ${wearLevel}.`;
@@ -1536,6 +1537,8 @@ function buildVisualPrompt(c,palette,rarityText){
      'Use a flat texture presentation: no perspective view, no cast shadows, no directional scene lighting, and no objects or props sitting on top of the surface unless they are inseparable parts of the material itself.',
      'Keep the texture stylized and hand-painted, with large readable shapes, broad forms, low visual noise, and strong material readability. Avoid photorealism.',
      'Important: prioritize readability in repetition and when scaled down to small game texture sizes such as 64x64 or 128x128. Favor fewer, larger shapes over many tiny noisy details.',
+     'Very important: use mostly large and medium shapes only. Avoid many small bricks, tiny stones, tiny filler pieces, tiny accent objects, or fussy micro-breakup.',
+     'For brick, plank, tile, stone, bark, and similar materials, prefer fewer bigger units that remain clear when scaled down.',
      'Keep the texture focused on the base surface material only.',
      'Do not add decorative inserts, emblems, faces, statues, clocks, banners, gems, symbols, runes, heraldry, metal trims, framed ornaments, embedded props, carvings, accessories, or small scenic details.',
      'For walls, floors, paths, planks, bark, soil, stone, and similar surfaces, generate the clean repeating material only. Any special decorations should be added manually later as separate overlays or placed objects, not baked into the tile texture.',
@@ -1551,7 +1554,7 @@ function buildVisualPrompt(c,palette,rarityText){
    if(tScale) textureParts.push(`Shape scale guidance: ${tScale[1]}.`);
    if(tWear) textureParts.push(`Wear level: ${tWear[1]}.`);
    if(tUse) textureParts.push(`Intended use: ${tUse[1]}.`);
-   textureParts.push('Allowed detail types are simple material-inherent features only, such as cracks, chips, seams, mortar gaps, grain direction, cloth weave, dirt breakup, or broad wear variation.');
+   textureParts.push('Allowed detail types are simple material-inherent features only, such as cracks, chips, seams, mortar gaps, grain direction, cloth weave, dirt breakup, or broad wear variation. Keep these broad and readable rather than tiny and busy.');
    textureParts.push('Keep edge definition clear and materials readable. Avoid muddy, blurry, mushy, noisy, or overly detailed surfaces.');
    textureParts.push('Do not include UI text, labels, technical notes, or scene composition. Focus purely on a usable seamless texture tile.');
    return textureParts.join(' ');
