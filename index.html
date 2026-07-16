@@ -481,7 +481,7 @@
 • Refined the timeline prompt so it asks for one coherent continuous action or growth progression, rather than mixing unrelated poses together.
 • Added a separate Spell Flipbook Prompt tab for Spell and Skill concepts, aimed at 2D VFX sprite-sheet / flipbook style follow-up prompts.
 • Refined the spell flipbook prompt to push much harder toward flat 2D sprite-sheet VFX, avoiding 3D in-world spell scenes.
-• Added a separate Spell VFX category focused on flatter 2D-friendly spell concept generation, and moved the Spell Flipbook Prompt tab to that category.</div></div>
+• Added a effect-only 2D Spell VFX category focused on flatter 2D-friendly spell concept generation, and moved the Spell Flipbook Prompt tab to that category.</div></div>
   </section>
 </main>
 <script>
@@ -567,7 +567,7 @@ const roles={
  NPC:['Quest giver','Wandering merchant','Trainer','Hermit','Faction scout','Cursed noble','Village elder','Monster researcher'],
  Spell:['Projectile spell','Area spell','Curse spell','Buff spell','Summon spell','Mobility spell','Trap spell','Channeled spell'],
  Skill:['Melee cleave','Ranged shot','Defensive stance','Dash attack','Totem skill','Channel skill','Combo finisher'],
- 'Spell VFX':['Projectile spell','Area spell','Curse spell','Buff spell','Summon spell','Mobility spell','Trap spell','Channeled spell'],
+ 'Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst'],
  Weapon:['One-handed sword','Two-handed axe','Wand','Staff','Bow','Dagger','Mace','Shield weapon'],
  Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
  Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
@@ -1442,6 +1442,25 @@ function spellVisualIntent(c){
   return lines;
 }
 
+function spellVfxRoleIntent(role){
+  const r=(role||'').toLowerCase();
+  if(r.includes('projectile')) return 'a flat 2D projectile trail with clear start, travel direction, and dissipating tail';
+  if(r.includes('impact')) return 'a flat 2D impact burst with readable expansion, sharp peak shape, and fading fragments';
+  if(r.includes('area')||r.includes('pulse')||r.includes('nova')) return 'a top-down planar area pulse or nova ring with clear radius and expanding energy';
+  if(r.includes('aura')||r.includes('buff')) return 'a flat protective or empowering aura ring made from clean layered circular VFX shapes, without a character inside it';
+  if(r.includes('shield')) return 'a flat shield flare or ward shell using clean arcs and protective glyph strokes, without a physical shield object';
+  if(r.includes('trap')||r.includes('rune')||r.includes('decal')) return 'a top-down magical decal or rune trap with simple readable glyph geometry and activation glow';
+  if(r.includes('beam')) return 'a flat beam sweep with clean directionality, energy core, and simple fading edge layers';
+  if(r.includes('cone')) return 'a flat cone blast with a clear origin, widening shape, and readable edge breakup';
+  if(r.includes('arc')||r.includes('lash')) return 'a flat arcing lash of energy with a strong sweeping silhouette and minimal particles';
+  if(r.includes('healing')) return 'a soft healing bloom with simple expanding petals, rings, or plus-like glow motifs';
+  if(r.includes('curse')||r.includes('mark')) return 'a hostile curse mark or debuff glyph built from sharp flat shapes and dark glow layers';
+  if(r.includes('charge')) return 'a build-up glow sequence with simple rings, sparks, and gathering energy shapes';
+  if(r.includes('dissolve')||r.includes('fade')) return 'a dissipating VFX shape with clean shrinking masks and fading particles';
+  if(r.includes('wisp')||r.includes('orbit')) return 'a small orbiting wisp pattern using simple repeated glow shapes and motion trails';
+  return 'a flat 2D spell effect built from clean abstract VFX shapes with clear timing and readable silhouette';
+}
+
 function buildVisualPrompt(c,palette,rarityText){
  const cat=c.category;
  const isSpellVfx=cat==='Spell VFX';
@@ -1473,16 +1492,18 @@ function buildVisualPrompt(c,palette,rarityText){
  const directedLine=ideaPromptLine();
  if(directedLine) baseParts.push(directedLine);
  if(cat==='Spell VFX'){
-   baseParts.push('Create one concept sheet with two clearly separated visual parts.');
-   baseParts.push('Left side: one square game icon only, centered, icon-ready, readable at 64x64, bold silhouette, fully contained, no text, no numbers, and no UI labels.');
-   baseParts.push('Right side: one flat 2D VFX example of the spell effect, shown as a clean top-down or front-facing effect design rather than an in-world scene.');
-   baseParts.push('Represent the effect using abstract VFX language such as rings, arcs, pulses, trails, bursts, runes, aura shapes, projectile streaks, shield shells, impact marks, or wisps depending on the spell role.');
-   baseParts.push('Avoid rendered 3D props or physical scene objects. If the spell identity suggests an object such as a lantern, sword, book, meteor, or idol, reinterpret it as a simplified 2D magical motif, emblem, silhouette, or glyph rather than a literal 3D object.');
-   baseParts.push('Keep the VFX readable and production-friendly: fewer larger shapes, simple layering, clean alpha-like edges, and clear effect timing cues.');
-   baseParts.push(`Spell category and role: ${c.category}, ${c.role}.`);
-   spellVisualIntent(c).forEach(line=>baseParts.push(line));
-   baseParts.push(`Spell visual identity: ${c.visual.join(', ')}.`);
-   baseParts.push('Important: this must feel like a 2D spell/VFX concept sheet. Do not turn it into a scenic spell illustration, a 3D summoned object showcase, or an environment concept.');
+   baseParts.push('Create one flat 2D spell VFX concept sheet for game production. This is effect-only VFX design, not a 3D spell scene, not a character spell cast, not a summoned object showcase, and not an isometric impact illustration.');
+   baseParts.push('Do not include a caster, humanoid target, creature, pet, statue, lantern, weapon, shield, book, idol, terrain crater, ground rocks, floor tiles, scenic environment, or any physical prop. The spell effect itself is the only subject.');
+   baseParts.push('Do not include the square ability icon in this main Spell VFX prompt. The icon is handled by the Portrait / Icon tab.');
+   baseParts.push('Show a clean planar 2D VFX design: front-facing or top-down, orthographic, flat layered shapes, no camera angle, no perspective depth, no cast shadow, and no 3D lighting.');
+   baseParts.push('Use abstract VFX language only: rings, arcs, pulses, streaks, trails, masks, glyph strokes, aura shells, projectile silhouettes, shield outlines, impact shapes, wisps, additive glow layers, and simple particles.');
+   baseParts.push('If the theme suggests a literal animal, object, or symbol such as raven, serpent, lantern, sword, crown, clock, eye, or tree, reinterpret it as an abstract 2D motif or simple silhouette made from VFX strokes, not a rendered creature or prop.');
+   baseParts.push('Keep the result production-friendly for 2D flipbooks: fewer larger shapes, clean alpha-like edges, clear timing cues, broad readable silhouettes, and minimal particle noise.');
+   baseParts.push('Optional layout: one larger main flat VFX design plus two small separated shape callouts showing the start and peak forms. Keep it simple and planar, not a scene.');
+   baseParts.push(`Spell VFX role: ${c.role}.`);
+   baseParts.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
+   baseParts.push(`Spell VFX visual identity: ${c.visual.join(', ')}.`);
+   baseParts.push('Important: this must look like a 2D game VFX production concept, suitable as the source for a flipbook prompt. Avoid painterly 3D rendering and avoid cinematic spell illustration.');
    baseParts.push('Do not include stat text, cooldowns, damage numbers, technical mechanics, ability descriptions, captions, UI frames, or interface elements.');
    return baseParts.join(' ');
  }
@@ -1774,29 +1795,28 @@ function buildSpellFlipbookPrompt(c,palette,rarityText){
  const cat=c.category;
  if(cat!=='Spell VFX') return 'Spell flipbook prompt is only generated for Spell VFX concepts.';
  const lines=[];
- lines.push('Use the previously generated Spell VFX concept as the reference and keep the exact same spell identity, symbol language, theme, palette, elemental logic, and emotional intent.');
- lines.push('Create a readable 2D flipbook-style spell animation sheet for game VFX production.');
- lines.push('This must look like a flat 2D sprite-sheet / flipbook reference, not a 3D cinematic concept sheet, not an isometric scene, not an in-world spell preview, and not a polished illustration scene.');
+ lines.push('Use the previously generated Spell VFX concept as the reference and keep the exact same abstract effect identity, symbol language, theme, palette, elemental logic, and emotional intent.');
+ lines.push('Create a readable flat 2D spell VFX flipbook / sprite-sheet for game production. This must be effect-only, not a 3D scene and not an in-world spell cast.');
  lines.push('Show 4 to 8 frames total, preferably around 6 frames, arranged in one clean sequence with clear spacing and chronological numbering.');
- lines.push('Very important: all frames must belong to one single continuous effect progression of the same spell. Do not mix several different spell moments or unrelated effects in the same sheet.');
- lines.push('Choose one readable 2D effect sequence only, such as cast start-up, aura pulse, projectile travel, beam pulse, shield activation, healing bloom, impact burst, trap arming, or dissipating burst, depending on the spell role.');
- lines.push('Use clear progression such as start, build-up, active phase, peak, follow-through, and fade or dissipate.');
- lines.push('Keep the effect flat and mostly front-facing or top-down, suitable for a 2D game VFX flipbook. Use orthographic presentation only.');
- lines.push('Avoid 3D perspective, camera angle, ground-plane depth, isometric staging, cast shadows, scene lighting, environmental context, dramatic scale silhouettes, or a full in-world impact scene.');
- lines.push('Avoid rendered 3D objects, physical weapons, star-shaped solid props, statues, terrain craters, rocky ground, character models, and cinematic spell scenery. Represent the spell using abstract 2D VFX shapes only.');
- lines.push('Use broad readable flat shapes: arcs, rings, pulses, streaks, glows, masks, silhouettes, soft additive layers, simple particles, and clean motion trails.');
+ lines.push('Very important: all frames must belong to one single continuous 2D effect progression of the same spell. Do not mix several different spell moments or unrelated effects in the same sheet.');
+ lines.push('Choose one readable 2D VFX sequence only, such as projectile travel, area pulse, aura ring expansion, beam sweep, shield flare, rune activation, cone blast, arc lash, healing bloom, curse mark forming, impact burst, charge-up glow, or dissipating fade.');
+ lines.push('Use clear timing progression such as tiny start shape, build-up, active shape, peak frame, follow-through, and fade/dissipate.');
+ lines.push('Every frame should be a flat 2D sprite/effect drawing with consistent framing and scale. Use orthographic presentation only.');
+ lines.push('No caster, no humanoid target, no creature, no pet, no character silhouette, no ground plane, no terrain, no rocks, no crater, no floor circle scene, no physical prop, no lantern, no weapon, no shield, no statue, and no 3D object.');
+ lines.push('If the spell concept suggests a literal object or animal, simplify it into abstract 2D VFX strokes, glyphs, masks, silhouettes, or motion trails. Do not draw the literal object or animal as a rendered subject.');
+ lines.push('Use broad readable flat shapes: arcs, rings, pulses, streaks, glows, masks, silhouettes, additive layers, simple particles, and clean motion trails.');
  lines.push('Keep details simple enough for real flipbook use: low noise, few particles, no micro-detail, no painterly over-rendering, no complex 3D material surfaces.');
- lines.push('Do not include the square spell icon here. This tab is only for the animated spell effect follow-up, not the icon.');
+ lines.push('Do not include the square spell icon here. This tab is only for the animated 2D spell effect follow-up, not the icon.');
  lines.push('Keep the background plain and production-friendly, such as dark neutral, transparent-style, or chroma-style, so each frame reads as a separate VFX sprite.');
- lines.push('Each frame should be a flat 2D VFX drawing/sprite, with the same framing and scale across the sequence.');
- lines.push(`Spell category and role: ${c.category}, ${c.role}.`);
- spellVisualIntent(c).forEach(line=>lines.push(line));
- lines.push(`Spell visual identity: ${c.visual.join(', ')}.`);
+ lines.push(`Spell VFX role: ${c.role}.`);
+ lines.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
+ lines.push(`Spell VFX visual identity: ${c.visual.join(', ')}.`);
  lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
  lines.push(`Themes: ${c.themes.join(', ')}.`);
  lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
  return lines.join(' ');
 }
+
 
 function buildPortraitPrompt(c,palette,rarityText){
  const cat=c.category;
