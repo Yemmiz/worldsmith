@@ -458,7 +458,7 @@
       <textarea id="prompt" readonly></textarea>
       <textarea id="followupPrompt" readonly style="display:none" placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea>
       <textarea id="timelinePrompt" readonly style="display:none" placeholder="Generated for categories where a 4–6 frame timeline makes sense."></textarea>
-      <textarea id="spellFlipbookPrompt" readonly style="display:none" placeholder="Generated for Spell and Skill concepts."></textarea>
+      <textarea id="spellFlipbookPrompt" readonly style="display:none" placeholder="Generated for Spell VFX concepts."></textarea>
       <textarea id="portraitPrompt" readonly style="display:none" placeholder="Generated for all categories with category-specific icon directions."></textarea>
       <p class="prompt-panel-note">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically.</p>
     </div>
@@ -480,13 +480,14 @@
 • Added a dedicated 4–6 frame timeline / animation prompt tab for categories where sequential motion or growth stages make sense.
 • Refined the timeline prompt so it asks for one coherent continuous action or growth progression, rather than mixing unrelated poses together.
 • Added a separate Spell Flipbook Prompt tab for Spell and Skill concepts, aimed at 2D VFX sprite-sheet / flipbook style follow-up prompts.
-• Refined the spell flipbook prompt to push much harder toward flat 2D sprite-sheet VFX, avoiding 3D in-world spell scenes.</div></div>
+• Refined the spell flipbook prompt to push much harder toward flat 2D sprite-sheet VFX, avoiding 3D in-world spell scenes.
+• Added a separate Spell VFX category focused on flatter 2D-friendly spell concept generation, and moved the Spell Flipbook Prompt tab to that category.</div></div>
   </section>
 </main>
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
@@ -566,6 +567,7 @@ const roles={
  NPC:['Quest giver','Wandering merchant','Trainer','Hermit','Faction scout','Cursed noble','Village elder','Monster researcher'],
  Spell:['Projectile spell','Area spell','Curse spell','Buff spell','Summon spell','Mobility spell','Trap spell','Channeled spell'],
  Skill:['Melee cleave','Ranged shot','Defensive stance','Dash attack','Totem skill','Channel skill','Combo finisher'],
+ 'Spell VFX':['Projectile spell','Area spell','Curse spell','Buff spell','Summon spell','Mobility spell','Trap spell','Channeled spell'],
  Weapon:['One-handed sword','Two-handed axe','Wand','Staff','Bow','Dagger','Mace','Shield weapon'],
  Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
  Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
@@ -602,7 +604,7 @@ const effectRules={
   retaliation:{verbs:['strikes','curses','marks','knocks back','drains mana from'],targets:['nearby enemies','the killer','the attacker','players in front'],validTarget:'Enemy'}
 };
 function mechanicFamily(cat,rar){
-  if(['Spell','Skill'].includes(cat)) return R(['offensive','defensive','reward']);
+  if(['Spell','Skill','Spell VFX'].includes(cat)) return R(['offensive','defensive','reward']);
   if(cat==='Boss') return R(['offensive','retaliation','summon']);
   if(cat==='NPC'||cat==='Vendor'||cat==='Biome'||cat==='Quest'||cat==='Currency'||cat==='Crafting Material') return R(['reward','defensive']);
   return R(['offensive','retaliation','summon','defensive']);
@@ -649,7 +651,7 @@ function weightedThemes(rar, existing=[]){
 function themeInfo(ts){let first=ts.find(t=>byTheme[t])||'Arcane'; return byTheme[first]||byTheme.Arcane;}
 function genName(cat,ts,role){
   const t=ts[0];
-  if(['Spell','Skill'].includes(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
+  if(['Spell','Skill','Spell VFX'].includes(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
   if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
   if(cat==='Texture') return R([`${t} ${role}`,`${capitalize(t)} ${role}`,`${R(prefixes)} ${role}`]);
   if(cat==='Flora') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
@@ -1376,7 +1378,7 @@ function standardConcept(forceReroll=false){
   const itemMode=isItemCategory(cat);
   const narrativeMode=isNarrativeCategory(cat);
   const allowItemMechanic=itemCanHaveMechanic(cat,rar);
-  const mechanicsMode=(cat==='Spell'||cat==='Skill'||allowItemMechanic) && !narrativeMode;
+  const mechanicsMode=(cat==='Spell'||cat==='Skill'||cat==='Spell VFX'||allowItemMechanic) && !narrativeMode;
   const tech=mechanicsMode ? (state.locks.mechanic&&old.tech?old.tech:technical(cat,ts,rar)) : null;
   const identity=itemMode?itemIdentity(cat,rar,ts):null;
   const name=ideaName(cat,itemMode?genItemName(cat,rar,ts,role,identity):genName(cat,ts,role),ts,rar);
@@ -1442,8 +1444,17 @@ function spellVisualIntent(c){
 
 function buildVisualPrompt(c,palette,rarityText){
  const cat=c.category;
+ const isSpellVfx=cat==='Spell VFX';
  const isModelSubject=['Monster','Boss','NPC','Vendor','Flora','Companion','Decoration'].includes(cat);
- const baseParts=isModelSubject?[
+ const baseParts=isSpellVfx?[
+   'Stylized fantasy 2D spell VFX concept sheet for game production, not a 3D in-world scene, cinematic illustration, or isometric spell preview.',
+   'Use flat 2D presentation, orthographic or front-facing/top-down effect design, large readable shapes, clean crisp edges, low visual noise, and production-friendly readability.',
+   'Keep the effect planar and layerable, suitable for sprite-sheet development, VFX planning, and 2D game readability rather than a rendered physical object in a scene.',
+   'No environment, no terrain, no cast shadows, no dramatic camera angle, no scenic background, and no cinematic storytelling. The spell effect itself is the subject.',
+   `Use this defining colour palette: ${palettePrompt(palette)}.`,
+   `Concept: ${c.name}, ${rarityText} ${c.category}.`,
+   `Themes: ${c.themes.join(', ')}.`
+ ]:isModelSubject?[
    'Stylized fantasy 3D game model reference for asset creation, not a painterly illustration or splash art.',
    'Use neutral studio presentation, even lighting, large readable shapes, simple geometric forms, broad planes, minimal surface noise, chunky stylized proportions, and model-friendly construction.',
    'Keep the shapes simplified and sculptable, but maintain high-quality game-ready surface treatment: crisp edges, clean material separation, clear forms, and polished readable textures.',
@@ -1461,6 +1472,20 @@ function buildVisualPrompt(c,palette,rarityText){
  ];
  const directedLine=ideaPromptLine();
  if(directedLine) baseParts.push(directedLine);
+ if(cat==='Spell VFX'){
+   baseParts.push('Create one concept sheet with two clearly separated visual parts.');
+   baseParts.push('Left side: one square game icon only, centered, icon-ready, readable at 64x64, bold silhouette, fully contained, no text, no numbers, and no UI labels.');
+   baseParts.push('Right side: one flat 2D VFX example of the spell effect, shown as a clean top-down or front-facing effect design rather than an in-world scene.');
+   baseParts.push('Represent the effect using abstract VFX language such as rings, arcs, pulses, trails, bursts, runes, aura shapes, projectile streaks, shield shells, impact marks, or wisps depending on the spell role.');
+   baseParts.push('Avoid rendered 3D props or physical scene objects. If the spell identity suggests an object such as a lantern, sword, book, meteor, or idol, reinterpret it as a simplified 2D magical motif, emblem, silhouette, or glyph rather than a literal 3D object.');
+   baseParts.push('Keep the VFX readable and production-friendly: fewer larger shapes, simple layering, clean alpha-like edges, and clear effect timing cues.');
+   baseParts.push(`Spell category and role: ${c.category}, ${c.role}.`);
+   spellVisualIntent(c).forEach(line=>baseParts.push(line));
+   baseParts.push(`Spell visual identity: ${c.visual.join(', ')}.`);
+   baseParts.push('Important: this must feel like a 2D spell/VFX concept sheet. Do not turn it into a scenic spell illustration, a 3D summoned object showcase, or an environment concept.');
+   baseParts.push('Do not include stat text, cooldowns, damage numbers, technical mechanics, ability descriptions, captions, UI frames, or interface elements.');
+   return baseParts.join(' ');
+ }
  if(cat==='Spell' || cat==='Skill'){
    baseParts.push('Create one concept sheet with two clearly separated visual parts.');
    baseParts.push('Left side: one square game icon only, centered, icon-ready, readable at 64x64, bold silhouette, fully contained, no text, no numbers, no UI labels.');
@@ -1747,9 +1772,9 @@ function render(c){
 
 function buildSpellFlipbookPrompt(c,palette,rarityText){
  const cat=c.category;
- if(!['Spell','Skill'].includes(cat)) return 'Spell flipbook prompt is only generated for Spell and Skill concepts.';
+ if(cat!=='Spell VFX') return 'Spell flipbook prompt is only generated for Spell VFX concepts.';
  const lines=[];
- lines.push('Use the previously generated spell or skill concept as the reference and keep the exact same spell identity, symbol language, theme, palette, elemental logic, and emotional intent.');
+ lines.push('Use the previously generated Spell VFX concept as the reference and keep the exact same spell identity, symbol language, theme, palette, elemental logic, and emotional intent.');
  lines.push('Create a readable 2D flipbook-style spell animation sheet for game VFX production.');
  lines.push('This must look like a flat 2D sprite-sheet / flipbook reference, not a 3D cinematic concept sheet, not an isometric scene, not an in-world spell preview, and not a polished illustration scene.');
  lines.push('Show 4 to 8 frames total, preferably around 6 frames, arranged in one clean sequence with clear spacing and chronological numbering.');
@@ -1830,7 +1855,7 @@ function buildPortraitPrompt(c,palette,rarityText){
    parts.push('Avoid tiny clutter, UI text, labels, or an overly detailed landscape painting.');
    return parts.join(' ');
  }
- if(cat==='Spell' || cat==='Skill'){
+ if(cat==='Spell' || cat==='Skill' || cat==='Spell VFX'){
    parts.push('Create a square spell/skill icon that clearly communicates the magical or combat identity at a glance.');
    parts.push('Use one centered readable motif, strong silhouette, bold shape language, and clean contrast.');
    parts.push('Keep the icon simple, readable, and suitable for a fantasy ARPG hotbar or ability panel.');
