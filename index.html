@@ -395,6 +395,15 @@
     border-color:#f2c46d;
     font-weight:700;
   }
+  .prompt-tab.disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    filter:saturate(.55);
+  }
+  .prompt-tab.disabled:hover{
+    color:var(--muted);
+    border-color:var(--line);
+  }
   .prompt-panel-note{
     margin-top:8px!important;
     color:var(--muted)!important;
@@ -404,7 +413,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching, and keeps the v0.95 sanity engine intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a timeline/animation prompt tab, and keeps the v0.95 sanity engine intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -442,12 +451,14 @@
       <div class="prompt-tab-row" id="promptTabs">
         <button class="prompt-tab active" data-prompt-tab="prompt">Image Prompt</button>
         <button class="prompt-tab" data-prompt-tab="followupPrompt">Follow-up Prompt</button>
+        <button class="prompt-tab" data-prompt-tab="timelinePrompt">4–6 Frame Timeline</button>
         <button class="prompt-tab" data-prompt-tab="portraitPrompt">Portrait / Icon Prompt</button>
       </div>
       <textarea id="prompt" readonly></textarea>
       <textarea id="followupPrompt" readonly style="display:none" placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea>
+      <textarea id="timelinePrompt" readonly style="display:none" placeholder="Generated for categories where a 4–6 frame timeline makes sense."></textarea>
       <textarea id="portraitPrompt" readonly style="display:none" placeholder="Generated for all categories with category-specific icon directions."></textarea>
-      <p class="prompt-panel-note">The general image prompt is shown by default after each generation. Click another tab to switch prompt type.</p>
+      <p class="prompt-panel-note">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
@@ -463,7 +474,8 @@
 • Strengthened texture prompts further so concept/theme words are not interpreted as literal decorative motifs; textures now explicitly request only clean base materials.
 • Expanded the texture type pool and pushed texture prompts harder toward fewer, bigger repeating shapes for better readability at small sizes.
 • Added grass and glass texture types, with dedicated material descriptions so those categories produce more suitable surface guidance.
-• Replaced the separate prompt boxes with tab-style prompt switching, so you can click between the general image prompt, follow-up prompt, and portrait/icon prompt in one compact panel.</div></div>
+• Replaced the separate prompt boxes with tab-style prompt switching, so you can click between the general image prompt, follow-up prompt, and portrait/icon prompt in one compact panel.
+• Added a dedicated 4–6 frame timeline / animation prompt tab for categories where sequential motion or growth stages make sense.</div></div>
   </section>
 </main>
 <script>
@@ -475,19 +487,33 @@ const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=docume
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
 const state={current:null, activePromptTab:'prompt', locks:{category:false,themes:false,rarity:false,attitude:false,role:false,mechanic:false}};
 
-const promptTabs=['prompt','followupPrompt','portraitPrompt'];
+const promptTabs=['prompt','followupPrompt','timelinePrompt','portraitPrompt'];
 const promptTabMeta={
   prompt:{title:'Image Prompt',copyLabel:'📋 Copy Image Prompt'},
   followupPrompt:{title:'Follow-up Prompt',copyLabel:'📋 Copy Follow-up Prompt'},
+  timelinePrompt:{title:'4–6 Frame Timeline Prompt',copyLabel:'📋 Copy Timeline Prompt'},
   portraitPrompt:{title:'Portrait / Icon Prompt',copyLabel:'📋 Copy Portrait / Icon Prompt'}
 };
+function promptTabAvailable(id){
+  const el=document.getElementById(id);
+  if(!el) return false;
+  const value=(el.value||'').trim();
+  return value && !value.startsWith('Not generated for this category.') && !value.startsWith('Timeline prompt is only generated') && !value.startsWith('Follow-up prompt is only generated');
+}
 function setActivePromptTab(tabId){
-  state.activePromptTab=promptTabs.includes(tabId)?tabId:'prompt';
+  let nextTab=promptTabs.includes(tabId)?tabId:'prompt';
+  if(nextTab!=='prompt' && !promptTabAvailable(nextTab)) nextTab='prompt';
+  state.activePromptTab=nextTab;
   promptTabs.forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display=id===state.activePromptTab?'block':'none';
   });
-  document.querySelectorAll('[data-prompt-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.promptTab===state.activePromptTab));
+  document.querySelectorAll('[data-prompt-tab]').forEach(btn=>{
+    const enabled=promptTabAvailable(btn.dataset.promptTab) || btn.dataset.promptTab==='prompt';
+    btn.classList.toggle('active',btn.dataset.promptTab===state.activePromptTab);
+    btn.classList.toggle('disabled',!enabled);
+    btn.title=enabled ? '' : 'Not generated for this category';
+  });
   const meta=promptTabMeta[state.activePromptTab]||promptTabMeta.prompt;
   const titleEl=document.getElementById('promptPanelTitle');
   const copyBtn=document.getElementById('copyPromptInline');
@@ -1700,9 +1726,11 @@ function render(c){
  const rarityText=c.creatureMode?`${c.encounterTier} encounter-tier`:c.rarity;
  const prompt=buildVisualPrompt(c,palette,rarityText);
  const followupPrompt=buildFollowupPrompt(c,palette,rarityText);
+ const timelinePrompt=buildTimelinePrompt(c,palette,rarityText);
  const portraitPrompt=buildPortraitPrompt(c,palette,rarityText);
  document.getElementById('prompt').value=prompt;
  document.getElementById('followupPrompt').value=followupPrompt;
+ document.getElementById('timelinePrompt').value=timelinePrompt;
  document.getElementById('portraitPrompt').value=portraitPrompt;
  setActivePromptTab('prompt');
  document.getElementById('stub').textContent=JSON.stringify(exportData(c),null,2);
@@ -1837,6 +1865,55 @@ function buildFollowupPrompt(c,palette,rarityText){
    lines.push('The walk poses should show readable body mechanics. The attack poses should be simple key action poses that fit the character identity, such as an unarmed strike, magical gesture, shove, or body-driven attack.');
    lines.push('Do not add new equipped weapons, tools, or props into the hands unless they already existed as a defined separate prop and are essential to the action.');
  }
+ lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+ lines.push(`Themes: ${c.themes.join(', ')}.`);
+ lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+ return lines.join(' ');
+}
+
+function buildTimelinePrompt(c,palette,rarityText){
+ const cat=c.category;
+ if(cat==='Flora'){
+   const lines=[];
+   lines.push('Use the previously generated flora image as the reference and keep the exact same plant identity, silhouette, species logic, palette, materials, and overall design language.');
+   lines.push('Create a readable 4 to 6 frame growth timeline sheet, not a painterly illustration and not a busy infographic.');
+   lines.push('Show 4 to 6 clear chronological stages of the same plant, such as seed, sprout, young stage, mid-growth stage, mature stage, and optionally harvest-ready stage.');
+   lines.push('If the plant has a harvestable output, you may include one small final yield callout only if there is room, but keep the main focus on the stage progression itself.');
+   lines.push('Arrange the stages in a clean left-to-right or top-to-bottom timeline with clear spacing between stages.');
+   lines.push('Keep the background simple and neutral, with no environment, no cast shadow, and no cinematic scene.');
+   lines.push('Maintain the same clean stylized 3D model look: large readable shapes, simple geometric forms, broad planes, low visual noise, crisp edges, clear material separation, and polished readable textures.');
+   lines.push('Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged.');
+   lines.push('Use 4 to 6 stages total; do not create many tiny panels. Readability matters more than quantity.');
+   lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+   lines.push(`Themes: ${c.themes.join(', ')}.`);
+   lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+   return lines.join(' ');
+ }
+ if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Timeline prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
+ const lines=[];
+ lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
+ lines.push('Create a readable 4 to 6 frame animation-style timeline sheet, not a painterly illustration and not a literal frame-by-frame film strip.');
+ lines.push('Show 4 to 6 key pose snapshots of the same exact '+cat.toLowerCase()+', arranged in a clean timeline or sequence.');
+ lines.push('Use 2 to 3 key walk or locomotion poses and 2 to 3 attack, utility, or action poses, for a total of 4 to 6 frames.');
+ lines.push('Each frame should read clearly on its own. Favor fewer strong poses over many tiny frames.');
+ lines.push('Arrange the poses in a clean left-to-right or top-to-bottom sequence with clear spacing between frames.');
+ lines.push('Keep the background simple and neutral, with no environment, no cast shadow, and no cinematic scene.');
+ lines.push('Maintain the same clean stylized 3D model look: large readable shapes, simple geometric forms, broad planes, low visual noise, crisp edges, clear material separation, and polished readable textures.');
+ lines.push('Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged.');
+ if(cat==='Monster' || cat==='Boss'){
+   lines.push('The action poses should fit the creature body plan and identity, such as claw swipe, pounce, bite, slam, charge, rearing, or magical body-driven attack.');
+   lines.push('Do not add any new equipped weapons or props.');
+ }
+ if(cat==='Companion'){
+   lines.push('Keep the sequence friendly or neutral in tone. The action poses can be utility-based, playful, alert, magical, or pet-like rather than violent.');
+   lines.push('Do not add any new equipped weapons or props.');
+ }
+ if(cat==='NPC' || cat==='Vendor'){
+   lines.push('Keep the same exact character design and clothing silhouette.');
+   lines.push('The walk poses should show readable body mechanics. The action poses should be simple key gestures that fit the character identity, such as a wave, cast gesture, shove, brace, or unarmed strike.');
+   lines.push('Do not add new equipped weapons, tools, or props into the hands unless they already existed as a defined separate prop and are essential to the action.');
+ }
+ lines.push('Very important: 4 to 6 frames total only. Do not create 8 or 9 tiny frames.');
  lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
  lines.push(`Themes: ${c.themes.join(', ')}.`);
  lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
@@ -1982,7 +2059,7 @@ document.getElementById('importSaves').addEventListener('change',e=>importSavesF
 document.getElementById('copyAllSaves').onclick=()=>copyAllSaves();
 document.getElementById('copyPrompt').onclick=copyActivePrompt;
 document.getElementById('copyPromptInline').onclick=copyActivePrompt;
-document.querySelectorAll('[data-prompt-tab]').forEach(btn=>btn.addEventListener('click',()=>setActivePromptTab(btn.dataset.promptTab)));
+document.querySelectorAll('[data-prompt-tab]').forEach(btn=>btn.addEventListener('click',()=>{ if(btn.classList.contains('disabled')) return; setActivePromptTab(btn.dataset.promptTab); }));
 document.getElementById('copyJson').onclick=()=>state.current&&navigator.clipboard.writeText(JSON.stringify(exportData(state.current),null,2));
 document.getElementById('copyMarkdown').onclick=()=>state.current&&navigator.clipboard.writeText(markdownNote(state.current));
 ideaChaosEl.addEventListener('input',()=>ideaChaosLabel.textContent=ideaChaosEl.value);
