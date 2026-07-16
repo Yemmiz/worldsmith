@@ -413,7 +413,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a refined coherent timeline prompt tab plus a spell flipbook prompt tab, and keeps the v0.95 sanity engine intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a refined coherent timeline prompt tab plus a flatter 2D spell flipbook prompt tab, and keeps the v0.95 sanity engine intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -479,7 +479,8 @@
 • Replaced the separate prompt boxes with tab-style prompt switching, so you can click between the general image prompt, follow-up prompt, and portrait/icon prompt in one compact panel.
 • Added a dedicated 4–6 frame timeline / animation prompt tab for categories where sequential motion or growth stages make sense.
 • Refined the timeline prompt so it asks for one coherent continuous action or growth progression, rather than mixing unrelated poses together.
-• Added a separate Spell Flipbook Prompt tab for Spell and Skill concepts, aimed at 2D VFX sprite-sheet / flipbook style follow-up prompts.</div></div>
+• Added a separate Spell Flipbook Prompt tab for Spell and Skill concepts, aimed at 2D VFX sprite-sheet / flipbook style follow-up prompts.
+• Refined the spell flipbook prompt to push much harder toward flat 2D sprite-sheet VFX, avoiding 3D in-world spell scenes.</div></div>
   </section>
 </main>
 <script>
@@ -1749,18 +1750,20 @@ function buildSpellFlipbookPrompt(c,palette,rarityText){
  if(!['Spell','Skill'].includes(cat)) return 'Spell flipbook prompt is only generated for Spell and Skill concepts.';
  const lines=[];
  lines.push('Use the previously generated spell or skill concept as the reference and keep the exact same spell identity, symbol language, theme, palette, elemental logic, and emotional intent.');
- lines.push('Create a readable 2D flipbook-style spell animation sheet for game VFX production, not a painterly illustration and not a 3D cinematic concept sheet.');
- lines.push('This should feel like a game-ready spell flipbook or sprite-sheet reference: simple, readable, stylized, and clearly usable as a basis for 2D VFX animation.');
+ lines.push('Create a readable 2D flipbook-style spell animation sheet for game VFX production.');
+ lines.push('This must look like a flat 2D sprite-sheet / flipbook reference, not a 3D cinematic concept sheet, not an isometric scene, not an in-world spell preview, and not a polished illustration scene.');
  lines.push('Show 4 to 8 frames total, preferably around 6 frames, arranged in one clean sequence with clear spacing and chronological numbering.');
  lines.push('Very important: all frames must belong to one single continuous effect progression of the same spell. Do not mix several different spell moments or unrelated effects in the same sheet.');
- lines.push('Choose one readable effect sequence only, such as a cast start-up, aura pulse, projectile travel, beam pulse, shield activation, healing bloom, impact burst, trap arming, or dissipating magical burst, depending on the spell role.');
+ lines.push('Choose one readable 2D effect sequence only, such as cast start-up, aura pulse, projectile travel, beam pulse, shield activation, healing bloom, impact burst, trap arming, or dissipating burst, depending on the spell role.');
  lines.push('Use clear progression such as start, build-up, active phase, peak, follow-through, and fade or dissipate.');
- lines.push('Keep the effect mostly 2D in nature: flat readable shapes, broad stylized forms, clean silhouettes, layered magical shapes, and minimal noise.');
- lines.push('Use an orthographic or nearly flat presentation suitable for a flipbook or sprite sheet. Avoid dramatic perspective, cinematic staging, or heavy 3D scene depth.');
+ lines.push('Keep the effect flat and mostly front-facing or top-down, suitable for a 2D game VFX flipbook. Use orthographic presentation only.');
+ lines.push('Avoid 3D perspective, camera angle, ground-plane depth, isometric staging, cast shadows, scene lighting, environmental context, dramatic scale silhouettes, or a full in-world impact scene.');
+ lines.push('Avoid rendered 3D objects, physical weapons, star-shaped solid props, statues, terrain craters, rocky ground, character models, and cinematic spell scenery. Represent the spell using abstract 2D VFX shapes only.');
+ lines.push('Use broad readable flat shapes: arcs, rings, pulses, streaks, glows, masks, silhouettes, soft additive layers, simple particles, and clean motion trails.');
+ lines.push('Keep details simple enough for real flipbook use: low noise, few particles, no micro-detail, no painterly over-rendering, no complex 3D material surfaces.');
  lines.push('Do not include the square spell icon here. This tab is only for the animated spell effect follow-up, not the icon.');
- lines.push('Avoid full characters, environments, UI mockups, frames, text labels, or scenic storytelling. If scale truly needs help, use only a tiny simple neutral silhouette or marker very sparingly, but prefer effect-only frames.');
- lines.push('Keep the background plain and production-friendly, such as a dark neutral backdrop or transparent-style presentation that makes the effect easy to read.');
- lines.push('Keep the effect simplified enough for flipbook use: avoid hyper-detailed painterly rendering, tiny particles everywhere, micro-detail, or overly complex 3D materials.');
+ lines.push('Keep the background plain and production-friendly, such as dark neutral, transparent-style, or chroma-style, so each frame reads as a separate VFX sprite.');
+ lines.push('Each frame should be a flat 2D VFX drawing/sprite, with the same framing and scale across the sequence.');
  lines.push(`Spell category and role: ${c.category}, ${c.role}.`);
  spellVisualIntent(c).forEach(line=>lines.push(line));
  lines.push(`Spell visual identity: ${c.visual.join(', ')}.`);
@@ -1769,7 +1772,6 @@ function buildSpellFlipbookPrompt(c,palette,rarityText){
  lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
  return lines.join(' ');
 }
-
 
 function buildPortraitPrompt(c,palette,rarityText){
  const cat=c.category;
