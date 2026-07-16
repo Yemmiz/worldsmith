@@ -567,7 +567,7 @@ const roles={
  NPC:['Quest giver','Wandering merchant','Trainer','Hermit','Faction scout','Cursed noble','Village elder','Monster researcher'],
  Spell:['Projectile spell','Area spell','Curse spell','Buff spell','Summon spell','Mobility spell','Trap spell','Channeled spell'],
  Skill:['Melee cleave','Ranged shot','Defensive stance','Dash attack','Totem skill','Channel skill','Combo finisher'],
- 'Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst'],
+ 'Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Rain volley','Spiral drill'],
  Weapon:['One-handed sword','Two-handed axe','Wand','Staff','Bow','Dagger','Mace','Shield weapon'],
  Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
  Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
@@ -1444,13 +1444,14 @@ function spellVisualIntent(c){
 
 function spellVfxRoleIntent(role){
   const r=(role||'').toLowerCase();
-  if(r.includes('projectile')) return 'a flat 2D projectile trail with clear start, travel direction, and dissipating tail';
+  if(r.includes('projectile')||r.includes('bolt')) return 'a flat 2D projectile trail with clear origin, strong travel direction, readable head shape, and dissipating tail';
+  if(r.includes('lightning')||r.includes('strike')) return 'a directional lightning strike or vertical magical hit using jagged branches, sharp impact emphasis, and strong line-of-action rather than a circular nova';
   if(r.includes('impact')) return 'a flat 2D impact burst with readable expansion, sharp peak shape, and fading fragments';
   if(r.includes('area')||r.includes('pulse')||r.includes('nova')) return 'a top-down planar area pulse or nova ring with clear radius and expanding energy';
   if(r.includes('aura')||r.includes('buff')) return 'a flat protective or empowering aura ring made from clean layered circular VFX shapes, without a character inside it';
   if(r.includes('shield')) return 'a flat shield flare or ward shell using clean arcs and protective glyph strokes, without a physical shield object';
   if(r.includes('trap')||r.includes('rune')||r.includes('decal')) return 'a top-down magical decal or rune trap with simple readable glyph geometry and activation glow';
-  if(r.includes('beam')) return 'a flat beam sweep with clean directionality, energy core, and simple fading edge layers';
+  if(r.includes('beam')) return 'a flat beam sweep with strong linear directionality, energy core, and simple fading edge layers';
   if(r.includes('cone')) return 'a flat cone blast with a clear origin, widening shape, and readable edge breakup';
   if(r.includes('arc')||r.includes('lash')) return 'a flat arcing lash of energy with a strong sweeping silhouette and minimal particles';
   if(r.includes('healing')) return 'a soft healing bloom with simple expanding petals, rings, or plus-like glow motifs';
@@ -1458,7 +1459,15 @@ function spellVfxRoleIntent(role){
   if(r.includes('charge')) return 'a build-up glow sequence with simple rings, sparks, and gathering energy shapes';
   if(r.includes('dissolve')||r.includes('fade')) return 'a dissipating VFX shape with clean shrinking masks and fading particles';
   if(r.includes('wisp')||r.includes('orbit')) return 'a small orbiting wisp pattern using simple repeated glow shapes and motion trails';
-  return 'a flat 2D spell effect built from clean abstract VFX shapes with clear timing and readable silhouette';
+  if(r.includes('fire jet')||r.includes('flame jet')) return 'a flat directional fire jet with clear nozzle-like origin, tapered flame body, and heat-like trailing breakup';
+  if(r.includes('flame wave')) return 'a flat sweeping wave of flame with a broad directional front and rolling layered edge shapes';
+  if(r.includes('chain tether')) return 'a flat chained or tethered effect connecting two points with readable links, arcs, or magical connective strands';
+  if(r.includes('meteor')) return 'a falling strike or meteor trail with strong top-to-bottom motion, entry streak, and concentrated impact point';
+  if(r.includes('wall')) return 'a flat wall or line barrier effect with horizontal spread, repeating segments, or a readable blocking edge';
+  if(r.includes('column')) return 'a vertical column burst with a strong upward or downward axis, stacked layers, and minimal radial spread';
+  if(r.includes('rain volley')) return 'a multi-hit falling volley using repeated downward streaks or drops with a shared directional angle';
+  if(r.includes('spiral')) return 'a spiral drill or corkscrew motion effect with clear twisting direction and elongated travel path';
+  return 'a flat 2D spell effect built from clean abstract VFX shapes with clear timing, readable silhouette, and a composition that matches the role rather than defaulting to a circular nova';
 }
 
 function buildVisualPrompt(c,palette,rarityText){
@@ -1497,6 +1506,8 @@ function buildVisualPrompt(c,palette,rarityText){
    baseParts.push('Do not include the square ability icon in this main Spell VFX prompt. The icon is handled by the Portrait / Icon tab.');
    baseParts.push('Show a clean planar 2D VFX design: front-facing or top-down, orthographic, flat layered shapes, no camera angle, no perspective depth, no cast shadow, and no 3D lighting.');
    baseParts.push('Use abstract VFX language only: rings, arcs, pulses, streaks, trails, masks, glyph strokes, aura shells, projectile silhouettes, shield outlines, impact shapes, wisps, additive glow layers, and simple particles.');
+   baseParts.push('Do not default to a centered circular nova composition. Only use circular or radial layouts when the role explicitly calls for an area pulse, aura ring, shield flare, healing bloom, curse mark, ground decal, rune trap, or nova burst.');
+   baseParts.push('For directional roles such as projectile trail, beam sweep, arc lash, lightning strike, fire jet, flame wave, meteor fall, wall line, chain tether, column burst, spiral drill, or rain volley, the composition must follow that directional motion and should look linear, vertical, sweeping, chained, or asymmetrical rather than radial.');
    baseParts.push('If the theme suggests a literal animal, object, or symbol such as raven, serpent, lantern, sword, crown, clock, eye, or tree, reinterpret it as an abstract 2D motif or simple silhouette made from VFX strokes, not a rendered creature or prop.');
    baseParts.push('Keep the result production-friendly for 2D flipbooks: fewer larger shapes, clean alpha-like edges, clear timing cues, broad readable silhouettes, and minimal particle noise.');
    baseParts.push('Optional layout: one larger main flat VFX design plus two small separated shape callouts showing the start and peak forms. Keep it simple and planar, not a scene.');
@@ -1800,6 +1811,7 @@ function buildSpellFlipbookPrompt(c,palette,rarityText){
  lines.push('Show 4 to 8 frames total, preferably around 6 frames, arranged in one clean sequence with clear spacing and chronological numbering.');
  lines.push('Very important: all frames must belong to one single continuous 2D effect progression of the same spell. Do not mix several different spell moments or unrelated effects in the same sheet.');
  lines.push('Choose one readable 2D VFX sequence only, such as projectile travel, area pulse, aura ring expansion, beam sweep, shield flare, rune activation, cone blast, arc lash, healing bloom, curse mark forming, impact burst, charge-up glow, or dissipating fade.');
+ lines.push('Do not default the flipbook to a circular nova unless the role truly calls for a radial effect. If the role suggests lightning, projectile travel, beam, cone, lash, fire jet, wall, chain, column, meteor, or falling volleys, keep the sequence directional and structured around that motion.');
  lines.push('Use clear timing progression such as tiny start shape, build-up, active shape, peak frame, follow-through, and fade/dissipate.');
  lines.push('Every frame should be a flat 2D sprite/effect drawing with consistent framing and scale. Use orthographic presentation only.');
  lines.push('No caster, no humanoid target, no creature, no pet, no character silhouette, no ground plane, no terrain, no rocks, no crater, no floor circle scene, no physical prop, no lantern, no weapon, no shield, no statue, and no 3D object.');
