@@ -413,7 +413,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a timeline/animation prompt tab, and keeps the v0.95 sanity engine intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a refined coherent timeline prompt tab, and keeps the v0.95 sanity engine intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -475,7 +475,8 @@
 • Expanded the texture type pool and pushed texture prompts harder toward fewer, bigger repeating shapes for better readability at small sizes.
 • Added grass and glass texture types, with dedicated material descriptions so those categories produce more suitable surface guidance.
 • Replaced the separate prompt boxes with tab-style prompt switching, so you can click between the general image prompt, follow-up prompt, and portrait/icon prompt in one compact panel.
-• Added a dedicated 4–6 frame timeline / animation prompt tab for categories where sequential motion or growth stages make sense.</div></div>
+• Added a dedicated 4–6 frame timeline / animation prompt tab for categories where sequential motion or growth stages make sense.
+• Refined the timeline prompt so it asks for one coherent continuous action or growth progression, rather than mixing unrelated poses together.</div></div>
   </section>
 </main>
 <script>
@@ -1878,8 +1879,9 @@ function buildTimelinePrompt(c,palette,rarityText){
    lines.push('Use the previously generated flora image as the reference and keep the exact same plant identity, silhouette, species logic, palette, materials, and overall design language.');
    lines.push('Create a readable 4 to 6 frame growth timeline sheet, not a painterly illustration and not a busy infographic.');
    lines.push('Show 4 to 6 clear chronological stages of the same plant, such as seed, sprout, young stage, mid-growth stage, mature stage, and optionally harvest-ready stage.');
+   lines.push('Every frame must belong to the same single progression and clearly read as one continuous growth sequence from early to late stage.');
    lines.push('If the plant has a harvestable output, you may include one small final yield callout only if there is room, but keep the main focus on the stage progression itself.');
-   lines.push('Arrange the stages in a clean left-to-right or top-to-bottom timeline with clear spacing between stages.');
+   lines.push('Arrange the stages in a clean left-to-right or top-to-bottom timeline with clear spacing, chronological numbering, and a consistent presentation across all frames.');
    lines.push('Keep the background simple and neutral, with no environment, no cast shadow, and no cinematic scene.');
    lines.push('Maintain the same clean stylized 3D model look: large readable shapes, simple geometric forms, broad planes, low visual noise, crisp edges, clear material separation, and polished readable textures.');
    lines.push('Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged.');
@@ -1893,27 +1895,30 @@ function buildTimelinePrompt(c,palette,rarityText){
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
  lines.push('Create a readable 4 to 6 frame animation-style timeline sheet, not a painterly illustration and not a literal frame-by-frame film strip.');
- lines.push('Show 4 to 6 key pose snapshots of the same exact '+cat.toLowerCase()+', arranged in a clean timeline or sequence.');
- lines.push('Use 2 to 3 key walk or locomotion poses and 2 to 3 attack, utility, or action poses, for a total of 4 to 6 frames.');
+ lines.push('Show 4 to 6 key pose snapshots of the same exact '+cat.toLowerCase()+', arranged in one coherent sequence.');
+ lines.push('Very important: this must be one single continuous action progression, not a mix of unrelated poses. Every frame should belong to the same motion from start to finish.');
+ lines.push('Choose one readable action only: either a walk cycle / locomotion sequence, or one signature attack / gesture / utility action. Do not mix walking frames with a separate different attack sequence in the same timeline.');
+ lines.push('Use clear motion progression such as start pose, anticipation, action, contact or apex, follow-through, and recovery, depending on the chosen action.');
+ lines.push('Keep the character at a consistent scale and generally the same viewing angle across all frames so the sequence reads as one timeline.');
+ lines.push('Arrange the frames in a clean left-to-right or top-to-bottom sequence with clear spacing, chronological numbering, and obvious progression from frame 1 to the last frame.');
  lines.push('Each frame should read clearly on its own. Favor fewer strong poses over many tiny frames.');
- lines.push('Arrange the poses in a clean left-to-right or top-to-bottom sequence with clear spacing between frames.');
  lines.push('Keep the background simple and neutral, with no environment, no cast shadow, and no cinematic scene.');
  lines.push('Maintain the same clean stylized 3D model look: large readable shapes, simple geometric forms, broad planes, low visual noise, crisp edges, clear material separation, and polished readable textures.');
  lines.push('Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged.');
  if(cat==='Monster' || cat==='Boss'){
-   lines.push('The action poses should fit the creature body plan and identity, such as claw swipe, pounce, bite, slam, charge, rearing, or magical body-driven attack.');
+   lines.push('If choosing an attack sequence, the motion should fit the creature body plan and identity, such as claw swipe, pounce, bite, slam, charge, rearing, or magical body-driven attack.');
    lines.push('Do not add any new equipped weapons or props.');
  }
  if(cat==='Companion'){
-   lines.push('Keep the sequence friendly or neutral in tone. The action poses can be utility-based, playful, alert, magical, or pet-like rather than violent.');
+   lines.push('Keep the sequence friendly or neutral in tone. The chosen action can be a walk, hop, playful pounce, alert gesture, familiar magic motion, or another single readable pet-like sequence.');
    lines.push('Do not add any new equipped weapons or props.');
  }
  if(cat==='NPC' || cat==='Vendor'){
    lines.push('Keep the same exact character design and clothing silhouette.');
-   lines.push('The walk poses should show readable body mechanics. The action poses should be simple key gestures that fit the character identity, such as a wave, cast gesture, shove, brace, or unarmed strike.');
+   lines.push('The chosen sequence can be a walk cycle or one simple gesture/action that fits the character identity, such as a wave, cast gesture, shove, brace, or unarmed strike.');
    lines.push('Do not add new equipped weapons, tools, or props into the hands unless they already existed as a defined separate prop and are essential to the action.');
  }
- lines.push('Very important: 4 to 6 frames total only. Do not create 8 or 9 tiny frames.');
+ lines.push('Very important: 4 to 6 frames total only. Do not create 8 or 9 tiny frames, and do not show unrelated bonus poses.');
  lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
  lines.push(`Themes: ${c.themes.join(', ')}.`);
  lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
