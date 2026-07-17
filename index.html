@@ -266,6 +266,14 @@
     border-radius:12px;
   }
   .fav:hover{background:#ffffff08;border-color:#f3c66f33}
+  .library-toggle{margin-top:8px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#121621,#0d1018);overflow:hidden}
+  .library-toggle summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;font-weight:800;color:var(--ink);background:linear-gradient(180deg,#171b27,#10131c)}
+  .library-toggle summary::-webkit-details-marker{display:none}
+  .library-toggle summary::before{content:'▸';display:inline-block;margin-right:10px;color:var(--gold);transition:transform .18s ease}
+  .library-toggle[open] summary::before{transform:rotate(90deg)}
+  .library-toggle summary span:first-child{display:flex;align-items:center}
+  .library-toggle .library-body{padding:12px}
+  .library-count{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
   .small{font-size:12px;color:var(--muted);line-height:1.4}
   .dna{height:13px;border-radius:999px;overflow:hidden;background:#090b11;display:flex;border:1px solid #ffffff12}
   .dna span{display:block;height:100%}
@@ -429,10 +437,14 @@
     <input type="file" id="importSaves" accept="application/json,.json" />
     <div id="testReport" class="report">Roll test not run yet.</div>
     <label>Lock Fields</label><div class="locks" id="locks"></div>
-    <h2>Worldsmith Library</h2>
-    <input id="favSearch" placeholder="Search saved ideas..." style="width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px" />
-    <div class="row"><select id="favCat"><option value="">All categories</option></select><select id="favRarity"><option value="">All rarities</option></select></div>
-    <div id="favs" class="small"></div>
+    <details id="libraryPanel" class="library-toggle">
+      <summary><span>Worldsmith Library</span><span id="libraryCount" class="library-count">0 saved</span></summary>
+      <div class="library-body">
+        <input id="favSearch" placeholder="Search saved ideas..." style="width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px" />
+        <div class="row"><select id="favCat"><option value="">All categories</option></select><select id="favRarity"><option value="">All rarities</option></select></div>
+        <div id="favs" class="small"></div>
+      </div>
+    </details>
   </aside>
   <section class="box card">
     <div class="concept-plate">
@@ -816,7 +828,7 @@ roles.Armour.push('Shoulder guard','Round shield','Kite shield','Robe','Mask','H
 
 const encounterUses=['pack filler','elite escort','corridor ambusher','treasure guardian','patrol encounter','rare spawn','dungeon-room anchor','event encounter','support unit in mixed packs'];
 const familyRoots=['Thornling','Mireborn','Ashkin','Crystal Brood','Hollowhide','Moonfang','Rotcap','Stormclaw','Bonebound','Sunken'];
-const familyRanks=['Hatchling','Skitterer','Stalker','Brute','Warden','Seer','Caller','Matriarch','Broodling','Ravager','Shellback','Spitter','Mender','Hexer','Lurker','Lasher','Burrower','Harvester','Watcher','Nestguard','Oracle','Gnasher','Rootbinder','Shardback','Prowler','Gatekeeper','Clutchmother','Old One'];
+const familyRanks=['Hatchling','Skitterer','Stalker','Brute','Warden','Seer','Caller','Matriarch','Broodling','Ravager','Shellback','Spitter','Mender','Hexer','Lurker','Lasher','Burrower','Harvester','Watcher','Nestguard','Oracle','Gnasher','Rootbinder','Shardback','Prowler','Gatekeeper','Clutchmother','Old One','Flier','Scout','Whelp','Raider','Glider','Totemguard','Striker','Runner','Marauder','Songcaller'];
 encounterUses.push('resource-node defender','shrine protector','bridge blocker','roaming pack leader','camp alarm unit','ritual guard','terrain hazard companion');
 familyRoots.push('Glasswing','Bogtooth','Ashroot','Runejaw','Pearlback','Sunscar','Deepcap','Gloomtail','Ironhide','Riftclaw','Thornmaw','Moonspine','Cinderjaw','Murktooth','Frostbelly','Hollowhorn','Sporehide','Belljaw','Ravenback','Serpentcoil','Webgloom','Stargrub','Cryptshell','Witchfang');
 // ---------- v1.7 World Depth Pass ----------
@@ -875,7 +887,7 @@ roles.Biome.push('Haunted forest','Eldritch coast','Dwarven mine','Elven grove',
 roles.Vendor.push('Relic dealer','Book merchant','Fishmonger','Mask seller','Tattoo mystic','Ruin salvager','Stable master','Lantern seller','Witch apothecary','Grave goods trader','Monster butcher','Traveling chef','Rune engraver','Map seller','Auctioneer');
 roles['Random Event'].push('Pilgrim procession','Broken shrine','Monster migration','Burning wagon','Lost child','Fallen star','Bridge toll','Cursed well','Witch trial','Ghost funeral','Duel challenge','Escaped prisoner','Living treasure chest','Runaway golem','Storm omen','Market quarrel');
 encounterUses.push('boss door guardian','ambush tutorial','faction camp patrol','rare material protector','environmental pressure unit','ritual interruption target','treasure-room misdirection','roadside nuisance pack','elite warning encounter','world event escalation');
-familyRoots.push('Briarling','Candlewisp','Ironmaw','Gloomfeather','Saltback','Glasscoil','Thornjaw','Graveshell','Wyrmkin','Mossbeard','Frothhide','Ashmantle','Vilebloom','Lantern-Eater','Bellskull','Rootwretch','Cogmite','Silkfang','Ravencrook','Serpentkin','Murkfin');
+familyRoots.push('Briarling','Candlewisp','Ironmaw','Gloomfeather','Saltback','Glasscoil','Thornjaw','Graveshell','Wyrmkin','Mossbeard','Frothhide','Ashmantle','Vilebloom','Lantern-Eater','Bellskull','Rootwretch','Cogmite','Silkfang','Ravencrook','Serpentkin','Murkfin','Skytalon','Boghopper','Stonehoof','Crowbeak','Sunwing','Ratling','Mothwing','Gullsnap','Houndmaw','Rookclaw','Toadhide','Impkin');
 
 function tierRoll(cat){return cat==='Boss'?'Boss':R(encounterTiers.filter(t=>t!=='Boss'));}
 function roleRoll(cat,tier){ if(cat==='Boss'||tier==='Boss') return R(['Bruiser','Mage','Summoner','Controller','Tank']); return R(monsterRoles); }
@@ -886,13 +898,13 @@ function makeMonsterName(ts,role,tier){
     Bruiser:['Ravager','Mauler','Crusher','Breaker','Brawler','Ripper','Pounder','Gnasher','Tusker','Bonecrush','Fleshrend','Grond','Batterhorn','Clobberer','Fangmaul'],
     Tank:['Shellback','Bulwark','Hornplate','Stonehide','Ironback','Bastion','Plated One','Thickhide','Gatebeast','Shieldhorn','Aegis Beast','Wallhide','Carapace','Anvilback','Wardbeast'],
     Assassin:['Lurker','Prowler','Shadeclaw','Nightfang','Knifetail','Ambusher','Silkstep','Razorback','Needlefang','Quickclaw','Gloomstalker','Hooktalon','Stingtail','Fellrunner','Ghostpaw'],
-    Archer:['Spitter','Darter','Quillshot','Needleback','Venomspine','Thornspitter','Shardflinger','Razorspine','Barbthrower','Boltmaw','Slingtail','Splinterback','Screecher','Longfang','Glasspike'],
-    Mage:['Oracle','Hexer','Binder','Whisperer','Runemouth','Chanter','Dreamseer','Spellgullet','Sigilborn','Glyphmaw','Stormsayer','Mooncaller','Covenbeast','Voidtongue','Star-Eye'],
+    Archer:['Spitter','Darter','Quillshot','Needleback','Venomspine','Thornspitter','Shardflinger','Razorspine','Barbthrower','Boltmaw','Slingtail','Splinterback','Screecher','Longfang','Glasspike','Harrier','Rookshot','Wingdart','Javelinbeak'],
+    Mage:['Oracle','Hexer','Binder','Whisperer','Runemouth','Chanter','Dreamseer','Spellgullet','Sigilborn','Glyphmaw','Stormsayer','Mooncaller','Covenbeast','Voidtongue','Star-Eye','Shaman','Skald','Runepriest'],
     Support:['Mender','Bloomkeeper','Nursebeast','Wardling','Tetherer','Choirbeast','Sap-Singer','Broodmother','Totemkin','Bellbearer','Rootmender','Lanternback','Hearthbeast','Pulsekeeper','Veilbearer'],
     Summoner:['Broodcaller','Eggkeeper','Nestwitch','Gateborn','Totembinder','Riftkeeper','Grubmother','Puppeteer','Idolmouth','Hivekeeper','Spawnlord','Wombseer','Caller-Beast','Den-Maker','Clutchlord'],
     Controller:['Snarer','Rootbinder','Webweaver','Trapjaw','Mudgrip','Briarlock','Chainmaw','Fogbelcher','Netcaster','Ringmaker','Stonebinder','Tanglehorn','Lockjaw','Gloomweaver','Zonekeeper']
   };
-  const generic=['Aberration','Beast','Fiend','Horror','Husk','Chimera','Crawler','Stalker','Skitterer','Warden','Seer','Brute','Maw','Gorger','Sentinel','Caller','Howler','Matriarch','Leaper','Burrower','Lasher','Devourer','Harvester','Watcher','Strider','Drifter','Colossus','Terror','Basilisk','Mandrake','Gargoyle','Banshee','Wraith','Ghoul','Dryad','Treant','Djinn','Golem','Automaton','Familiar','Leviathan','Kraken','Wyvern','Owlbear','Imp','Gremlin','Sludge','Bogbeast','Cryptid','Carrion','Parasite','Hiveborn','Frostling','Ashling','Cinderbeast','Murkfin','Ridgeback','Tuskling','Clawbeast','Sporeback','Fangtoad','Bonejack','Palejaw','Shardhide'];
+  const generic=['Aberration','Beast','Fiend','Horror','Husk','Chimera','Crawler','Stalker','Skitterer','Warden','Seer','Brute','Maw','Gorger','Sentinel','Caller','Howler','Matriarch','Leaper','Burrower','Lasher','Devourer','Harvester','Watcher','Strider','Drifter','Colossus','Terror','Basilisk','Mandrake','Gargoyle','Banshee','Wraith','Ghoul','Dryad','Treant','Djinn','Golem','Automaton','Familiar','Leviathan','Kraken','Wyvern','Owlbear','Imp','Gremlin','Sludge','Bogbeast','Cryptid','Carrion','Parasite','Hiveborn','Frostling','Ashling','Cinderbeast','Murkfin','Ridgeback','Tuskling','Clawbeast','Sporeback','Fangtoad','Bonejack','Palejaw','Shardhide','Harpy','Batling','Whelp','Hound','Jackal','Beastman','Raider','Crowkin','Mothkin','Boghopper','Sprite','Satyr','Minotaur','Rookbeast','Toadling'];
   const pool=[...(typePools[role]||[]),...generic];
   const base=R(pool);
   const veteranAdj=['Dire','Elder','Scarred','Hungry','Wild','Feral','Grizzled','Pale','Ravenous','Old','Vicious','Mottled','Cave-born','Thorned','Iron-scarred','Moon-touched'];
@@ -929,6 +941,36 @@ function makeHabitat(ts,role){
   const biome=R(info.biome||['old ruins','wild forests']);
   const placement={Swarm:'appears in groups of 5–10',Bruiser:'guards doorways and open lanes',Tank:'stands in front of fragile enemies',Assassin:'hides near corners and side paths',Archer:'uses ledges or rear lines',Mage:'guards shrines or ritual circles',Support:'stays behind bruisers and tanks',Summoner:'prefers rooms with space for adds',Controller:'likes choke points and narrow paths'};
   return [biome,placement[role]||'appears in mixed packs',R(['near resources','near old ruins','around treasure routes','near faction camps','inside side caves']),R(['more active at night','avoids open sunlight','guards a small territory','responds to nearby combat noise'])];
+}
+const monsterBodyProfiles=[
+  {key:'small-hunter',label:'Small hunter',prompt:'Use a small creature frame with a compact body, short readable limbs, and a simple game-friendly silhouette. Think rat, hound pup, imp, or little raptor energy rather than an overbuilt beast.',size:'small and simple',roles:['Swarm','Assassin'],themes:['Wolf','Wildwood','Nature','Ashen','Moonlit']},
+  {key:'winged-flier',label:'Flying flier',prompt:'Use a clear flying silhouette with readable wings and a compact body. Think bat, raven, owl, drake, moth, or small wyvern shapes, with the wings as the main read.',size:'small-to-medium flying creature',roles:['Archer','Mage','Support','Controller','Summoner','Assassin'],themes:['Raven','Storm','Moonlit','Celestial','Divine','Elven','Norse']},
+  {key:'avian-raider',label:'Avian / winged humanoid',prompt:'Use an anthropomorphic winged creature frame with two strong legs, two clear arms or wing-arms, and a readable birdlike or harpy-like silhouette.',size:'medium and agile',roles:['Archer','Assassin','Mage'],themes:['Raven','Elven','Storm','Celestial','Knightly']},
+  {key:'anthro-raider',label:'Anthropomorphic raider',prompt:'Use a biped anthropomorphic creature frame. Think beastman, goblin-sized raider, jackal warrior, satyr, minotaur scout, or other upright monster with readable torso, arms, and legs.',size:'small-to-medium upright creature',roles:['Bruiser','Archer','Support','Summoner','Controller','Tank'],themes:['Knightly','Norse','Elven','Wolf','Pirate','Cultist','Dwarven']},
+  {key:'hulking-upright',label:'Hulking upright brute',prompt:'Use a larger upright monster frame with a heavy torso, thick limbs, and a bold silhouette. Think troll, minotaur, ogre, beastman, or stone idol proportions.',size:'medium-to-large and sturdy',roles:['Bruiser','Tank'],themes:['Dwarven','Forge','Ancient','Knightly','Norse','Cathedral']},
+  {key:'simple-quadruped',label:'Simple quadruped beast',prompt:'Use a straightforward four-legged creature frame with a clean readable silhouette and a simple body plan. Think wolf, boar, bear cub, lizard hound, or fantasy hound rather than a complicated insect body.',size:'small-to-medium quadruped',roles:['Swarm','Bruiser','Tank','Controller'],themes:['Wolf','Nature','Wildwood','Frost','Ashen','Desert']},
+  {key:'reptile-amphibian',label:'Reptile / amphibian creature',prompt:'Use a toad, salamander, lizard, gecko, or crocodile-like creature frame with chunky readable anatomy and a simple surface breakup.',size:'small-to-medium beast',roles:['Swarm','Controller','Support','Bruiser'],themes:['Swamp','Ocean','Desert','Rot','Fungal','Nature']},
+  {key:'serpentine',label:'Serpentine monster',prompt:'Use a snake-like, eel-like, or naga-like body plan with one clear dominant sweep and only a few bold secondary shapes. Keep it readable and not over-coiled.',size:'medium streamlined creature',roles:['Assassin','Mage','Controller','Support'],themes:['Serpent','Ocean','Sunken','Void','Astral']},
+  {key:'construct-idol',label:'Construct / idol creature',prompt:'Use a simplified construct, animated statue, or living idol frame with bold geometry, thick limbs, and readable material blocks rather than organic bug anatomy.',size:'medium-to-large rigid creature',roles:['Tank','Bruiser','Controller','Summoner'],themes:['Clockwork','Rune-carved','Ancient','Dwarven','Cathedral','Knightly']},
+  {key:'arachnid-stalker',label:'Arachnid stalker',prompt:'Use a spider-like creature frame with multiple legs and a low stalking silhouette. Keep the legs fewer, larger, and chunkier.',size:'small-to-medium crawler',roles:['Swarm','Assassin','Controller'],themes:['Spider','Insect','Shadow','Rot']},
+  {key:'scorpion-shellback',label:'Scorpion / shellback',prompt:'Use a scorpion-like or shell-backed arthropod frame with a clear segmented body and a few large limbs, not many tiny ones.',size:'medium crawler',roles:['Bruiser','Tank','Controller'],themes:['Desert','Insect','Rot','Sunken']}
+];
+function makeMonsterBody(role,ts,tier,cat){
+  const themeSet=new Set(ts||[]);
+  let pool=[];
+  monsterBodyProfiles.forEach(p=>{
+    let w=1;
+    if((p.roles||[]).includes(role)) w+=3;
+    if((p.themes||[]).some(t=>themeSet.has(t))) w+=3;
+    if((tier==='Boss'||cat==='Boss') && /Hulking|Construct|Serpentine|Flying/.test(p.label)) w+=1;
+    if((tier==='Normal'||tier==='Veteran') && /Small|Simple/.test(p.label)) w+=1;
+    if((p.key==='arachnid-stalker' || p.key==='scorpion-shellback') && !(themeSet.has('Spider')||themeSet.has('Insect')||themeSet.has('Desert'))) w=Math.max(0.2,w-3.5);
+    if((p.key==='winged-flier' || p.key==='avian-raider') && Math.random()<0.25) w+=1;
+    for(let i=0;i<Math.max(1,Math.round(w));i++) pool.push(p);
+  });
+  const chosen=R(pool);
+  const antiArach=((chosen.key!=='arachnid-stalker'&&chosen.key!=='scorpion-shellback') && !(themeSet.has('Spider')||themeSet.has('Insect')));
+  return {label:chosen.label,prompt:chosen.prompt,size:chosen.size,antiArach};
 }
 function makeFamily(ts){
   const root=R(familyRoots);
@@ -967,17 +1009,18 @@ function creatureConcept(forceReroll=false){
   const family=makeFamily(ts);
   const rotation=makeRotation(role,abilities,tier);
   const habitat=makeHabitat(ts,role);
+  const bodyPlan=makeMonsterBody(role,ts,tier,cat);
   const weakness=R(roleWeaknesses[role]||roleWeaknesses.Bruiser);
   const purpose=R(rolePurposes[role]||rolePurposes.Bruiser);
   const encounterUse=cat==='Boss'||tier==='Boss'?'boss arena':R(encounterUses);
   const phases=(tier==='Boss'||cat==='Boss')?makeBossPhases(role,ts,abilities):null;
   const signature=tech?tech.sentence:`${tier} rule: no signature mechanic. The creature stays focused on its role, movement pattern, and one or two readable actions.`;
-  const desc=`A ${tier.toLowerCase()} encounter-tier ${cat.toLowerCase()} built around ${ts.join(', ').toLowerCase()} fantasy. It acts as a ${role.toLowerCase()} with ${personality.toLowerCase()} combat behaviour and is mainly used as a ${encounterUse}.`;
-  const visual=[R(info.visual||['strong silhouette']),R(['large readable silhouette','broad simple shapes','chunky hand-painted forms','clear at small scale']),`${personality.toLowerCase()} movement style`,`${role.toLowerCase()} body language`].concat(ideaVisualBits());
+  const desc=`A ${tier.toLowerCase()} encounter-tier ${cat.toLowerCase()} built around ${ts.join(', ').toLowerCase()} fantasy. It acts as a ${role.toLowerCase()} with ${personality.toLowerCase()} combat behaviour, uses a ${bodyPlan.label.toLowerCase()} frame, and is mainly used as a ${encounterUse}.`;
+  const visual=[bodyPlan.label.toLowerCase(),bodyPlan.size,R(info.visual||['strong silhouette']),R(['large readable silhouette','broad simple shapes','chunky hand-painted forms','clear at small scale']),`${personality.toLowerCase()} movement style`,`${role.toLowerCase()} body language`].concat(ideaVisualBits());
   const loot=[`${ts[0]} ${R(['Fang','Core','Shard','Spore','Claw','Rune'])}`,`${R(['Cracked','Living','Ancient','Polished'])} ${R(['Scale','Bone','Gem','Hide','Sigil'])}`];
   const why=`This encounter works because it has a defined job: it ${purpose}. The threat budget keeps it from becoming overloaded, while the weakness gives players a practical answer: ${weakness}.`;
   const palette=makePalette(ts,cat,null);
-  const c={creatureMode:true,category:cat,themes:ts,rarity:tier,encounterTier:tier,attitude:personality,combatPersonality:personality,role:role,monsterRole:role,threatBudget:budget,abilities,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),family,rotation,habitat,weakness,purpose,encounterUse,phases,brainValidation:validateMonsterBrain(role,personality,abilities,tier),directedIdea:directedIdea()};
+  const c={creatureMode:true,category:cat,themes:ts,rarity:tier,encounterTier:tier,attitude:personality,combatPersonality:personality,role:role,monsterRole:role,threatBudget:budget,abilities,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),family,bodyPlan,rotation,habitat,weakness,purpose,encounterUse,phases,brainValidation:validateMonsterBrain(role,personality,abilities,tier),directedIdea:directedIdea()};
   state.current=c; render(c);
 }
 
@@ -1707,6 +1750,8 @@ function buildVisualPrompt(c,palette,rarityText){
    baseParts.push('Keep the pose readable and model-friendly: mostly full-body, clear limbs, clear front or three-quarter silhouette, not hidden by smoke, environment, or overlapping props. Use at most 3 views total; preferably one large main render, or one main render plus up to two supporting views. Do not generate 4 or more turnarounds or many small repeated angles.');
    if(c.category==='Boss') baseParts.push('Make it feel larger and more imposing through silhouette, anatomy, posture, and a few bold standout features rather than extra environment or dense detail.');
    if(c.family && c.family.name) baseParts.push(`Belongs to the ${c.family.name} family.`);
+   if(c.bodyPlan) baseParts.push(`Preferred creature frame: ${c.bodyPlan.label}. ${c.bodyPlan.prompt} Size guidance: ${c.bodyPlan.size}.`);
+   if(c.bodyPlan && c.bodyPlan.antiArach) baseParts.push('Do not default to spider, scorpion, crab, or generic many-legged insect anatomy unless the selected themes strongly call for it. Prefer the requested body plan instead.');
    baseParts.push(`Creature appearance and silhouette: ${c.visual.join(', ')}.`);
    if(c.habitat && c.habitat.length) baseParts.push(`Use only tiny optional habitat cues as separate motifs, not a full environment: ${c.habitat.join(', ')}.`);
    baseParts.push('Important: this must resemble a stylized 3D game model reference or model sheet, not a painted concept illustration. The result should feel like a polished game asset with clean readable textures and crisp forms. Fewer, larger views are better than many small ones.');
@@ -1786,7 +1831,7 @@ function render(c){
  document.getElementById('paletteNote').textContent=`Palette use: ${paletteText(palette)}.`;
  if(c.creatureMode){
    document.getElementById('details').innerHTML=
-     kv('Monster Role',c.monsterRole)+kv('Encounter Use',c.encounterUse)+kv('Threat Budget',`${c.threatBudget.points} points • ${c.threatBudget.label}`)+kv('Core Abilities',c.abilities.join(', '))+
+     kv('Monster Role',c.monsterRole)+kv('Creature Frame',c.bodyPlan?`${c.bodyPlan.label} • ${c.bodyPlan.size}`:'Varied')+kv('Encounter Use',c.encounterUse)+kv('Threat Budget',`${c.threatBudget.points} points • ${c.threatBudget.label}`)+kv('Core Abilities',c.abilities.join(', '))+
      kv('Combat Rotation',c.rotation.join(' → '))+kv('Weakness / Counterplay',c.weakness)+kv('Habitat Intelligence',c.habitat.join(', '))+kv('Monster Family',`${c.family.name}: ${c.family.variants.join(', ')}`);
    document.querySelector('#signature').parentElement.querySelector('h2').textContent=(c.encounterTier==='Boss'||c.encounterTier==='Champion'||c.encounterTier==='Elite')?'Signature Encounter Mechanic':'Encounter Design Focus';
    document.getElementById('signature').textContent=c.signature;
@@ -2099,6 +2144,8 @@ function setFavs(f){localStorage.setItem(SAVE_KEY,JSON.stringify(f)); renderFavs
 function renderFavs(){
  const q=(document.getElementById('favSearch')?.value||'').toLowerCase(); const fc=favCatEl.value; const fr=favRarityEl.value;
  const all=favs(); const f=all.map((x,i)=>({...x,_i:i})).filter(x=>(!fc||x.category===fc)&&(!fr||(x.encounterTier||x.rarity)===fr)&&(!q||(x.name+' '+x.category+' '+(x.encounterTier||x.rarity)+' '+(x.themes||[]).join(' ')).toLowerCase().includes(q)));
+ const countEl=document.getElementById('libraryCount');
+ if(countEl) countEl.textContent=all.length===f.length?`${all.length} saved`:`${f.length} shown • ${all.length} saved`;
  document.getElementById('favs').innerHTML=f.length?f.map(x=>`<div class="fav" data-i="${x._i}"><b>${x.name}</b><br><span class="small">${x.encounterTier||x.rarity} ${x.category} • ${(x.themes||[]).join(', ')}</span></div>`).join(''):'No saved ideas match.';
  document.querySelectorAll('.fav').forEach(el=>el.onclick=()=>{state.current=all[+el.dataset.i];render(state.current)})
 }
