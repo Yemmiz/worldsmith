@@ -531,7 +531,7 @@ function getActivePromptText(){
   return (document.getElementById(state.activePromptTab||'prompt')||document.getElementById('prompt')).value;
 }
 function copyActivePrompt(){ navigator.clipboard.writeText(getActivePromptText()); }
-const themes=['Fire','Frost','Storm','Fungal','Rot','Crystal','Holy','Shadow','Blood','Bone','Arcane','Void','Dream','Nature','Royal','Ancient','Goblin-made','Clockwork','Swamp','Desert','Ocean','Celestial','Insect','Rune-carved','Moonlit','Sunken','Eldritch','Infernal','Wildwood','Faerie','Draconic','Dwarven','Elven','Orcish','Graveyard','Ashen','Thorned','Alchemical','Astral','Pirate','Cultist','Scholarly','Mirror','Timeworn','Deep Sea','Underground','Cathedral','Forge','Library','Carnival','Serpent','Raven','Spider','Wolf','Machine'];
+const themes=['Fire','Frost','Storm','Fungal','Rot','Crystal','Holy','Divine','Knightly','Norse','Shadow','Blood','Bone','Arcane','Void','Dream','Nature','Royal','Ancient','Goblin-made','Clockwork','Swamp','Desert','Ocean','Celestial','Insect','Rune-carved','Moonlit','Sunken','Eldritch','Infernal','Wildwood','Faerie','Draconic','Dwarven','Elven','Orcish','Graveyard','Ashen','Thorned','Alchemical','Astral','Pirate','Cultist','Scholarly','Mirror','Timeworn','Deep Sea','Underground','Cathedral','Forge','Library','Carnival','Serpent','Raven','Spider','Wolf','Machine'];
 const rarity=['Common','Uncommon','Rare','Epic','Legendary','Mythic','Unique'];
 const encounterTiers=['Normal','Veteran','Elite','Champion','Boss'];
 categories.forEach(c=>favCatEl.add(new Option(c,c))); [...rarity,...encounterTiers].forEach(r=>favRarityEl.add(new Option(r,r)));
@@ -559,7 +559,10 @@ const byTheme={
  Bone:{effects:['Fracture','Bone Spear','Necrotic Mark','Armor Break'],visual:['bone masks','rib cages','ivory spikes'],biome:['catacombs','ossuaries'],counter:['crushing damage','turn undead']},
  Arcane:{effects:['Mana Burn','Arcane Vulnerability','Blink Echo','Spell Lock'],visual:['floating glyphs','violet aura','rune rings'],biome:['wizard towers','leyline ruins'],counter:['silence','mana shields']},
  Void:{effects:['Void Hunger','Gravity Snare','Reality Tear','Dread'],visual:['starless holes','inward glow','warped edges'],biome:['broken observatories','deep rifts'],counter:['stability anchors','distance']},
- Nature:{effects:['Root','Regrowth','Thornmail','Verdant Mark'],visual:['vines','leafy crests','bark armor'],biome:['ancient groves','wild meadows'],counter:['Fire damage','cutting roots']}
+ Nature:{effects:['Root','Regrowth','Thornmail','Verdant Mark'],visual:['vines','leafy crests','bark armor'],biome:['ancient groves','wild meadows'],counter:['Fire damage','cutting roots']},
+ Divine:{effects:['Grace Ward','Radiant Mercy','Blessed Oath','Consecrated Light'],visual:['halo motifs','sunburst filigree','clean white-gold trim','radiant feathers'],biome:['sacred courts','sun shrines'],counter:['shadow damage','break line of sight']},
+ Knightly:{effects:['Shield Oath','Banner Rally','Lance Charge','Guarded Step'],visual:['tabards','polished plate','heraldic crests','banner trims'],biome:['castle roads','watch keeps'],counter:['break formation','bait the charge']},
+ Norse:{effects:['Storm Oath','Runeblood','Winter Howl','Saga Mark'],visual:['fur mantles','knotwork runes','carved wood','storm motifs'],biome:['frozen fjords','mead halls'],counter:['interrupt the chant','use fire','break the rune totem']}
 };
 const roles={
  Monster:['Ambush predator','Pack hunter','Support caster','Area-denial bruiser','Fast skirmisher','Stationary guardian','Summoner','Debuffer'],
@@ -638,11 +641,39 @@ function weightedThemes(rar, existing=[]){
   const prof=profileFor(rar);
   const desired=chaos<25?1:chaos<70?2:3;
   const count=Math.min(desired, prof.themeMax);
+  const brightThemes=['Holy','Divine','Knightly','Elven','Celestial','Royal','Nature','Dream','Desert','Ocean','Cathedral','Wildwood'];
+  const darkThemes=['Shadow','Blood','Bone','Void','Rot','Fungal','Infernal','Cultist','Graveyard','Eldritch','Raven','Spider','Sunken','Deep Sea','Underground'];
   for(let i=0;i<count;i++){
     let candidates=pool.filter(x=>!result.includes(x));
     if(result.length && chaos<70){
-      const synergy={Fungal:['Rot','Nature','Swamp','Insect'],Crystal:['Arcane','Ancient','Frost'],Fire:['Ash','Storm','Sunken'],Frost:['Crystal','Moonlit','Ancient'],Shadow:['Void','Bone','Moonlit'],Holy:['Celestial','Royal','Fire'],Ocean:['Sunken','Storm','Pearl'],Clockwork:['Arcane','Rune-carved','Goblin-made']};
+      const synergy={
+        Fungal:['Rot','Nature','Swamp','Insect'],
+        Crystal:['Arcane','Ancient','Frost','Divine'],
+        Fire:['Ashen','Storm','Infernal','Knightly'],
+        Frost:['Crystal','Moonlit','Ancient','Norse'],
+        Shadow:['Void','Bone','Moonlit','Raven'],
+        Holy:['Celestial','Royal','Divine','Knightly','Cathedral'],
+        Divine:['Holy','Celestial','Knightly','Royal','Cathedral','Elven'],
+        Knightly:['Royal','Divine','Holy','Cathedral','Dwarven','Elven','Norse'],
+        Norse:['Frost','Storm','Wolf','Dwarven','Moonlit','Knightly'],
+        Ocean:['Sunken','Storm','Pearl','Deep Sea'],
+        Clockwork:['Arcane','Rune-carved','Goblin-made','Machine'],
+        Elven:['Nature','Moonlit','Royal','Divine','Knightly','Wildwood'],
+        Dwarven:['Forge','Knightly','Rune-carved','Norse'],
+        Cathedral:['Holy','Divine','Knightly','Royal'],
+        Wildwood:['Nature','Elven','Faerie','Divine']
+      };
       const s=(synergy[result[0]]||[]).filter(x=>candidates.includes(x)); if(s.length && Math.random()<.7)candidates=s;
+    }
+    if(!result.length && Math.random()<0.38){
+      const brighter=candidates.filter(x=>brightThemes.includes(x));
+      if(brighter.length) candidates=brighter;
+    }else if(result.length===1 && !result.some(t=>brightThemes.includes(t)) && Math.random()<0.45){
+      const brighter=candidates.filter(x=>brightThemes.includes(x));
+      if(brighter.length) candidates=brighter;
+    }else if(result.length===1 && result.some(t=>darkThemes.includes(t)) && Math.random()<0.25){
+      const nonDark=candidates.filter(x=>!darkThemes.includes(x));
+      if(nonDark.length) candidates=nonDark;
     }
     result.push(R(candidates));
   }
@@ -797,6 +828,9 @@ Object.assign(byTheme,{
  Draconic:{effects:['Dragonfire','Scale Ward','Wing Buffet','Wyrm Roar'],visual:['scale plates','horn crowns','smoking nostrils','wing-like cloaks'],biome:['volcanic nests','mountain hoards','ancient wyrm roads'],counter:['strike the exposed belly','use frost','break the horn focus']},
  Dwarven:{effects:['Stone Oath','Anvil Guard','Runic Fortify','Forge Heat'],visual:['blocky armour','hammer icons','braided beards','angular stonework'],biome:['deep halls','mountain forges','abandoned mines'],counter:['shatter the rune plate','cool the forge','attack during hammer lift']},
  Elven:{effects:['Silver Thorn','Moon Arrow','Grace Mark','Ancient Song'],visual:['leaf filigree','slender crescent shapes','silver bows','flowing cloaks'],biome:['hidden groves','white ruins','twilight bridges'],counter:['break concentration','block line of sight','disturb the song']},
+ Divine:{effects:['Judgement Light','Sacred Aegis','Blessed Choir','Mercy Flame'],visual:['sun halos','white-gold cloth','clean sigils','angelic wingshapes'],biome:['sun courts','holy terraces','sacred cloisters'],counter:['step out of the sanctified zone','break the choir focus','use shadow cover']},
+ Knightly:{effects:['Shield Wall','Heraldic Oath','Banner March','Lance Thrust'],visual:['crest shields','tabards','lance shapes','polished steel'],biome:['castle baileys','royal roads','training yards'],counter:['break formation','circle the flank','destroy the banner']},
+ Norse:{effects:['Thunder Oath','Frost Rune','Berserker Cry','Saga Storm'],visual:['braided furs','runed axes','knotwork carvings','storm cloaks'],biome:['ice coasts','longhalls','mountain fjords'],counter:['interrupt the war cry','break the rune stone','use fire and spacing']},
  Orcish:{effects:['War Cry','Blood Fury','Iron Hide','Banner Rage'],visual:['jaw tusks','painted shields','heavy cleavers','red war banners'],biome:['war camps','burned roads','spike palisades'],counter:['destroy the banner','bait the charge','separate the pack']},
  Graveyard:{effects:['Grave Chill','Restless Dead','Tomb Dust','Mourning Bell'],visual:['tilted headstones','grave candles','mourning veils','cold blue wisps'],biome:['old cemeteries','foggy mausoleums','battle graves'],counter:['ring the bell','consecrate the grave','shatter the headstone']},
  Ashen:{effects:['Ash Blind','Cinder Mark','Smoulder','Blackened Breath'],visual:['falling ash','burned cloth','charcoal plates','orange embers under grey'],biome:['ash valleys','burned villages','volcanic roads'],counter:['clear the smoke','use water','move upwind']},
@@ -821,7 +855,7 @@ Object.assign(byTheme,{
  Machine:{effects:['Saw Pulse','Steam Vent','Gear Snare','Logic Lock'],visual:['cog limbs','smoke stacks','oil stains','brass eyes'],biome:['machine halls','foundries','clockwork vaults'],counter:['jam the gears','vent the steam','hit exposed joints']}
 });
 
-prefixes.push('Black','White','Grey','Silver','Golden','Cinder','Iron','Glass','Elder','Witch','Grave','Bell','Crown','Oath','Wyrm','Briar','Lantern','Gilded','Feral','Ragged','Silent','Whisper','Crimson','Sable','Ivory','Verdant','Umbral','Abyssal','Runed','Hollow','Star','Mist','Vile','Blessed','Forgotten','Oaken','Sulfur','Marrow','Ink','Ashen','Thistle','Duskworn','Salt','Candle','Mirror','Clock','Rusted','Gallows','Chapel','Hearth','Fang');
+prefixes.push('Black','White','Grey','Silver','Golden','Cinder','Iron','Glass','Elder','Witch','Grave','Bell','Crown','Oath','Wyrm','Briar','Lantern','Gilded','Feral','Ragged','Silent','Whisper','Crimson','Sable','Ivory','Verdant','Umbral','Abyssal','Runed','Hollow','Star','Mist','Vile','Blessed','Forgotten','Oaken','Sulfur','Marrow','Ink','Ashen','Thistle','Duskworn','Salt','Candle','Mirror','Clock','Rusted','Gallows','Chapel','Hearth','Fang','Divine','Knightly','Aurora','Fjord','Sunlit');
 nouns.push('Chanter','Mender','Weaver','Vessel','Knight','Reaver','Pilgrim','Scribe','Smith','Bishop','Hound','Serpent','Drake','Witch','Grove','Bell','Chalice','Mask','Candle','Cairn','Basilisk','Gryphon','Manticore','Harpy','Gargoyle','Banshee','Wraith','Ghoul','Dryad','Treant','Djinn','Golem','Automaton','Familiar','Mandrake','Leviathan','Kraken','Wyvern','Owlbear','Acolyte','Mariner','Waystone','Reliquary','Compass','Hourglass','Gate','Shrine','Vault');
 suffixes.push('of the Black Stair','of the Gilded Root','of the Starless Sea','of the Candle Court','of the Iron Choir','of the Hollow Crown','of the Witch Road','of the Broken Bell','of the Old Forest','of the Mirror Gate','of the Ashen Chapel','of the Deep Vault','of the Serpent Moon','of the Raven Watch','of the Last Library','of the Thorn Court','of the Sunken Crown','of the Clock Tower','of the Drowned Orchard','of the Ivory Sepulcher','of the Green Flame','of the Red Comet','of the Shattered Anvil');
 roles.Monster.push('Burrowing lurker','Totem defender','Curse bearer','Beast pack alpha','Nest guardian','Corpse eater','Ruin scavenger','Possessed construct','Feral caster','Shrine beast','Cave horror','Winged harasser');
@@ -1068,6 +1102,9 @@ Object.assign(themePalettes,{
  Draconic:{base:['Scale Black','#241B18'],mid:['Wyrm Scale','#6E3424'],accent:['Hoard Gold','#E0A93F'],glow:['Dragon Breath','#FFB76B']},
  Dwarven:{base:['Deep Granite','#2F2E2C'],mid:['Iron Beard','#68605A'],accent:['Forge Gold','#C18B38'],glow:['Rune Ember','#FFBF66']},
  Elven:{base:['Green Shadow','#223629'],mid:['Silver Leaf','#9BAF9D'],accent:['Moon Gold','#D6C882'],glow:['Elder Light','#E8FFE2']},
+ Divine:{base:['Ivory Dawn','#E8DFC7'],mid:['Blessed Gold','#D8B45A'],accent:['Radiant White','#FFF8E8'],glow:['Sacred Glow','#FFF2A6']},
+ Knightly:{base:['Steel Blue','#3B4658'],mid:['Tabard Cream','#D7CFBC'],accent:['Heraldic Gold','#D2A34A'],glow:['Banner Light','#E7F1FF']},
+ Norse:{base:['Fjord Blue','#23384A'],mid:['Runed Timber','#7A5E43'],accent:['Frost Iron','#AEBBC9'],glow:['Aurora Mist','#BFEFFF']},
  Orcish:{base:['Warhide Green','#2E3A27'],mid:['Dark Leather','#5A3B2A'],accent:['War Paint Red','#B33A2E'],glow:['Battle Fire','#FF9A45']},
  Graveyard:{base:['Wet Grave','#252C32'],mid:['Tombstone Grey','#70736B'],accent:['Candle Bone','#D8CBA3'],glow:['Ghost Blue','#A8D7FF']},
  Ashen:{base:['Ash Grey','#3B3835'],mid:['Cinder Brown','#6C4B39'],accent:['Dull Ember','#D6763D'],glow:['Coal Glow','#F7B15E']},
@@ -1115,7 +1152,7 @@ function paletteText(palette){return (palette||[]).map(s=>`${s.role}: ${s.name} 
 function palettePrompt(palette){return (palette||[]).map(s=>`${s.role.toLowerCase()} ${s.name} (${s.hex})`).join(', ');}
 
 function itemIdentity(cat,rar,ts){
- const materials={Fire:['charred iron','smoked leather','ember glass'],Frost:['pale steel','frosted hide','cold crystal'],Rot:['rotting bark','blackened leather','sickly bronze'],Fungal:['mushroom leather','soft bark','spore-stained cloth'],Crystal:['cut crystal','polished stone','silver fittings'],Nature:['living wood','woven vines','leaf-dyed cloth'],Shadow:['dark cloth','black iron','smoky gems'],Holy:['bright steel','white cloth','gold trim']};
+ const materials={Fire:['charred iron','smoked leather','ember glass'],Frost:['pale steel','frosted hide','cold crystal'],Rot:['rotting bark','blackened leather','sickly bronze'],Fungal:['mushroom leather','soft bark','spore-stained cloth'],Crystal:['cut crystal','polished stone','silver fittings'],Nature:['living wood','woven vines','leaf-dyed cloth'],Shadow:['dark cloth','black iron','smoky gems'],Holy:['bright steel','white cloth','gold trim'],Divine:['sanctified steel','white cloth','sun-gilded trim'],Knightly:['polished plate','tabard cloth','leather straps'],Norse:['fur-lined leather','carved timber','cold iron']};
  const mats=materials[ts[0]]||['worked iron','aged leather','simple cloth','carved wood'];
  return {materials:R(mats), construction:R(['crude','sturdy','elegant','old','patched','ceremonial','practical']), wear:R(['new','worn','battle-scarred','ancient','well-kept']), visual:R(itemVisualDetails)};
 }
