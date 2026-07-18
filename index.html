@@ -421,7 +421,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a refined coherent timeline prompt tab plus a flatter 2D spell flipbook prompt tab, and keeps the v0.95 sanity engine intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a refined coherent timeline prompt tab with stronger reference locking, a flatter 2D spell flipbook prompt tab, and keeps the v0.95 sanity engine intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -2090,6 +2090,8 @@ function buildFollowupPrompt(c,palette,rarityText){
  if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
+ lines.push('The reference image is the primary and authoritative source. Do not redesign, replace, or reinterpret it into a different species, body plan, creature family, or character. If any text detail conflicts with the reference image, follow the reference image.');
+ lines.push('Preserve the same exact defining features from the reference image, such as head shape, face, eyes, limb count, wings if present, tail if present, horns/ears if present, major accessories or ornaments if present, and the same overall tone and personality.');
  lines.push('Create a follow-up stylized 3D game model reference sheet for animation exploration, not a painterly illustration.');
  lines.push('Show the same exact '+cat.toLowerCase()+' performing a few key movement snapshots rather than a full frame-by-frame sheet.');
  lines.push('Include 2 to 3 key poses from a walk cycle and 2 to 3 key poses from an attack animation, for a total maximum of 6 poses. Fewer high-quality poses are better than many small poses.');
@@ -2114,6 +2116,9 @@ function buildFollowupPrompt(c,palette,rarityText){
  }
  lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
  lines.push(`Themes: ${c.themes.join(', ')}.`);
+ if(c.family) lines.push(`Belongs to the ${c.family} family.`);
+ if(c.bodyPlan&&c.bodyPlan.label) lines.push(`Primary body plan: ${c.bodyPlan.label}.`);
+ if(c.visual&&c.visual.length) lines.push(`Creature appearance and silhouette: ${c.visual.slice(0,6).join(', ')}.`);
  lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
  return lines.join(' ');
 }
@@ -2123,6 +2128,7 @@ function buildTimelinePrompt(c,palette,rarityText){
  if(cat==='Flora'){
    const lines=[];
    lines.push('Use the previously generated flora image as the reference and keep the exact same plant identity, silhouette, species logic, palette, materials, and overall design language.');
+   lines.push('The reference image is authoritative. Do not redesign it into a different species, crop, flower, tree, or harvest type. If any text detail is ambiguous, follow the reference image.');
    lines.push('Create a readable 4 to 6 frame growth timeline sheet, not a painterly illustration and not a busy infographic.');
    lines.push('Show 4 to 6 clear chronological stages of the same plant, such as seed, sprout, young stage, mid-growth stage, mature stage, and optionally harvest-ready stage.');
    lines.push('Every frame must belong to the same single progression and clearly read as one continuous growth sequence from early to late stage.');
@@ -2141,6 +2147,8 @@ function buildTimelinePrompt(c,palette,rarityText){
  if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Timeline prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
+ lines.push('The reference image is the primary and authoritative source. Do not redesign, replace, or reinterpret it into a different species, body plan, creature family, or character. If any text detail conflicts with the reference image, follow the reference image.');
+ lines.push('Preserve the same exact defining features from the reference image, such as head shape, face, eyes, limb count, wings if present, tail if present, horns/ears if present, major accessories or ornaments if present, and the same overall tone and personality.');
  lines.push('Create a readable 4 to 6 frame animation-style timeline sheet, not a painterly illustration and not a literal frame-by-frame film strip.');
  lines.push('Show 4 to 6 key pose snapshots of the same exact '+cat.toLowerCase()+', arranged in one coherent sequence.');
  lines.push('Very important: this must be one single continuous action progression, not a mix of unrelated poses. Every frame should belong to the same motion from start to finish.');
@@ -2169,6 +2177,9 @@ function buildTimelinePrompt(c,palette,rarityText){
  const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
  lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
  lines.push(`Themes: ${c.themes.join(', ')}.`);
+ if(c.family) lines.push(`Belongs to the ${c.family} family.`);
+ if(c.bodyPlan&&c.bodyPlan.label) lines.push(`Primary body plan: ${c.bodyPlan.label}.`);
+ if(c.visual&&c.visual.length) lines.push(`Creature appearance and silhouette: ${c.visual.slice(0,6).join(', ')}.`);
  lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
  return lines.join(' ');
 }
