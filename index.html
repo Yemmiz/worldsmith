@@ -550,7 +550,10 @@
 • Audio mode covers four prompt slots per concept: Primary One-shot, Secondary One-shot, Ambience / Loop, and UI / Pickup, each dimmed automatically where it does not apply.
 • One-shot SFX prompts are deliberately kept dry (close-mic'd, no reverb, no music) so the sounds stay reusable anywhere in-game, with space to be added by the engine later. Ambience prompts are written for the seamless looping toggle.
 • SFX prompts pull sound character from the concept themes (e.g. Frost → icy crystalline shimmer), creature size from the body plan, and item materials from the item identity.
-• Each audio tab shows recommended ElevenLabs settings (duration, looping, prompt influence, WAV export) under the prompt.</div></div>
+• Each audio tab shows recommended ElevenLabs settings (duration, looping, prompt influence, WAV export) under the prompt.
+• Removed loop/looping wording from generated SFX prompt text, since seamless looping is an ElevenLabs setting rather than a prompt instruction. Ambience prompts now just describe a continuous steady sound with no fades.
+• Added Longbow, Shortbow, Recurve bow, and Repeating crossbow to the weapon type pool.
+• Added ranged weapon presentation guidance for bows, crossbows, and slingshots: clean unheld profile, string at rest, no archer or firing pose, and no nocked arrows, with ammunition rendered as a separate tidy set when relevant.</div></div>
   </section>
 </main>
 <script>
@@ -991,7 +994,7 @@ roles.Boss.push('Ancient dragon','Corrupted monarch','Cathedral horror','Clockwo
 roles.NPC.push('Exiled prince','Grave tender','Rune scholar','Potion peddler','Witch hunter','Relic smuggler','Bell ringer','Moth priest','Old sailor','Goblin broker','Forest midwife','Runaway apprentice','Court jester','Dwarven mason','Elven waywatcher','Orc deserter','Bookbinder','Lantern keeper');
 roles.Spell.push('Ward spell','Sigil spell','Beam spell','Nova spell','Chain spell','Hex spell','Ritual spell','Aura spell','Ground rune','Transformation spell','Reflection spell','Weather spell');
 roles.Skill.push('Shield bash','Spear thrust','Whirlwind','Trap throw','Warcry','Marking shot','Pet command','Counter stance','Leap strike','Blade dance','Bomb toss','Rune strike');
-roles.Weapon.push('Warhammer','Spear','Halberd','Crossbow','Flail','Claw weapon','Greatsword','Hand axe','Javelin','Sickle','Spellblade','Totem staff','War pick','Hook blade');
+roles.Weapon.push('Warhammer','Spear','Halberd','Crossbow','Flail','Claw weapon','Greatsword','Hand axe','Javelin','Sickle','Spellblade','Totem staff','War pick','Hook blade','Longbow','Shortbow','Recurve bow','Repeating crossbow');
 roles.Armour.push('Breastplate','Chainmail','Leather jerkin','Battle robe','Buckler','Tower shield','Pauldron','Hood','War mask','Bracers','Tabard','Scale mail');
 roles.Relic.push('Broken bell','Saint bone','Stained-glass shard','Dragon scale','Witch candle','Clockwork heart','Prayer wheel','Ancient astrolabe','Mariner compass','Mirror shard','Sealed book','Grave lantern');
 roles.Potion.push('Smoke flask','Rage brew','Iron-skin draught','Luck tonic','Invisibility vial','Haste cordial','Witchwater','Firebomb bottle','Frost phial','Antique perfume');
@@ -1916,6 +1919,11 @@ function buildVisualPrompt(c,palette,rarityText){
    if(c.role) baseParts.push(`Item type: ${c.role}.`);
    if(c.identity) baseParts.push(`Materials and construction: ${c.identity.materials}; ${c.identity.construction}; ${c.identity.wear}.`);
    if(cat==='Armour') baseParts.push(armourPresentationGuidance(c.role,false));
+   if(cat==='Weapon' && /bow|crossbow|slingshot/i.test(c.role||'')){
+     baseParts.push('Ranged weapon presentation: show the weapon in a clean side or three-quarter profile with the full limbs, stock, and string clearly visible and the string at rest, not drawn.');
+     baseParts.push('Do not include hands, an archer, a shooting pose, motion lines, or a firing action scene. The weapon is unheld and isolated.');
+     baseParts.push('Do not nock an arrow or bolt on the string. If arrows, bolts, ammunition, or a quiver are part of the identity, render them as a small separate tidy set beside the weapon, clearly not loaded and not attached.');
+   }
    baseParts.push(`Visual identity: ${c.visual.join(', ')}.`);
    baseParts.push('No stat text, no labels, and no technical mechanics. Prioritize silhouette and material readability.');
    return baseParts.join(' ');
@@ -2000,7 +2008,7 @@ function sfxThemeTexture(ts){
   return found.slice(0,2).join(', ');
 }
 const SFX_DRY=", close-mic'd dry studio recording, no reverb, no echo, no music, high-quality game sound effect one-shot";
-const SFX_LOOP=', seamless looping ambience, no music, no melody, consistent level throughout, high-quality game ambience loop';
+const SFX_LOOP=', continuous steady ambience, no music, no melody, consistent level from start to end, no fade in or out, high-quality game ambience';
 const SFX_UI=', clean minimal dry recording, no reverb, very short, satisfying game UI sound one-shot';
 const SFX_NOTES={
   oneshot:'ElevenLabs settings → Duration: 1–3 s (manual) • Looping: OFF • Prompt influence: ~40% • Download as WAV, keep it dry and add reverb in-engine later.',
@@ -2047,7 +2055,7 @@ function buildSfxPrompts(c){
   } else if(cat==='Spell'||cat==='Skill'||cat==='Spell VFX'){
     out.primary=sfxEntry(`Fantasy spell cast release, magical energy bursting outward with a punchy transient attack and a short energetic tail, ${tex}`,SFX_DRY,'oneshot');
     out.secondary=sfxEntry(`Fantasy spell impact hit, magical energy striking a target with a sharp crack and dissipating sparkle, ${tex}`,SFX_DRY,'oneshot');
-    out.loop=sfxEntry(`Fantasy spell channelling loop, continuous contained magical energy swirling and humming steadily, ${tex}`,SFX_LOOP,'loop');
+    out.loop=sfxEntry(`Fantasy spell channelling sound, continuous contained magical energy swirling and humming steadily, ${tex}`,SFX_LOOP,'loop');
     out.ui=sfxEntry(`Skill-ready notification, short bright magical ping, subtle and non-intrusive`,SFX_UI,'ui');
   } else if(cat==='Weapon'){
     out.primary=sfxEntry(`Fantasy weapon swing, fast sharp air whoosh with a slight ${matBit||'metallic '}character, aggressive and quick`,SFX_DRY,'oneshot');
@@ -2089,7 +2097,7 @@ function buildSfxPrompts(c){
   } else if(cat==='Flora'){
     out.primary=sfxEntry(`Fantasy plant being harvested, leafy rustle with a crisp stem snap and a soft pull, ${tex}`,SFX_DRY,'oneshot');
     out.secondary=sfxEntry(`Magical plant blooming open, soft organic unfurling with a gentle sparkling shimmer, ${tex}`,SFX_DRY,'oneshot');
-    out.loop=sfxEntry(`Gentle plant sway loop, soft leaves and stems rustling in light air with faint organic creaks, ${tex}`,SFX_LOOP,'loop');
+    out.loop=sfxEntry(`Gentle plant sway, soft leaves and stems rustling in light air with faint organic creaks, ${tex}`,SFX_LOOP,'loop');
     out.ui=sfxEntry(`Inventory pickup sound for a herb, quick soft leafy rustle, light and natural`,SFX_UI,'ui');
   } else if(cat==='Decoration'){
     out.primary=sfxEntry(`Decorative fantasy object being placed down, short ${matBit}settling thump with a small material detail, ${tex}`,SFX_DRY,'oneshot');
@@ -2098,7 +2106,7 @@ function buildSfxPrompts(c){
   } else if(cat==='Texture'){
     out.primary=sfxEntry(`Footsteps walking on ${mats||'this material'}, four distinct steps with natural weight and clear surface character, ${tex}`,SFX_DRY,'oneshot');
     out.secondary=sfxEntry(`Hard object impact on a ${mats||'material'} surface, single dry hit with realistic surface response, ${tex}`,SFX_DRY,'oneshot');
-    out.loop=sfxEntry(`Continuous walking loop on ${mats||'this material'}, steady rhythmic footsteps with natural variation, ${tex}`,SFX_LOOP,'loop');
+    out.loop=sfxEntry(`Continuous walking on ${mats||'this material'}, steady rhythmic footsteps with natural variation, ${tex}`,SFX_LOOP,'loop');
   } else if(cat==='Random Event'){
     out.primary=sfxEntry(`Event alert stinger, attention-grabbing dramatic hit with a fast rising swell, urgent, ${tex}`,SFX_DRY,'stinger');
     out.secondary=sfxEntry(`Event resolved stinger, short settling resolution accent, relieving, ${tex}`,SFX_DRY,'stinger');
