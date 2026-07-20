@@ -465,6 +465,11 @@
     <label>Directed idea</label><input id="ideaInput" type="text" placeholder="e.g. Raven Statue, Goblin Chef, Frost Wolf" />
     <label>Idea Drift: <span id="ideaChaosLabel">25</span>%</label><input id="ideaChaos" type="range" min="0" max="100" value="25" />
     <label>Chaos: <span id="chaosLabel">50</span>%</label><input id="chaos" type="range" min="0" max="100" value="50" />
+    <label>Design Style</label><select id="designStyle">
+      <option value="fantastical" selected>✨ Fantastical — full fantasy flair</option>
+      <option value="stylized">🎯 Toned Down — subtle accents only</option>
+      <option value="grounded">🌿 Simple &amp; Classic — plain and believable</option>
+    </select>
     <button class="big" id="conjure">✦ Conjure Content</button>
     <div class="row"><button class="btn" id="reroll">🔁 Reroll Unlocked</button><button class="btn" id="save">⭐ Save</button></div>
     <div class="row"><button class="btn" id="copyPrompt">📋 Copy Prompt</button><button class="btn" id="copyJson">{} Copy JSON</button></div>
@@ -553,7 +558,9 @@
 • Each audio tab shows recommended ElevenLabs settings (duration, looping, prompt influence, WAV export) under the prompt.
 • Removed loop/looping wording from generated SFX prompt text, since seamless looping is an ElevenLabs setting rather than a prompt instruction. Ambience prompts now just describe a continuous steady sound with no fades.
 • Added Longbow, Shortbow, Recurve bow, and Repeating crossbow to the weapon type pool.
-• Added ranged weapon presentation guidance for bows, crossbows, and slingshots: clean unheld profile, string at rest, no archer or firing pose, and no nocked arrows, with ammunition rendered as a separate tidy set when relevant.</div></div>
+• Added ranged weapon presentation guidance for bows, crossbows, and slingshots: clean unheld profile, string at rest, no archer or firing pose, and no nocked arrows, with ammunition rendered as a separate tidy set when relevant.
+• Added a Design Style control with three levels: Fantastical (current full-flair behaviour), Toned Down (mostly natural subject with one or two subtle accents), and Simple & Classic (a plain, believable, real-world version with fantasy details stripped out and natural colours).
+• Design Style applies to the image prompt and portrait prompt, adapts its wording for spell categories (simpler cleaner effects instead of no-glow), and re-renders the current concept live when changed, no reroll needed.</div></div>
   </section>
 </main>
 <script>
@@ -1705,7 +1712,36 @@ function spellVfxRoleIntent(role){
   return 'a flat 2D spell effect built from clean abstract VFX shapes with clear timing, readable silhouette, and a composition that matches the role rather than defaulting to a circular nova';
 }
 
+
+function designStyleValue(){const el=document.getElementById('designStyle');return el?el.value:'fantastical';}
+function designStyleDirectives(cat){
+  const style=designStyleValue();
+  const isEffect=(cat==='Spell'||cat==='Skill'||cat==='Spell VFX');
+  if(style==='grounded'){
+    if(isEffect) return ['Design intensity: simple and classic. Keep the effect minimal and clean: one clear primary shape, restrained glow, very few layers, no dense runes, no busy particle clutter, and no stacked secondary effects. It should read like a simple, timeless classic game spell effect.'];
+    return [
+      'Design intensity: simple and classic. Depict a plain, ordinary, believable version of this subject, close to how it would exist in the real world or in grounded low-fantasy.',
+      'Strictly avoid: armour plating, runes, glowing elements, crystals, gems, embedded magical effects, auras, ornaments, trophies, decorative metalwork, extra horns, extra spikes, and any over-the-top fantasy additions that the plain real version would not have.',
+      'Use natural, realistic, muted colours and materials appropriate to the subject. Treat the listed themes, palette, and any exotic visual identity features as extremely subtle mood inspiration only, not as literal visual elements. When in doubt, leave fantasy details out.'
+    ];
+  }
+  if(style==='stylized'){
+    if(isEffect) return ['Design intensity: toned down. Keep the effect readable and restrained, with limited layers, modest glow, and at most one or two distinctive thematic flourishes. Avoid dense runes, heavy particle clutter, and stacked secondary effects.'];
+    return ['Design intensity: toned down. Keep the base subject clearly recognizable and mostly natural, with at most one or two subtle thematic accents. Avoid heavy armour, dense runes, strong glow, busy ornamentation, and stacked fantasy features. The plain subject comes first, and the fantasy flavour stays quiet.'];
+  }
+  return [];
+}
 function buildVisualPrompt(c,palette,rarityText){
+  const base=buildVisualPromptCore(c,palette,rarityText);
+  const extra=designStyleDirectives(c.category);
+  return extra.length?base+' '+extra.join(' '):base;
+}
+function buildPortraitPrompt(c,palette,rarityText){
+  const base=buildPortraitPromptCore(c,palette,rarityText);
+  const extra=designStyleDirectives(c.category);
+  return extra.length?base+' '+extra.join(' '):base;
+}
+function buildVisualPromptCore(c,palette,rarityText){
  const cat=c.category;
  const isSpellVfx=cat==='Spell VFX';
  const isModelSubject=['Monster','Boss','NPC','Vendor','Flora','Companion','Decoration'].includes(cat);
@@ -2211,7 +2247,7 @@ function buildSpellFlipbookPrompt(c,palette,rarityText){
 }
 
 
-function buildPortraitPrompt(c,palette,rarityText){
+function buildPortraitPromptCore(c,palette,rarityText){
  const cat=c.category;
  const parts=[];
  const squareBase=[
@@ -2556,6 +2592,7 @@ document.getElementById('copyPrompt').onclick=copyActivePrompt;
 document.getElementById('copyPromptInline').onclick=copyActivePrompt;
 document.querySelectorAll('[data-prompt-tab]').forEach(btn=>btn.addEventListener('click',()=>{ if(btn.classList.contains('disabled')) return; setActivePromptTab(btn.dataset.promptTab); }));
 document.querySelectorAll('[data-prompt-mode]').forEach(btn=>btn.addEventListener('click',()=>setPromptMode(btn.dataset.promptMode)));
+document.getElementById('designStyle').addEventListener('change',()=>{ if(state.current) render(state.current); });
 document.getElementById('copyJson').onclick=()=>state.current&&navigator.clipboard.writeText(JSON.stringify(exportData(state.current),null,2));
 document.getElementById('copyMarkdown').onclick=()=>state.current&&navigator.clipboard.writeText(markdownNote(state.current));
 ideaChaosEl.addEventListener('input',()=>ideaChaosLabel.textContent=ideaChaosEl.value);
