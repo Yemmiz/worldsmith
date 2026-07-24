@@ -565,7 +565,8 @@
 • The base Spell VFX prompt now explicitly demands ONE single moment as ONE single image, never a timeline, sprite sheet, flipbook, progression strip, or multi-frame sequence, and forbids defaulting to circular aura/ring/orb compositions unless the role calls for one.
 • Toned Down and Simple & Classic now explicitly forbid particle spray on effect categories: no floating specks, embers, motes, sparkles, or scattered debris.
 • Spell, Skill, and Spell VFX audio prompts are now element-aware instead of theme-culture-aware: the element is inferred from the concept name, themes, and mechanic (Ashen Lance → fire), so a flame cone gets roaring flame whoosh and fiery burst rather than silvery chimes.
-• Spell audio prompts also fold in the effect shape from the role: lances are fast piercing directional, cones are broad sweeping, pillars are rising eruptive, beams are sustained focused, and so on.</div></div>
+• Spell audio prompts also fold in the effect shape from the role: lances are fast piercing directional, cones are broad sweeping, pillars are rising eruptive, beams are sustained focused, and so on.
+• Biome and Dungeon Room ambience is now generated as a labeled three-layer stack (base bed, mid texture, sparse details) with theme-aware air, water, and detail content, meant to be generated separately and layered in-engine with offset start times, with the one-shot tabs fired at random intervals on top.</div></div>
   </section>
 </main>
 <script>
@@ -2106,6 +2107,30 @@ function sfxSpellShape(role){
   if(/spiral|drill|cyclone/.test(r)) return 'twisting accelerating';
   return 'energetic';
 }
+function sfxAmbienceLayers(c,kind){
+  const tex=sfxThemeTexture(c.themes);
+  const t=(c.themes||[]).join(' ').toLowerCase();
+  let air='low steady wind moving through open terrain, broad and even';
+  if(/frost|ashen|graveyard|moonlit|norse/.test(t)) air='cold desolate wind, low hollow gusts with a thin icy edge';
+  else if(/desert|infernal|forge/.test(t)) air='hot dry wind, gritty sand-laden gusts with a faint shimmer of heat';
+  else if(/swamp|jungle|fungal|rot/.test(t)) air='thick humid air, dense insect texture with slow wet undertones';
+  else if(/ocean|coastal|sunken|deep sea/.test(t)) air='steady rolling waves washing against rock with salty spray hiss';
+  else if(/sylvan|wildwood|nature|fey|faerie/.test(t)) air='soft forest air, gentle leaf rustle with light birdsong far away';
+  if(kind==='dungeon') air='still heavy underground air, faint low rumble of deep rock with slow cold draughts';
+  const mid=kind==='dungeon'
+    ?'sparse water drips echoing softly, thin trickles running down stone, occasional wet plinks'
+    :'a small stream trickling steadily with a soft distant waterfall wash behind it';
+  const detail=kind==='dungeon'
+    ?`sparse unsettling details with silence between them: deep stone settling groans, distant chain clinks, faint ${tex}`
+    :`sparse environmental details with silence between them: slow wooden creaks, distant faint wildlife, subtle ${tex}`;
+  const mk=d=>d+SFX_LOOP;
+  return {
+    value:'LAYER 1 — BASE BED (loudest):\n'+mk((kind==='dungeon'?'Underground ambience base, ':'Outdoor ambience base, ')+air)
+      +'\n\nLAYER 2 — MID TEXTURE:\n'+mk((kind==='dungeon'?'Underground water layer, ':'Nature water layer, ')+mid)
+      +'\n\nLAYER 3 — SPARSE DETAILS (quietest):\n'+mk('Ambient detail layer, '+detail),
+    note:'Generate each layer as its OWN 30 s generation (Looping ON, prompt influence 20–30%, WAV). In-engine: play all three together at offset start times and different volumes (base loudest, details quietest). Fire the one-shot tabs randomly every 20–60 s on top for a living, non-repeating soundscape.'
+  };
+}
 function sfxCreatureSize(c){
   const s=((c.bodyPlan&&(c.bodyPlan.size+' '+c.bodyPlan.label))||'').toLowerCase();
   if(/massive|huge|towering|colossal/.test(s)) return {adj:'massive heavy',pitch:'deep low-pitched'};
@@ -2182,11 +2207,11 @@ function buildSfxPrompts(c){
   } else if(cat==='Dungeon Room'){
     out.primary=sfxEntry(`Heavy dungeon mechanism activating, stone and metal grinding into motion with a final locking thunk, ${tex}`,SFX_DRY,'stinger');
     out.secondary=sfxEntry(`Dungeon trap triggering, sharp mechanical snap with a fast dangerous release, ${tex}`,SFX_DRY,'oneshot');
-    out.loop=sfxEntry(`Dark dungeon room ambience, ${tex}, distant unsettling details, sparse dripping and faint air movement, tense and quiet`,SFX_LOOP,'loop');
+    out.loop=sfxAmbienceLayers(c,'dungeon');
   } else if(cat==='Biome'){
     out.primary=sfxEntry(`Signature wildlife or nature event from a fantasy biome, single distinctive call or natural occurrence, ${tex}`,SFX_DRY,'oneshot');
     out.secondary=sfxEntry(`Distant dramatic event in a fantasy biome, far-off rumble or disturbance rolling across the landscape, ${tex}`,SFX_DRY,'stinger');
-    out.loop=sfxEntry(`Fantasy biome ambience bed, ${tex}, layered natural background details at a steady calm level, immersive and continuous`,SFX_LOOP,'loop');
+    out.loop=sfxAmbienceLayers(c,'biome');
   } else if(cat==='Flora'){
     out.primary=sfxEntry(`Fantasy plant being harvested, leafy rustle with a crisp stem snap and a soft pull, ${tex}`,SFX_DRY,'oneshot');
     out.secondary=sfxEntry(`Magical plant blooming open, soft organic unfurling with a gentle sparkling shimmer, ${tex}`,SFX_DRY,'oneshot');
