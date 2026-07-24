@@ -560,7 +560,10 @@
 • Added Longbow, Shortbow, Recurve bow, and Repeating crossbow to the weapon type pool.
 • Added ranged weapon presentation guidance for bows, crossbows, and slingshots: clean unheld profile, string at rest, no archer or firing pose, and no nocked arrows, with ammunition rendered as a separate tidy set when relevant.
 • Added a Design Style control with three levels: Fantastical (current full-flair behaviour), Toned Down (mostly natural subject with one or two subtle accents), and Simple & Classic (a plain, believable, real-world version with fantasy details stripped out and natural colours).
-• Design Style applies to the image prompt and portrait prompt, adapts its wording for spell categories (simpler cleaner effects instead of no-glow), and re-renders the current concept live when changed, no reroll needed.</div></div>
+• Design Style applies to the image prompt and portrait prompt, adapts its wording for spell categories (simpler cleaner effects instead of no-glow), and re-renders the current concept live when changed, no reroll needed.
+• Rebalanced the Spell VFX shape pool away from circular auras and spheres: added Flame pillar, Single lightning bolt, Energy lance, Erupting ground spikes, Cyclone column, Piercing ice bolt, and Vertical eruption, and increased the odds of directional and columnar shapes overall.
+• The base Spell VFX prompt now explicitly demands ONE single moment as ONE single image, never a timeline, sprite sheet, flipbook, progression strip, or multi-frame sequence, and forbids defaulting to circular aura/ring/orb compositions unless the role calls for one.
+• Toned Down and Simple & Classic now explicitly forbid particle spray on effect categories: no floating specks, embers, motes, sparkles, or scattered debris.</div></div>
   </section>
 </main>
 <script>
@@ -686,7 +689,7 @@ const roles={
  NPC:['Quest giver','Wandering merchant','Trainer','Hermit','Faction scout','Cursed noble','Village elder','Monster researcher'],
  Spell:['Projectile spell','Area spell','Curse spell','Buff spell','Summon spell','Mobility spell','Trap spell','Channeled spell'],
  Skill:['Melee cleave','Ranged shot','Defensive stance','Dash attack','Totem skill','Channel skill','Combo finisher'],
- 'Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Rain volley','Spiral drill'],
+ 'Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Column burst','Rain volley','Spiral drill','Flame pillar','Flame pillar','Single lightning bolt','Single lightning bolt','Energy lance','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption'],
  Weapon:['One-handed sword','Two-handed axe','Wand','Staff','Bow','Dagger','Mace','Shield weapon'],
  Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
  Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
@@ -1686,8 +1689,12 @@ function spellVisualIntent(c){
 
 function spellVfxRoleIntent(role){
   const r=(role||'').toLowerCase();
+  if(r.includes('lightning')||r.includes('strike')) return 'a single directional lightning bolt or vertical strike using one dominant jagged main branch, sharp impact emphasis, and strong line-of-action rather than a circular nova; one bolt, not a storm of bolts';
+  if(r.includes('pillar')||r.includes('eruption')) return 'a single vertical pillar of the element rising from the ground with a strong bottom-to-top axis, a contained cylindrical silhouette, clean stacked internal layers, and a readable base impact ring kept small';
+  if(r.includes('lance')||r.includes('piercing')) return 'a single elongated piercing lance or bolt of energy with one dominant straight axis, a sharp readable tip, and a clean tapering tail; no radial burst around it';
+  if(r.includes('ground spikes')||r.includes('spike')) return 'a burst of sharp ground spikes erupting upward with hard triangular silhouettes, a clear shared direction, and minimal debris';
+  if(r.includes('cyclone')) return 'a twisting vertical cyclone column with a clear spiral surface direction and a contained cylindrical silhouette, not a flat ring';
   if(r.includes('projectile')||r.includes('bolt')) return 'a flat 2D projectile trail with clear origin, strong travel direction, readable head shape, and dissipating tail';
-  if(r.includes('lightning')||r.includes('strike')) return 'a directional lightning strike or vertical magical hit using jagged branches, sharp impact emphasis, and strong line-of-action rather than a circular nova';
   if(r.includes('impact')) return 'a flat 2D impact burst with readable expansion, sharp peak shape, and fading fragments';
   if(r.includes('area')||r.includes('pulse')||r.includes('nova')) return 'a top-down planar area pulse or nova ring with clear radius and expanding energy';
   if(r.includes('aura')||r.includes('buff')) return 'a flat protective or empowering aura ring made from clean layered circular VFX shapes, without a character inside it';
@@ -1718,7 +1725,7 @@ function designStyleDirectives(cat){
   const style=designStyleValue();
   const isEffect=(cat==='Spell'||cat==='Skill'||cat==='Spell VFX');
   if(style==='grounded'){
-    if(isEffect) return ['Design intensity: simple and classic. Keep the effect minimal and clean: one clear primary shape, restrained glow, very few layers, no dense runes, no busy particle clutter, and no stacked secondary effects. It should read like a simple, timeless classic game spell effect.'];
+    if(isEffect) return ['Design intensity: simple and classic. Keep the effect minimal and clean: one clear primary shape, restrained glow, very few layers, no dense runes, and no stacked secondary effects. Absolutely no particles: no floating specks, embers, motes, sparks, sparkles, dust, or scattered debris anywhere around the effect. The core shapes alone carry the design, like a simple, timeless classic game spell effect.'];
     return [
       'Design intensity: simple and classic. Depict a plain, ordinary, believable version of this subject, close to how it would exist in the real world or in grounded low-fantasy.',
       'Strictly avoid: armour plating, runes, glowing elements, crystals, gems, embedded magical effects, auras, ornaments, trophies, decorative metalwork, extra horns, extra spikes, and any over-the-top fantasy additions that the plain real version would not have.',
@@ -1726,7 +1733,7 @@ function designStyleDirectives(cat){
     ];
   }
   if(style==='stylized'){
-    if(isEffect) return ['Design intensity: toned down. Keep the effect readable and restrained, with limited layers, modest glow, and at most one or two distinctive thematic flourishes. Avoid dense runes, heavy particle clutter, and stacked secondary effects.'];
+    if(isEffect) return ['Design intensity: toned down. Keep the effect readable and restrained, with limited layers, modest glow, and at most one or two distinctive thematic flourishes. Do not add particle spray: no floating specks, embers, motes, sparkles, or scattered debris around the effect. Avoid dense runes and stacked secondary effects; the core shapes carry the design.'];
     return ['Design intensity: toned down. Keep the base subject clearly recognizable and mostly natural, with at most one or two subtle thematic accents. Avoid heavy armour, dense runes, strong glow, busy ornamentation, and stacked fantasy features. The plain subject comes first, and the fantasy flavour stays quiet.'];
   }
   return [];
@@ -1750,6 +1757,8 @@ function buildVisualPromptCore(c,palette,rarityText){
    'Use flat 2D presentation, orthographic or front-facing/top-down effect design, large readable shapes, clean crisp edges, low visual noise, and production-friendly readability.',
    'Keep the effect planar and layerable, suitable for sprite-sheet development, VFX planning, and 2D game readability rather than a rendered physical object in a scene.',
    'No environment, no terrain, no cast shadows, no dramatic camera angle, no scenic background, and no cinematic storytelling. The spell effect itself is the subject.',
+   'Render exactly ONE single moment of the effect as ONE single image. This is NOT a timeline, NOT a sprite sheet, NOT a flipbook, NOT an animation sequence, NOT a progression strip, and NOT multiple frames, panels, or steps. Do not show before/during/after stages. One effect, one moment, one image.',
+   'Do not default to a circular aura, ring, orb, or spherical shape. Only use a radial or circular composition if the stated role explicitly calls for one; otherwise follow the directional shape of the role.',
    `Use this defining colour palette: ${palettePrompt(palette)}.`,
    `Concept: ${c.name}, ${rarityText} ${c.category}.`,
    `Themes: ${c.themes.join(', ')}.`
