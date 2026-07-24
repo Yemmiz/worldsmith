@@ -563,7 +563,9 @@
 • Design Style applies to the image prompt and portrait prompt, adapts its wording for spell categories (simpler cleaner effects instead of no-glow), and re-renders the current concept live when changed, no reroll needed.
 • Rebalanced the Spell VFX shape pool away from circular auras and spheres: added Flame pillar, Single lightning bolt, Energy lance, Erupting ground spikes, Cyclone column, Piercing ice bolt, and Vertical eruption, and increased the odds of directional and columnar shapes overall.
 • The base Spell VFX prompt now explicitly demands ONE single moment as ONE single image, never a timeline, sprite sheet, flipbook, progression strip, or multi-frame sequence, and forbids defaulting to circular aura/ring/orb compositions unless the role calls for one.
-• Toned Down and Simple & Classic now explicitly forbid particle spray on effect categories: no floating specks, embers, motes, sparkles, or scattered debris.</div></div>
+• Toned Down and Simple & Classic now explicitly forbid particle spray on effect categories: no floating specks, embers, motes, sparkles, or scattered debris.
+• Spell, Skill, and Spell VFX audio prompts are now element-aware instead of theme-culture-aware: the element is inferred from the concept name, themes, and mechanic (Ashen Lance → fire), so a flame cone gets roaring flame whoosh and fiery burst rather than silvery chimes.
+• Spell audio prompts also fold in the effect shape from the role: lances are fast piercing directional, cones are broad sweeping, pillars are rising eruptive, beams are sustained focused, and so on.</div></div>
   </section>
 </main>
 <script>
@@ -2061,6 +2063,49 @@ const SFX_NOTES={
   loop:'ElevenLabs settings → Duration: 15–30 s • Looping: ON • Prompt influence: 20–30% (lower = more organic) • Generate 2–3 variations and layer them offset for richer beds.',
   ui:'ElevenLabs settings → Duration: 0.5–1.5 s (manual, auto tends to run long) • Looping: OFF • Prompt influence: 40–50%.'
 };
+const sfxElementVocab={
+  fire:'roaring flame whoosh, fiery burst, crackling ember hiss, searing heat sizzle',
+  frost:'icy crystalline burst, freezing crackle, sharp cold shatter, frosty air rush',
+  lightning:'sharp electric crack, snapping arc zap, charged static build, crisp thunder snap',
+  holy:'blazing radiant flare, warm golden energy swell, purifying fiery shimmer',
+  shadow:'dark hollow rush, smoky reverse swell, whispering airy void tone',
+  poison:'sizzling acidic hiss, bubbling toxic gurgle, corrosive spatter',
+  blood:'wet visceral surge, thick pulsing rush, sanguine spatter',
+  water:'surging watery rush, crashing splash, churning torrent',
+  earth:'deep stony rumble, cracking rock, heavy gravel burst',
+  nature:'whipping organic lash, thick vine snap, earthy living surge',
+  arcane:'surging magical energy, sparkling arcane rush, resonant power hum'
+};
+function sfxSpellElement(c){
+  const hay=((c.name||'')+' '+(c.themes||[]).join(' ')+' '+((c.tech&&c.tech.effect)||'')+' '+((c.tech&&c.tech.name)||'')).toLowerCase();
+  const tests=[
+    [/fire|flame|ash|ember|cinder|infern|scorch|burn|pyre|brand|forge/,'fire'],
+    [/frost|ice|glacial|snow|chill|winter|freez/,'frost'],
+    [/storm|lightning|thunder|spark|volt|shock/,'lightning'],
+    [/holy|divine|angel|radiant|dawn|templar|sacred|celestial|astral/,'holy'],
+    [/shadow|void|umbral|night|eclipse|dread|grave/,'shadow'],
+    [/rot|poison|venom|toxi|plague|blight|acid|fungal/,'poison'],
+    [/blood|crimson|sanguine|gore/,'blood'],
+    [/ocean|tide|wave|sunken|coastal|deep sea|torrent|rain/,'water'],
+    [/stone|earth|underground|mountain|dwarven|quake|rock/,'earth'],
+    [/nature|sylvan|wildwood|thorn|jungle|swamp|bloom|vine|bramble/,'nature']
+  ];
+  for(const [rx,el] of tests) if(rx.test(hay)) return el;
+  return 'arcane';
+}
+function sfxSpellShape(role){
+  const r=(role||'').toLowerCase();
+  if(/lance|bolt|projectile|javelin|piercing/.test(r)) return 'fast piercing directional';
+  if(/cone|breath|wave|sweep|jet/.test(r)) return 'broad sweeping';
+  if(/pillar|column|eruption|meteor|strike|volley/.test(r)) return 'rising eruptive';
+  if(/nova|pulse|area|burst/.test(r)) return 'expanding radial';
+  if(/beam/.test(r)) return 'sustained focused';
+  if(/aura|ward|shield|buff|bloom|heal/.test(r)) return 'soft enveloping';
+  if(/trap|rune|decal|mark|curse/.test(r)) return 'ominous activating';
+  if(/chain|tether|arc|lash/.test(r)) return 'snapping connective';
+  if(/spiral|drill|cyclone/.test(r)) return 'twisting accelerating';
+  return 'energetic';
+}
 function sfxCreatureSize(c){
   const s=((c.bodyPlan&&(c.bodyPlan.size+' '+c.bodyPlan.label))||'').toLowerCase();
   if(/massive|huge|towering|colossal/.test(s)) return {adj:'massive heavy',pitch:'deep low-pitched'};
@@ -2098,9 +2143,12 @@ function buildSfxPrompts(c){
     if(cat==='Vendor') out.loop=sfxEntry(`Busy fantasy market stall ambience, quiet murmuring crowd, clinking wares and shuffling goods, ${tex}`,SFX_LOOP,'loop');
     out.ui=sfxEntry(cat==='Vendor'?`Trade window opening sound, soft coin clink with a small wooden slide, warm and inviting`:`Dialogue window opening sound, soft parchment rustle with a subtle quill tick, understated`,SFX_UI,'ui');
   } else if(cat==='Spell'||cat==='Skill'||cat==='Spell VFX'){
-    out.primary=sfxEntry(`Fantasy spell cast release, magical energy bursting outward with a punchy transient attack and a short energetic tail, ${tex}`,SFX_DRY,'oneshot');
-    out.secondary=sfxEntry(`Fantasy spell impact hit, magical energy striking a target with a sharp crack and dissipating sparkle, ${tex}`,SFX_DRY,'oneshot');
-    out.loop=sfxEntry(`Fantasy spell channelling sound, continuous contained magical energy swirling and humming steadily, ${tex}`,SFX_LOOP,'loop');
+    const el=sfxSpellElement(c);
+    const ev=sfxElementVocab[el]||sfxElementVocab.arcane;
+    const shape=sfxSpellShape(c.role);
+    out.primary=sfxEntry(`Fantasy spell cast release, ${shape} burst of ${ev}, punchy transient attack with a short energetic tail`,SFX_DRY,'oneshot');
+    out.secondary=sfxEntry(`Fantasy spell impact, ${ev} striking a target with a hard crack and a fast dissipating tail`,SFX_DRY,'oneshot');
+    out.loop=sfxEntry(`Fantasy spell channelling sound, continuous contained ${ev}, held steadily at an even intensity`,SFX_LOOP,'loop');
     out.ui=sfxEntry(`Skill-ready notification, short bright magical ping, subtle and non-intrusive`,SFX_UI,'ui');
   } else if(cat==='Weapon'){
     out.primary=sfxEntry(`Fantasy weapon swing, fast sharp air whoosh with a slight ${matBit||'metallic '}character, aggressive and quick`,SFX_DRY,'oneshot');
