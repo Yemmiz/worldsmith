@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.5</title>
+<title>Worldsmith v1.9.6</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.5";
+    content:"v1.9.6";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -1428,29 +1428,7 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='NPC concepts become stronger when they have a motive and a secret. That gives them a reason to exist in quests or towns.';
     detailRows=[['NPC Role',role],['Motivation',motivation],['Signature Prop',prop],['Secret',secret]];
     structureRows=[['Likely Use',R(['quest giver','vendor unlock','dungeon clue','faction contact','comic relief','tragic lore source','crafting trainer'])],['Attitude',att],['Visual Priority','Full-body character concept with props']];
-  } else if(cat==='Anime Spell VFX'){
-   const lines=[];
-   lines.push('Use the previously generated Anime Spell VFX concept as the reference and keep the exact same effect identity, elemental logic, silhouette language, layering, palette relationships, curved shape vocabulary, and anime-inspired / Asian action-RPG VFX style.');
-   lines.push('Create a readable 4 to 6 frame spell-effect timeline sheet for game production. This must be effect-only, not a 3D scene and not an in-world spell cast.');
-   lines.push('Show 4 to 6 clear key stages total, arranged in one clean sequence with clear spacing and chronological numbering.');
-   lines.push('Very important: all frames must belong to one single continuous progression of the same effect. Do not mix several different spell moments or unrelated effects in the same sheet.');
-   lines.push('Choose one readable progression only, such as projectile travel, charge-up to release, area pulse expansion, beam sweep, shield flare, rune activation, cone blast, arc lash, healing bloom, curse mark forming, impact burst, or dissipating fade.');
-   lines.push('Use clear motion progression such as tiny start shape, build-up, active shape, peak frame, follow-through, and fade/dissipate.');
-   lines.push('Every frame should be a flat effect drawing with consistent framing and scale. Keep the style clean, graphic, and anime-inspired, with bold silhouettes, sweeping arcs, tapered ribbons, layered energy bands, decorative negative spaces, and graceful motion.');
-   lines.push('No caster, no humanoid target, no creature, no pet, no environment, no terrain, no scenic background, no props, and no interface elements. The effect itself is the only subject.');
-   lines.push('Do not default the sequence to a circular nova unless the role truly calls for a radial effect. If the role suggests a directional effect such as beam, projectile, cone, lash, wall, chain, column, or falling volley, keep the sequence directional and structured around that motion.');
-   lines.push('Keep details production-friendly: large readable shapes, limited particle noise, no muddy rendering, no photorealistic fire or smoke, and no overly painterly 3D materials.');
-   lines.push('Keep the background plain and production-friendly so each frame reads clearly as a separate stage of one effect.');
-   const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
-   lines.push(`Anime Spell VFX role: ${c.role}.`);
-   lines.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
-   lines.push(`Anime Spell VFX visual identity: ${c.visual.join(', ')}.`);
-   lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
-   lines.push(`Themes: ${c.themes.join(', ')}.`);
-   lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
-   return lines.join(' ');
- }
- if(cat==='Flora'){
+  } else if(cat==='Flora'){
     const growth=R(['low creeping growth','upright clustered stalks','broad layered leaves','hanging vine drape','mushroom shelf formation','root-heavy trunk form','spiral flower structure','tufted field-crop silhouette','thick bulbous base','thorned branching shape']);
     const habitat=R(['old farm edges','moonlit forest floors','damp cave beds','ruined gardens','windswept cliffs','bog margins','sunlit terraces','graveyard soil','ancient temple cracks','riverbank reeds']);
     const use=R(['alchemy ingredient','cooking crop','healing herb','dye source','ritual flower','poison component','campfire seasoning','beast feed','rare trade good','quest harvest']);
@@ -2564,6 +2542,28 @@ function buildFollowupPrompt(c,palette,rarityText){
 
 function buildTimelinePrompt(c,palette,rarityText){
  const cat=c.category;
+ if(cat==='Anime Spell VFX'){
+   const lines=[];
+   lines.push('Use the previously generated Anime Spell VFX concept as the reference and keep the exact same effect identity, elemental logic, silhouette language, layering, palette relationships, curved shape vocabulary, and anime-inspired / Asian action-RPG VFX style.');
+   lines.push('Create a readable 4 to 6 frame spell-effect timeline sheet for game production. This must be effect-only, not a 3D scene and not an in-world spell cast.');
+   lines.push('Show 4 to 6 clear key stages total, arranged in one clean sequence with clear spacing and chronological numbering.');
+   lines.push('Very important: all frames must belong to one single continuous progression of the same effect. Do not mix several different spell moments or unrelated effects in the same sheet.');
+   lines.push('Choose one readable progression only, such as projectile travel, charge-up to release, area pulse expansion, beam sweep, shield flare, rune activation, cone blast, arc lash, healing bloom, curse mark forming, impact burst, or dissipating fade.');
+   lines.push('Use clear motion progression such as tiny start shape, build-up, active shape, peak frame, follow-through, and fade or dissipate.');
+   lines.push('Every frame should be a flat effect drawing with consistent framing and scale. Keep the style clean, graphic, and anime-inspired, with bold silhouettes, sweeping arcs, tapered ribbons, layered energy bands, decorative negative spaces, and graceful motion.');
+   lines.push('No caster, no humanoid target, no creature, no pet, no environment, no terrain, no scenic background, no props, and no interface elements. The effect itself is the only subject.');
+   lines.push('Do not default the sequence to a circular nova unless the role truly calls for a radial effect. If the role suggests a directional effect such as beam, projectile, cone, lash, wall, chain, column, or falling volley, keep the sequence directional and structured around that motion.');
+   lines.push('Keep details production-friendly: large readable shapes, limited particle noise, no muddy rendering, no photorealistic fire or smoke, and no overly painterly 3D materials.');
+   lines.push('Keep the background plain and production-friendly so each frame reads clearly as a separate stage of one effect.');
+   const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
+   lines.push(`Anime Spell VFX role: ${c.role}.`);
+   lines.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
+   lines.push(`Anime Spell VFX visual identity: ${c.visual.join(', ')}.`);
+   lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+   lines.push(`Themes: ${c.themes.join(', ')}.`);
+   lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+   return lines.join(' ');
+ }
  if(cat==='Flora'){
    const lines=[];
    lines.push('Use the previously generated flora image as the reference and keep the exact same plant identity, silhouette, species logic, palette, materials, and overall design language.');
