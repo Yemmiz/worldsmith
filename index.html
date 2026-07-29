@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.2</title>
+<title>Worldsmith v1.9.4</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.1";
+    content:"v1.9.4";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -511,12 +511,14 @@
         <button class="prompt-tab" data-prompt-tab="followupPrompt">Follow-up Prompt</button>
         <button class="prompt-tab" data-prompt-tab="timelinePrompt">4–6 Frame Timeline</button>
         <button class="prompt-tab" data-prompt-tab="spellFlipbookPrompt">Spell Flipbook Prompt</button>
+        <button class="prompt-tab" data-prompt-tab="shaderMasksPrompt">Shader Masks Prompt</button>
         <button class="prompt-tab" data-prompt-tab="portraitPrompt">Portrait / Icon Prompt</button>
       </div>
       <textarea id="prompt" readonly></textarea>
       <textarea id="followupPrompt" readonly style="display:none" placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea>
       <textarea id="timelinePrompt" readonly style="display:none" placeholder="Generated for categories where a 4–6 frame timeline makes sense."></textarea>
       <textarea id="spellFlipbookPrompt" readonly style="display:none" placeholder="Generated for Spell VFX concepts."></textarea>
+      <textarea id="shaderMasksPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Attach the generated effect image when using it."></textarea>
       <textarea id="portraitPrompt" readonly style="display:none" placeholder="Generated for all categories with category-specific icon directions."></textarea>
       <div class="prompt-tab-row" id="audioPromptTabs" style="display:none">
         <button class="prompt-tab active" data-prompt-tab="sfxPrimaryPrompt">Primary One-shot</button>
@@ -529,7 +531,7 @@
       <textarea id="sfxLoopPrompt" readonly style="display:none" placeholder="ElevenLabs looping ambience prompt, generated where a continuous sound makes sense."></textarea>
       <textarea id="sfxUiPrompt" readonly style="display:none" placeholder="ElevenLabs UI / pickup sound prompt, generated for item-like categories."></textarea>
       <p class="prompt-panel-note sfx-settings-note" id="sfxSettingsNote" style="display:none"></p>
-      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
+      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Anime Spell VFX also provides a Shader Masks Prompt intended to be used with the generated effect image attached. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
@@ -566,19 +568,21 @@
 • Toned Down and Simple & Classic now explicitly forbid particle spray on effect categories: no floating specks, embers, motes, sparkles, or scattered debris.
 • Spell, Skill, and Spell VFX audio prompts are now element-aware instead of theme-culture-aware: the element is inferred from the concept name, themes, and mechanic (Ashen Lance → fire), so a flame cone gets roaring flame whoosh and fiery burst rather than silvery chimes.
 • Spell audio prompts also fold in the effect shape from the role: lances are fast piercing directional, cones are broad sweeping, pillars are rising eruptive, beams are sustained focused, and so on.
-• Biome and Dungeon Room ambience is now generated as a labeled three-layer stack (base bed, mid texture, sparse details) with theme-aware air, water, and detail content, meant to be generated separately and layered in-engine with offset start times, with the one-shot tabs fired at random intervals on top.</div></div>
+• Biome and Dungeon Room ambience is now generated as a labeled three-layer stack (base bed, mid texture, sparse details) with theme-aware air, water, and detail content, meant to be generated separately and layered in-engine with offset start times, with the one-shot tabs fired at random intervals on top.
+• Added the experimental Anime Spell VFX category for clean anime / Asian action-RPG effects designed around UV-panned shader layers.
+• Added a dedicated Shader Masks Prompt tab for Anime Spell VFX. It analyzes the generated effect image, proposes the minimum practical texture set, and requests one production-ready shader map at a time.</div></div>
   </section>
 </main>
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Anime Spell VFX','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
 const state={current:null, activePromptTab:'prompt', promptMode:'visual', activeVisualTab:'prompt', activeAudioTab:'sfxPrimaryPrompt', locks:{category:false,themes:false,rarity:false,attitude:false,role:false,mechanic:false}};
 
-const visualPromptTabs=['prompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','portraitPrompt'];
+const visualPromptTabs=['prompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','portraitPrompt'];
 const audioPromptTabs=['sfxPrimaryPrompt','sfxSecondaryPrompt','sfxLoopPrompt','sfxUiPrompt'];
 const promptTabs=[...visualPromptTabs,...audioPromptTabs];
 const promptTabMeta={
@@ -586,6 +590,7 @@ const promptTabMeta={
   followupPrompt:{title:'Follow-up Prompt',copyLabel:'📋 Copy Follow-up Prompt'},
   timelinePrompt:{title:'4–6 Frame Timeline Prompt',copyLabel:'📋 Copy Timeline Prompt'},
   spellFlipbookPrompt:{title:'Spell Flipbook Prompt',copyLabel:'📋 Copy Spell Flipbook Prompt'},
+  shaderMasksPrompt:{title:'Shader Masks Prompt',copyLabel:'📋 Copy Shader Masks Prompt'},
   portraitPrompt:{title:'Portrait / Icon Prompt',copyLabel:'📋 Copy Portrait / Icon Prompt'},
   sfxPrimaryPrompt:{title:'SFX — Primary One-shot',copyLabel:'📋 Copy Primary SFX Prompt'},
   sfxSecondaryPrompt:{title:'SFX — Secondary One-shot',copyLabel:'📋 Copy Secondary SFX Prompt'},
@@ -597,7 +602,7 @@ function promptTabAvailable(id){
   const el=document.getElementById(id);
   if(!el) return false;
   const value=(el.value||'').trim();
-  return value && !value.startsWith('Not generated for this category.') && !value.startsWith('Timeline prompt is only generated') && !value.startsWith('Follow-up prompt is only generated') && !value.startsWith('Spell flipbook prompt is only generated');
+  return value && !value.startsWith('Not generated for this category.') && !value.startsWith('Timeline prompt is only generated') && !value.startsWith('Follow-up prompt is only generated') && !value.startsWith('Spell flipbook prompt is only generated') && !value.startsWith('Shader masks prompt is only generated');
 }
 function setActivePromptTab(tabId){
   let nextTab=promptTabs.includes(tabId)?tabId:'prompt';
@@ -693,6 +698,7 @@ const roles={
  Spell:['Projectile spell','Area spell','Curse spell','Buff spell','Summon spell','Mobility spell','Trap spell','Channeled spell'],
  Skill:['Melee cleave','Ranged shot','Defensive stance','Dash attack','Totem skill','Channel skill','Combo finisher'],
  'Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Column burst','Rain volley','Spiral drill','Flame pillar','Flame pillar','Single lightning bolt','Single lightning bolt','Energy lance','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption'],
+ 'Anime Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Column burst','Rain volley','Spiral drill','Flame pillar','Flame pillar','Single lightning bolt','Single lightning bolt','Energy lance','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption'],
  Weapon:['One-handed sword','Two-handed axe','Wand','Staff','Bow','Dagger','Mace','Shield weapon'],
  Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
  Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
@@ -709,6 +715,9 @@ const roles={
  Texture:['Castle wall bricks','Cut stone blocks','Dungeon floor tiles','Flagstone floor','Cobblestone path','Brick pathway','Marble floor tiles','Ancient mosaic floor','Rough cave wall rock','Cliff rock face','Sewer bricks','Fortress stone floor','Wooden planks','Weathered dock planks','Oak bark','Pine bark','Roof shingles','Thatch roofing','Tilled soil','Farmland rows','Forest ground','Mossy forest floor','Grass ground','Tall meadow grass','Trimmed lawn grass','Sand','Dunes sand','Gravel','Muddy ground','Snowy ground','Icy ground','Ashen ground','Moss ground','Lava rock','Cracked obsidian floor','Volcanic basalt tiles','Cave wall rock','Carpet weave','Woven cloth texture','Red carpet texture','Clear glass panes','Stained glass panes','Frosted glass panels'],
  'Random Event':['Traveling caravan','Meteor fall','Goblin raid','Haunted fog','Treasure goblin','Portal storm']
 };
+function isSpellVfxCategory(cat){return cat==='Spell VFX'||cat==='Anime Spell VFX';}
+function isAnimeSpellVfxCategory(cat){return cat==='Anime Spell VFX';}
+function isAbilityCategory(cat){return cat==='Spell'||cat==='Skill'||isSpellVfxCategory(cat);}
 const nouns=['Warden','Seer','Maw','Keeper','Bloom','Sentinel','Hermit','Crown','Idol','Shard','Howler','Caller','Binder','Root','Glaive','Lantern','Oracle','Mire','Fang','Monolith'];
 const prefixes=['Ash','Frost','Thorn','Rot','Crystal','Moon','Blood','Storm','Sun','Bone','Void','Moss','Rune','Deep','Gloom','Amber','Iron','Pearl','Royal'];
 const suffixes=['of the Hollow','of Old Kings','of the Sleeping Grove','of the Broken Star','of the Mire','of the Last Flame','of the Deep Root','of the Glass Moon','of the Drowned Hall'];
@@ -729,7 +738,7 @@ const effectRules={
   retaliation:{verbs:['strikes','curses','marks','knocks back','drains mana from'],targets:['nearby enemies','the killer','the attacker','players in front'],validTarget:'Enemy'}
 };
 function mechanicFamily(cat,rar){
-  if(['Spell','Skill','Spell VFX'].includes(cat)) return R(['offensive','defensive','reward']);
+  if(isAbilityCategory(cat)) return R(['offensive','defensive','reward']);
   if(cat==='Boss') return R(['offensive','retaliation','summon']);
   if(cat==='NPC'||cat==='Vendor'||cat==='Biome'||cat==='Quest'||cat==='Currency'||cat==='Crafting Material') return R(['reward','defensive']);
   return R(['offensive','retaliation','summon','defensive']);
@@ -815,7 +824,7 @@ function weightedThemes(rar, existing=[]){
 function themeInfo(ts){let first=ts.find(t=>byTheme[t])||'Arcane'; return byTheme[first]||byTheme.Arcane;}
 function genName(cat,ts,role){
   const t=ts[0];
-  if(['Spell','Skill','Spell VFX'].includes(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
+  if(isAbilityCategory(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
   if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
   if(cat==='Texture') return R([`${t} ${role}`,`${capitalize(t)} ${role}`,`${R(prefixes)} ${role}`]);
   if(cat==='Flora') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
@@ -1626,7 +1635,7 @@ function standardConcept(forceReroll=false){
   const itemMode=isItemCategory(cat);
   const narrativeMode=isNarrativeCategory(cat);
   const allowItemMechanic=itemCanHaveMechanic(cat,rar);
-  const mechanicsMode=(cat==='Spell'||cat==='Skill'||cat==='Spell VFX'||allowItemMechanic) && !narrativeMode;
+  const mechanicsMode=(isAbilityCategory(cat)||allowItemMechanic) && !narrativeMode;
   const tech=mechanicsMode ? (state.locks.mechanic&&old.tech?old.tech:technical(cat,ts,rar)) : null;
   const identity=itemMode?itemIdentity(cat,rar,ts):null;
   const name=ideaName(cat,itemMode?genItemName(cat,rar,ts,role,identity):genName(cat,ts,role),ts,rar);
@@ -1726,7 +1735,7 @@ function spellVfxRoleIntent(role){
 function designStyleValue(){const el=document.getElementById('designStyle');return el?el.value:'fantastical';}
 function designStyleDirectives(cat){
   const style=designStyleValue();
-  const isEffect=(cat==='Spell'||cat==='Skill'||cat==='Spell VFX');
+  const isEffect=isAbilityCategory(cat);
   if(style==='grounded'){
     if(isEffect) return ['Design intensity: simple and classic. Keep the effect minimal and clean: one clear primary shape, restrained glow, very few layers, no dense runes, and no stacked secondary effects. Absolutely no particles: no floating specks, embers, motes, sparks, sparkles, dust, or scattered debris anywhere around the effect. The core shapes alone carry the design, like a simple, timeless classic game spell effect.'];
     return [
@@ -1753,7 +1762,8 @@ function buildPortraitPrompt(c,palette,rarityText){
 }
 function buildVisualPromptCore(c,palette,rarityText){
  const cat=c.category;
- const isSpellVfx=cat==='Spell VFX';
+ const isSpellVfx=isSpellVfxCategory(cat);
+ const isAnimeSpellVfx=isAnimeSpellVfxCategory(cat);
  const isModelSubject=['Monster','Boss','NPC','Vendor','Flora','Companion','Decoration'].includes(cat);
  const baseParts=isSpellVfx?[
    'Stylized fantasy 2D spell VFX concept sheet for game production, not a 3D in-world scene, cinematic illustration, or isometric spell preview.',
@@ -1783,6 +1793,29 @@ function buildVisualPromptCore(c,palette,rarityText){
  ];
  const directedLine=ideaPromptLineFor(c);
  if(directedLine) baseParts.push(directedLine);
+ if(cat==='Anime Spell VFX'){
+   baseParts.length=0;
+   baseParts.push('Create one stylized real-time spell VFX concept intended to be implemented primarily with UV-panned textures on simple game meshes, ribbons, cones, rings, planes, cylinders, or billboards.');
+   baseParts.push('This is a single continuous looping effect concept, not a flipbook, sprite sheet, animation timeline, or collection of unrelated spell moments. Show the effect itself clearly on a simple dark or neutral background.');
+   baseParts.push('No character, no caster, no environment, no terrain, no cinematic scene, no interface, no labels, and no technical diagrams. The effect itself is the only subject.');
+   baseParts.push('Style direction: polished anime-inspired / Asian action-RPG spell VFX. Use clean graphic shapes, strong readable silhouettes, sweeping arcs, tapered ribbons, curling energy tongues, layered inner bands, controlled glow, decorative negative spaces, and graceful directional motion. Prioritize elegant designed shape language over realistic physical simulation.');
+   baseParts.push('Design the effect so it can realistically be reconstructed from approximately three to five shader layers. Give those layers visibly different roles, such as one broad outer body or primary energy mass, one smaller brighter inner core, one animated erosion or breakup layer, one flowing ribbon streak or accent layer when appropriate, and one subtle distortion, refraction, or surrounding glow layer when appropriate.');
+   baseParts.push('The effect must be implementation-aware. Use broad continuous forms that can scroll, wrap, distort, and repeat through moving UV coordinates. Let the major shapes flow in a clear direction and overlap with different speeds. Use asymmetry, changing width, bends, pinches, curls, splits, and reconnections to imply motion.');
+   baseParts.push('Keep all important forms readable at small gameplay scale. Approximately 70% of the visual identity should come from large shapes, 25% from medium shapes, and no more than 5% from tiny accents.');
+   baseParts.push('Avoid relying on one static finished silhouette. Avoid unique painted details that would become visibly repetitive when UV-panned. Avoid dense particle noise, hundreds of sparks, realistic smoke simulation, photorealistic flames, muddy transparency, random turbulence, excessive bloom, and generic glowing columns.');
+   baseParts.push('For flame effects, use broad cel-shaded flame masses, elegant split tongues, crescent-shaped curls, tapered hooks, flowing S-curves, and layered internal contours rather than realistic campfire fire. For other elements, adapt the same clean anime-inspired shape language to the appropriate element rather than defaulting everything to flame.');
+   baseParts.push('The finished concept should clearly communicate the primary silhouette, the direction of flow, the distinct visual layers, the intended internal motion, which parts remain anchored, and which parts scroll, curl, erode, pulse, or distort.');
+   baseParts.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+   baseParts.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+   baseParts.push(`Themes: ${c.themes.join(', ')}.`);
+   const animeIdeaLine=ideaPromptLineFor(c); if(animeIdeaLine) baseParts.push(animeIdeaLine);
+   baseParts.push(`Anime Spell VFX role: ${c.role}.`);
+   baseParts.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
+   baseParts.push(`Anime Spell VFX visual identity: ${c.visual.join(', ')}.`);
+   baseParts.push('Do not include the square ability icon in this main Anime Spell VFX prompt. The icon is handled by the Portrait / Icon tab.');
+   baseParts.push('Do not include stat text, cooldowns, damage numbers, technical mechanics, captions, UI frames, or interface elements.');
+   return baseParts.join(' ');
+ }
  if(cat==='Spell VFX'){
    baseParts.push('Create one flat 2D spell VFX concept sheet for game production. This is effect-only VFX design, not a 3D spell scene, not a character spell cast, not a summoned object showcase, and not an isometric impact illustration.');
    baseParts.push('Do not include a caster, humanoid target, creature, pet, statue, lantern, weapon, shield, book, idol, terrain crater, ground rocks, floor tiles, scenic environment, or any physical prop. The spell effect itself is the only subject.');
@@ -2167,7 +2200,7 @@ function buildSfxPrompts(c){
     out.secondary=sfxEntry(`Short wordless human vocal reaction, curious acknowledging grunt or hum, natural and understated`,SFX_DRY,'oneshot');
     if(cat==='Vendor') out.loop=sfxEntry(`Busy fantasy market stall ambience, quiet murmuring crowd, clinking wares and shuffling goods, ${tex}`,SFX_LOOP,'loop');
     out.ui=sfxEntry(cat==='Vendor'?`Trade window opening sound, soft coin clink with a small wooden slide, warm and inviting`:`Dialogue window opening sound, soft parchment rustle with a subtle quill tick, understated`,SFX_UI,'ui');
-  } else if(cat==='Spell'||cat==='Skill'||cat==='Spell VFX'){
+  } else if(isAbilityCategory(cat)){
     const el=sfxSpellElement(c);
     const ev=sfxElementVocab[el]||sfxElementVocab.arcane;
     const shape=sfxSpellShape(c.role);
@@ -2284,11 +2317,13 @@ function render(c){
  const followupPrompt=buildFollowupPrompt(c,palette,rarityText);
  const timelinePrompt=buildTimelinePrompt(c,palette,rarityText);
  const spellFlipbookPrompt=buildSpellFlipbookPrompt(c,palette,rarityText);
+ const shaderMasksPrompt=buildShaderMasksPrompt(c,palette,rarityText);
  const portraitPrompt=buildPortraitPrompt(c,palette,rarityText);
  document.getElementById('prompt').value=prompt;
  document.getElementById('followupPrompt').value=followupPrompt;
  document.getElementById('timelinePrompt').value=timelinePrompt;
  document.getElementById('spellFlipbookPrompt').value=spellFlipbookPrompt;
+ document.getElementById('shaderMasksPrompt').value=shaderMasksPrompt;
  document.getElementById('portraitPrompt').value=portraitPrompt;
  const sfx=buildSfxPrompts(c);
  [['sfxPrimaryPrompt',sfx.primary],['sfxSecondaryPrompt',sfx.secondary],['sfxLoopPrompt',sfx.loop],['sfxUiPrompt',sfx.ui]].forEach(([id,d])=>{
@@ -2300,9 +2335,42 @@ function render(c){
 }
 
 
+function buildShaderMasksPrompt(c,palette,rarityText){
+ const cat=c.category;
+ if(cat!=='Anime Spell VFX') return 'Shader masks prompt is only generated for Anime Spell VFX concepts.';
+ const lines=[];
+ lines.push('Use the attached generated Anime Spell VFX concept as the exact visual target for a real-time game shader effect.');
+ lines.push('Study the image carefully and determine the smallest practical set of texture masks needed to reproduce its identity using UV panning, alpha shaping, erosion, emissive colour ramps, distortion, and simple game meshes such as cones, cylinders, rings, ribbons, planes, and billboards.');
+ lines.push('Preserve the reference image’s exact elemental identity, broad silhouette language, motion direction, curved shape vocabulary, internal layering, decorative negative spaces, balance between outer body and inner core, palette relationships, and polished anime-inspired / Asian action-RPG VFX style.');
+ lines.push('Do not merely convert the finished illustration to grayscale. Reinterpret each visual component as clean numerical shader data designed to combine with the other layers.');
+ lines.push('First return a concise technical texture plan before generating any image. For each required texture, state: texture name; shader purpose; whether it is visible directly or used only as control data; required tiling direction; intended mesh or effect layer; suggested UV movement direction and relative speed; and whether it should be grayscale, alpha-only, or an RG vector map.');
+ lines.push('Use only textures that materially contribute to reproducing this specific effect. Do not automatically include every possible map. Most effects should need approximately three to five textures.');
+ lines.push('Possible texture roles include: BODY OR DENSITY MASK for the broad visible mass and main silhouette language; EROSION OR BREAKUP TILE for animated alpha subtraction and changing cavities; INNER CORE OR HIGHLIGHT MASK for a smaller brighter interior; ACCENT, RIBBON, OR STREAK MASK for a distinct secondary sweep, spiral, contour, or travelling arc; DISTORTION OR FLOW MAP for UV perturbation; and SOFT GLOW OR FALLOFF MASK only when bloom and the other masks cannot produce the required halo.');
+ lines.push('After presenting the texture plan, generate only the first and most important required texture. Generate one texture per image and one image per response. Do not create a contact sheet, atlas, labelled diagram, comparison grid, or several maps on one canvas.');
+ lines.push('General requirements for every generated shader texture: square 1:1 image; 1024x1024; flat texture data only; no mesh; no environment; no rendered spell; no perspective; no lighting; no cast shadow; no baked bloom; no decorative presentation; no frame; no border; no labels; and no text.');
+ lines.push('For grayscale and alpha masks, black represents zero influence, white represents maximum influence, and grayscale represents smooth intermediate values. Use large and medium forms with very little micro-detail, and keep every important structure readable when reduced to 128x128.');
+ lines.push('For a body or density mask, use large connected forms, broad bends, tapering regions, pinches, curls, clean cavities, controlled splits, and decorative negative spaces that preserve the reference effect’s anime shape language. It must define shader mass rather than depict one finished spell illustration. If it wraps around a cone or cylinder, make the horizontal axis genuinely seamless.');
+ lines.push('For an erosion or breakup tile, create abstract directional turbulence rather than visible flames or spell artwork. Make it perfectly seamless on all four edges, with broad cavities, medium channels, soft threshold-friendly transitions, and minimal high-frequency noise.');
+ lines.push('For an inner core or highlight mask, keep it clearly narrower, simpler, and less extensive than the outer body. Avoid a straight centred beam or a full-height copy of the outer silhouette.');
+ lines.push('For an accent, ribbon, or streak mask, include it only when the reference contains a clearly separate sweeping layer. Keep it sparse and suitable for a different UV speed, direction, or mesh.');
+ lines.push('For a distortion or flow map, do not render it visibly. Use smooth low-frequency directional motion. A true RG flow map should use coherent vector data with neutral displacement near 0.5, 0.5; do not fake it as a pretty painted grayscale image.');
+ lines.push('Do not bake the full spell palette into every texture. Apply colour mainly through shader gradients, colour ramps, emissive parameters, and layer tinting unless the reference genuinely requires a coloured texture.');
+ lines.push('The maps should look plain and abstract individually. Their purpose is to combine into the attractive effect shown in the attached reference. Avoid realistic smoke, photographic fire, muddy transparency, tiny particles, dense static, repeated hard stripes, unrelated symbols, and decorative details added only to make a mask look attractive.');
+ lines.push(`Reference concept: ${c.name}, ${rarityText} ${c.category}.`);
+ lines.push(`Spell role: ${c.role}.`);
+ lines.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
+ lines.push(`Themes: ${c.themes.join(', ')}.`);
+ lines.push(`Reference palette: ${palettePrompt(palette)}.`);
+ lines.push(`Reference visual identity: ${c.visual.join(', ')}.`);
+ const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
+ lines.push('Begin with the texture plan, then generate only the first required map.');
+ return lines.join(' ');
+}
+
+
 function buildSpellFlipbookPrompt(c,palette,rarityText){
  const cat=c.category;
- if(cat!=='Spell VFX') return 'Spell flipbook prompt is only generated for Spell VFX concepts.';
+ if(cat!=='Spell VFX') return 'Spell flipbook prompt is only generated for Spell VFX concepts. Anime Spell VFX uses the dedicated Shader Masks Prompt tab instead.';
  const lines=[];
  lines.push('Use the previously generated Spell VFX concept as the reference and keep the exact same abstract effect identity, symbol language, theme, palette, elemental logic, and emotional intent.');
  lines.push('Create a readable flat 2D spell VFX flipbook / sprite-sheet for game production. This must be effect-only, not a 3D scene and not an in-world spell cast.');
@@ -2386,7 +2454,7 @@ function buildPortraitPromptCore(c,palette,rarityText){
    parts.push('Avoid tiny clutter, UI text, labels, or an overly detailed landscape painting.');
    return parts.join(' ');
  }
- if(cat==='Spell' || cat==='Skill' || cat==='Spell VFX'){
+ if(isAbilityCategory(cat)){
    parts.push('Create a square spell/skill icon that clearly communicates the magical or combat identity at a glance.');
    parts.push('Use one centered readable motif, strong silhouette, bold shape language, and clean contrast.');
    parts.push('Keep the icon simple, readable, and suitable for a fantasy ARPG hotbar or ability panel.');
@@ -2434,7 +2502,8 @@ function buildFollowupPrompt(c,palette,rarityText){
    const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
    return lines.join(' ');
  }
- if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
+ if(cat==='Anime Spell VFX') return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts. Anime Spell VFX uses the dedicated Shader Masks Prompt tab with the generated effect image attached.';
+  if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
  lines.push('The reference image is the primary and authoritative source. Do not redesign, replace, or reinterpret it into a different species, body plan, creature family, or character. If any text detail conflicts with the reference image, follow the reference image.');
