@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.4</title>
+<title>Worldsmith v1.9.5</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.4";
+    content:"v1.9.5";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a refined coherent timeline prompt tab with stronger reference locking, a flatter 2D spell flipbook prompt tab, and keeps the v0.95 sanity engine intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a refined coherent timeline prompt tab with stronger reference locking, a flatter 2D spell flipbook prompt tab, and keeps the v0.95 sanity engine intact.• Enabled the 4–6 frame Timeline Prompt for Anime Spell VFX so anime-style spell effects can also be explored as readable staged progressions.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -518,7 +518,7 @@
       <textarea id="followupPrompt" readonly style="display:none" placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea>
       <textarea id="timelinePrompt" readonly style="display:none" placeholder="Generated for categories where a 4–6 frame timeline makes sense."></textarea>
       <textarea id="spellFlipbookPrompt" readonly style="display:none" placeholder="Generated for Spell VFX concepts."></textarea>
-      <textarea id="shaderMasksPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Attach the generated effect image when using it."></textarea>
+      <textarea id="shaderMasksPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Use it after generating the main effect concept."></textarea>
       <textarea id="portraitPrompt" readonly style="display:none" placeholder="Generated for all categories with category-specific icon directions."></textarea>
       <div class="prompt-tab-row" id="audioPromptTabs" style="display:none">
         <button class="prompt-tab active" data-prompt-tab="sfxPrimaryPrompt">Primary One-shot</button>
@@ -531,7 +531,7 @@
       <textarea id="sfxLoopPrompt" readonly style="display:none" placeholder="ElevenLabs looping ambience prompt, generated where a continuous sound makes sense."></textarea>
       <textarea id="sfxUiPrompt" readonly style="display:none" placeholder="ElevenLabs UI / pickup sound prompt, generated for item-like categories."></textarea>
       <p class="prompt-panel-note sfx-settings-note" id="sfxSettingsNote" style="display:none"></p>
-      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Anime Spell VFX also provides a Shader Masks Prompt intended to be used with the generated effect image attached. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
+      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Anime Spell VFX also provides a Shader Masks Prompt intended to be used after generating the main effect concept. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
@@ -570,7 +570,7 @@
 • Spell audio prompts also fold in the effect shape from the role: lances are fast piercing directional, cones are broad sweeping, pillars are rising eruptive, beams are sustained focused, and so on.
 • Biome and Dungeon Room ambience is now generated as a labeled three-layer stack (base bed, mid texture, sparse details) with theme-aware air, water, and detail content, meant to be generated separately and layered in-engine with offset start times, with the one-shot tabs fired at random intervals on top.
 • Added the experimental Anime Spell VFX category for clean anime / Asian action-RPG effects designed around UV-panned shader layers.
-• Added a dedicated Shader Masks Prompt tab for Anime Spell VFX. It analyzes the generated effect image, proposes the minimum practical texture set, and requests one production-ready shader map at a time.</div></div>
+• Added a dedicated Shader Masks Prompt tab for Anime Spell VFX. It analyzes the previously generated effect concept, proposes the minimum practical texture set, and asks which production-ready shader map to generate first.</div></div>
   </section>
 </main>
 <script>
@@ -1428,7 +1428,29 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='NPC concepts become stronger when they have a motive and a secret. That gives them a reason to exist in quests or towns.';
     detailRows=[['NPC Role',role],['Motivation',motivation],['Signature Prop',prop],['Secret',secret]];
     structureRows=[['Likely Use',R(['quest giver','vendor unlock','dungeon clue','faction contact','comic relief','tragic lore source','crafting trainer'])],['Attitude',att],['Visual Priority','Full-body character concept with props']];
-  } else if(cat==='Flora'){
+  } else if(cat==='Anime Spell VFX'){
+   const lines=[];
+   lines.push('Use the previously generated Anime Spell VFX concept as the reference and keep the exact same effect identity, elemental logic, silhouette language, layering, palette relationships, curved shape vocabulary, and anime-inspired / Asian action-RPG VFX style.');
+   lines.push('Create a readable 4 to 6 frame spell-effect timeline sheet for game production. This must be effect-only, not a 3D scene and not an in-world spell cast.');
+   lines.push('Show 4 to 6 clear key stages total, arranged in one clean sequence with clear spacing and chronological numbering.');
+   lines.push('Very important: all frames must belong to one single continuous progression of the same effect. Do not mix several different spell moments or unrelated effects in the same sheet.');
+   lines.push('Choose one readable progression only, such as projectile travel, charge-up to release, area pulse expansion, beam sweep, shield flare, rune activation, cone blast, arc lash, healing bloom, curse mark forming, impact burst, or dissipating fade.');
+   lines.push('Use clear motion progression such as tiny start shape, build-up, active shape, peak frame, follow-through, and fade/dissipate.');
+   lines.push('Every frame should be a flat effect drawing with consistent framing and scale. Keep the style clean, graphic, and anime-inspired, with bold silhouettes, sweeping arcs, tapered ribbons, layered energy bands, decorative negative spaces, and graceful motion.');
+   lines.push('No caster, no humanoid target, no creature, no pet, no environment, no terrain, no scenic background, no props, and no interface elements. The effect itself is the only subject.');
+   lines.push('Do not default the sequence to a circular nova unless the role truly calls for a radial effect. If the role suggests a directional effect such as beam, projectile, cone, lash, wall, chain, column, or falling volley, keep the sequence directional and structured around that motion.');
+   lines.push('Keep details production-friendly: large readable shapes, limited particle noise, no muddy rendering, no photorealistic fire or smoke, and no overly painterly 3D materials.');
+   lines.push('Keep the background plain and production-friendly so each frame reads clearly as a separate stage of one effect.');
+   const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
+   lines.push(`Anime Spell VFX role: ${c.role}.`);
+   lines.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
+   lines.push(`Anime Spell VFX visual identity: ${c.visual.join(', ')}.`);
+   lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+   lines.push(`Themes: ${c.themes.join(', ')}.`);
+   lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+   return lines.join(' ');
+ }
+ if(cat==='Flora'){
     const growth=R(['low creeping growth','upright clustered stalks','broad layered leaves','hanging vine drape','mushroom shelf formation','root-heavy trunk form','spiral flower structure','tufted field-crop silhouette','thick bulbous base','thorned branching shape']);
     const habitat=R(['old farm edges','moonlit forest floors','damp cave beds','ruined gardens','windswept cliffs','bog margins','sunlit terraces','graveyard soil','ancient temple cracks','riverbank reeds']);
     const use=R(['alchemy ingredient','cooking crop','healing herb','dye source','ritual flower','poison component','campfire seasoning','beast feed','rare trade good','quest harvest']);
@@ -2339,23 +2361,24 @@ function buildShaderMasksPrompt(c,palette,rarityText){
  const cat=c.category;
  if(cat!=='Anime Spell VFX') return 'Shader masks prompt is only generated for Anime Spell VFX concepts.';
  const lines=[];
- lines.push('Use the attached generated Anime Spell VFX concept as the exact visual target for a real-time game shader effect.');
- lines.push('Study the image carefully and determine the smallest practical set of texture masks needed to reproduce its identity using UV panning, alpha shaping, erosion, emissive colour ramps, distortion, and simple game meshes such as cones, cylinders, rings, ribbons, planes, and billboards.');
- lines.push('Preserve the reference image’s exact elemental identity, broad silhouette language, motion direction, curved shape vocabulary, internal layering, decorative negative spaces, balance between outer body and inner core, palette relationships, and polished anime-inspired / Asian action-RPG VFX style.');
+ lines.push('Use the previously generated Anime Spell VFX concept as the exact visual target for a real-time game shader effect, and keep the exact same effect identity, silhouette language, motion direction, shape vocabulary, layering, and anime-inspired / Asian action-RPG style.');
+ lines.push('Study the reference concept carefully and determine the smallest practical set of texture masks needed to reproduce its identity using UV panning, alpha shaping, erosion, emissive colour ramps, distortion, and simple game meshes such as cones, cylinders, rings, ribbons, planes, and billboards.');
+ lines.push("Preserve the reference image's exact elemental identity, broad silhouette language, motion direction, curved shape vocabulary, internal layering, decorative negative spaces, balance between outer body and inner core, palette relationships, and polished anime-inspired / Asian action-RPG VFX style.");
  lines.push('Do not merely convert the finished illustration to grayscale. Reinterpret each visual component as clean numerical shader data designed to combine with the other layers.');
- lines.push('First return a concise technical texture plan before generating any image. For each required texture, state: texture name; shader purpose; whether it is visible directly or used only as control data; required tiling direction; intended mesh or effect layer; suggested UV movement direction and relative speed; and whether it should be grayscale, alpha-only, or an RG vector map.');
+ lines.push('First return a concise technical texture plan only. For each required texture, state: texture name; shader purpose; whether it is visible directly or used only as control data; required tiling direction; intended mesh or effect layer; suggested UV movement direction and relative speed; and whether it should be grayscale, alpha-only, or an RG vector map.');
  lines.push('Use only textures that materially contribute to reproducing this specific effect. Do not automatically include every possible map. Most effects should need approximately three to five textures.');
  lines.push('Possible texture roles include: BODY OR DENSITY MASK for the broad visible mass and main silhouette language; EROSION OR BREAKUP TILE for animated alpha subtraction and changing cavities; INNER CORE OR HIGHLIGHT MASK for a smaller brighter interior; ACCENT, RIBBON, OR STREAK MASK for a distinct secondary sweep, spiral, contour, or travelling arc; DISTORTION OR FLOW MAP for UV perturbation; and SOFT GLOW OR FALLOFF MASK only when bloom and the other masks cannot produce the required halo.');
- lines.push('After presenting the texture plan, generate only the first and most important required texture. Generate one texture per image and one image per response. Do not create a contact sheet, atlas, labelled diagram, comparison grid, or several maps on one canvas.');
+ lines.push('After presenting the texture plan, do not generate any image yet. Stop and ask the user which texture from the plan should be generated first.');
+ lines.push('When the user chooses a texture to generate, create only one texture per image and one image per response. Do not create a contact sheet, atlas, labelled diagram, comparison grid, or several maps on one canvas.');
  lines.push('General requirements for every generated shader texture: square 1:1 image; 1024x1024; flat texture data only; no mesh; no environment; no rendered spell; no perspective; no lighting; no cast shadow; no baked bloom; no decorative presentation; no frame; no border; no labels; and no text.');
  lines.push('For grayscale and alpha masks, black represents zero influence, white represents maximum influence, and grayscale represents smooth intermediate values. Use large and medium forms with very little micro-detail, and keep every important structure readable when reduced to 128x128.');
- lines.push('For a body or density mask, use large connected forms, broad bends, tapering regions, pinches, curls, clean cavities, controlled splits, and decorative negative spaces that preserve the reference effect’s anime shape language. It must define shader mass rather than depict one finished spell illustration. If it wraps around a cone or cylinder, make the horizontal axis genuinely seamless.');
+ lines.push("For a body or density mask, use large connected forms, broad bends, tapering regions, pinches, curls, clean cavities, controlled splits, and decorative negative spaces that preserve the reference effect's anime shape language. It must define shader mass rather than depict one finished spell illustration. If it wraps around a cone or cylinder, make the horizontal axis genuinely seamless.");
  lines.push('For an erosion or breakup tile, create abstract directional turbulence rather than visible flames or spell artwork. Make it perfectly seamless on all four edges, with broad cavities, medium channels, soft threshold-friendly transitions, and minimal high-frequency noise.');
  lines.push('For an inner core or highlight mask, keep it clearly narrower, simpler, and less extensive than the outer body. Avoid a straight centred beam or a full-height copy of the outer silhouette.');
  lines.push('For an accent, ribbon, or streak mask, include it only when the reference contains a clearly separate sweeping layer. Keep it sparse and suitable for a different UV speed, direction, or mesh.');
  lines.push('For a distortion or flow map, do not render it visibly. Use smooth low-frequency directional motion. A true RG flow map should use coherent vector data with neutral displacement near 0.5, 0.5; do not fake it as a pretty painted grayscale image.');
  lines.push('Do not bake the full spell palette into every texture. Apply colour mainly through shader gradients, colour ramps, emissive parameters, and layer tinting unless the reference genuinely requires a coloured texture.');
- lines.push('The maps should look plain and abstract individually. Their purpose is to combine into the attractive effect shown in the attached reference. Avoid realistic smoke, photographic fire, muddy transparency, tiny particles, dense static, repeated hard stripes, unrelated symbols, and decorative details added only to make a mask look attractive.');
+ lines.push('The maps should look plain and abstract individually. Their purpose is to combine into the attractive effect shown in the previously generated reference. Avoid realistic smoke, photographic fire, muddy transparency, tiny particles, dense static, repeated hard stripes, unrelated symbols, and decorative details added only to make a mask look attractive.');
  lines.push(`Reference concept: ${c.name}, ${rarityText} ${c.category}.`);
  lines.push(`Spell role: ${c.role}.`);
  lines.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
@@ -2363,7 +2386,7 @@ function buildShaderMasksPrompt(c,palette,rarityText){
  lines.push(`Reference palette: ${palettePrompt(palette)}.`);
  lines.push(`Reference visual identity: ${c.visual.join(', ')}.`);
  const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
- lines.push('Begin with the texture plan, then generate only the first required map.');
+ lines.push('Begin by returning only the texture plan, then ask which texture should be generated first.');
  return lines.join(' ');
 }
 
@@ -2502,7 +2525,7 @@ function buildFollowupPrompt(c,palette,rarityText){
    const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
    return lines.join(' ');
  }
- if(cat==='Anime Spell VFX') return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts. Anime Spell VFX uses the dedicated Shader Masks Prompt tab with the generated effect image attached.';
+ if(cat==='Anime Spell VFX') return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts. Anime Spell VFX uses the dedicated Shader Masks Prompt tab after the main effect concept has been generated.';
   if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
@@ -2560,7 +2583,7 @@ function buildTimelinePrompt(c,palette,rarityText){
    const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
    return lines.join(' ');
  }
- if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Timeline prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
+ if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Timeline prompt is only generated for Monster, Boss, NPC, Vendor, Companion, Flora, and Anime Spell VFX concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
  lines.push('The reference image is the primary and authoritative source. Do not redesign, replace, or reinterpret it into a different species, body plan, creature family, or character. If any text detail conflicts with the reference image, follow the reference image.');
