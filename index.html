@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.6</title>
+<title>Worldsmith v1.9.7</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.6";
+    content:"v1.9.7";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.1 adds generated colour palettes, stronger concept-card presentation, tabbed prompt switching plus a refined coherent timeline prompt tab with stronger reference locking, a flatter 2D spell flipbook prompt tab, and keeps the v0.95 sanity engine intact.• Enabled the 4–6 frame Timeline Prompt for Anime Spell VFX so anime-style spell effects can also be explored as readable staged progressions.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.7 adds role-aware Anime Spell VFX construction families for much broader effect variety, while keeping the existing shader-mask and timeline workflows intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -570,7 +570,9 @@
 • Spell audio prompts also fold in the effect shape from the role: lances are fast piercing directional, cones are broad sweeping, pillars are rising eruptive, beams are sustained focused, and so on.
 • Biome and Dungeon Room ambience is now generated as a labeled three-layer stack (base bed, mid texture, sparse details) with theme-aware air, water, and detail content, meant to be generated separately and layered in-engine with offset start times, with the one-shot tabs fired at random intervals on top.
 • Added the experimental Anime Spell VFX category for clean anime / Asian action-RPG effects designed around UV-panned shader layers.
-• Added a dedicated Shader Masks Prompt tab for Anime Spell VFX. It analyzes the previously generated effect concept, proposes the minimum practical texture set, and asks which production-ready shader map to generate first.</div></div>
+• Added a dedicated Shader Masks Prompt tab for Anime Spell VFX. It analyzes the previously generated effect concept, proposes the minimum practical texture set, and asks which production-ready shader map to generate first.
+• Enabled the 4–6 frame Timeline Prompt for Anime Spell VFX so anime-style spell effects can also be explored as readable staged progressions.
+• Added role-aware Anime Spell VFX construction families to greatly reduce repeated flame, ribbon, and lightning designs. Concepts now select from discs, plates, shields, shards, slashes, petals, membranes, nodes, glyphs, lattices, clouds, chains, and other structures based on the effect role.</div></div>
   </section>
 </main>
 <script>
@@ -1624,6 +1626,81 @@ function ideaFollowupLineFor(c){
   return `Important: keep the original directed idea "${idea.raw}" recognizable in this follow-up, even while retaining the wilder fantasy remix.`;
 }
 
+const animeVfxFormFamilies={
+  radial:[
+    {name:'Segmented halo plates',directive:'build the effect from separated ring segments, floating plates, controlled gaps, and staggered rotational layers rather than flame tongues'},
+    {name:'Petal or fan burst',directive:'use broad petal-like wedges or fan blades opening outward with clean overlap, limited glow, and strong negative spaces'},
+    {name:'Runic stamp or seal',directive:'use one bold planar seal, stamped glyph mass, or layered symbol planes that activate, fracture, rotate, or expand'},
+    {name:'Fractured ground field',directive:'use clustered spikes, broken planar shards, cracks, and uneven rising wedges distributed across the area'},
+    {name:'Expanding membrane',directive:'use one broad translucent shell, liquid-like sheet, or pressure membrane that stretches and breaks into large sections'},
+    {name:'Orbiting fragment crown',directive:'use a small number of chunky orbiting shards, plates, petals, or nodes arranged around a quiet center'}
+  ],
+  defensive:[
+    {name:'Faceted dome shell',directive:'use a dome, partial shell, or curved shield made from broad faceted panels and clear gaps'},
+    {name:'Interlocking ward plates',directive:'use layered plates, shields, scales, or floating panels that slide into a protective formation'},
+    {name:'Woven energy lattice',directive:'use a clean grid, knot, cage, or braided field structure with deliberate crossings and open negative space'},
+    {name:'Layered sigil planes',directive:'use two or three flat symbol planes, discs, or geometric sheets offset in depth and motion'},
+    {name:'Orbiting guardian nodes',directive:'use a few large nodes, stones, petals, blades, or glyph pieces circling a protected center'}
+  ],
+  projectile:[
+    {name:'Faceted shard spear',directive:'use a hard-edged wedge, crystal spear, or arrowhead body with layered shell plates and a readable pointed travel direction'},
+    {name:'Segmented drill',directive:'use stacked rings, rotating sections, corkscrew plates, or repeating blade segments around a narrow core'},
+    {name:'Spinning disc projectile',directive:'use a disc, crescent wheel, saw-like halo, or flat rotating plate with a compact trail'},
+    {name:'Linked-node bolt',directive:'use a chain of separated energy nodes, beads, plates, or pulses connected by short controlled bridges'},
+    {name:'Split-blade projectile',directive:'use two or three parallel blade-like masses that converge, separate, or shear past one another'},
+    {name:'Hollow shell comet',directive:'use a hollow capsule, cage, or shell around a compact core, with torn planar wake pieces rather than long ribbons'}
+  ],
+  directional:[
+    {name:'Layered slash fan',directive:'use a fan of broad planar slashes, crescent cuts, or blade-shaped sheets with different lengths and timing'},
+    {name:'Shock planes',directive:'use stacked translucent planes, pressure wedges, or broad sheets sweeping in one direction'},
+    {name:'Crescent wave',directive:'use one or two thick crescent masses with a clean inner cutout and restrained secondary accents'},
+    {name:'Runic wavefront',directive:'use repeating symbol fragments, stamped bars, or geometric motifs carried along a broad moving front'},
+    {name:'Petal sweep',directive:'use layered petal, leaf, feather, or scale-like wedges travelling as a coherent fan'},
+    {name:'Segmented wall',directive:'use separated vertical slabs, panels, spikes, or shield-like sections forming a moving line'}
+  ],
+  vertical:[
+    {name:'Ascending ring stack',directive:'use stacked rings, collars, hoops, or rotating bands climbing around a restrained core'},
+    {name:'Erupting slab column',directive:'use broad broken slabs, plates, spikes, or crystal wedges rising in staggered sections'},
+    {name:'Glyph elevator',directive:'use layered symbols, runic plates, or stamped planes appearing and rising at different heights'},
+    {name:'Clustered shard eruption',directive:'use several large uneven shard groups with varied height and spacing rather than one continuous flame pillar'},
+    {name:'Pulsing node column',directive:'use separated energy nodes or compressed spheres travelling upward through a narrow field'},
+    {name:'Folding fan tower',directive:'use broad fan-shaped sheets or panels opening, folding, and rotating upward'}
+  ],
+  impact:[
+    {name:'Star wedge impact',directive:'use a few large triangular wedges, spear-like rays, and a compressed central contact shape'},
+    {name:'Broken plate burst',directive:'use chunky planar fragments and shield-like plates snapping outward from the contact point'},
+    {name:'Ring-and-spike burst',directive:'combine one clean impact ring with a limited number of large uneven spikes or wedges'},
+    {name:'Ink-blot splash',directive:'use bold calligraphic masses, rounded lobes, and a few tapered splashes rather than realistic liquid droplets'},
+    {name:'Collapsed shell impact',directive:'show a compact shell or membrane crushing inward and rebounding into broad broken sections'},
+    {name:'Radial shard fan',directive:'use asymmetric clusters of large shards or blades with clear empty sectors between them'}
+  ],
+  abstract:[
+    {name:'Geometric prism field',directive:'use prisms, polygons, cubes, facets, or nested angular shells as the main identity'},
+    {name:'Calligraphic ink strokes',directive:'use a few broad brush-like strokes, stamped ends, and expressive negative space without becoming flame-shaped'},
+    {name:'Petal and leaf geometry',directive:'use layered petals, leaves, feathers, scales, or fins as repeated readable units'},
+    {name:'Cloud-puff volumes',directive:'use large rounded lobes, compressed puffs, or soft cel-shaded volumes with clean edges and minimal wisps'},
+    {name:'Mechanical arc segments',directive:'use rotating arcs, cogs without teeth, brackets, rails, and segmented mechanical-looking energy pieces'},
+    {name:'Floating stone or shard assembly',directive:'use a handful of chunky hovering fragments forming and dispersing around the effect'},
+    {name:'Liquid sheet and crest',directive:'use broad wave sheets, crests, curls, and hollow foam-like cutouts without realistic water simulation'},
+    {name:'Chain or tether structure',directive:'use linked sections, knots, hooks, clasps, or connected nodes as the main readable structure'}
+  ]
+};
+function animeVfxFamilyGroup(role){
+  const r=(role||'').toLowerCase();
+  if(/impact|burst/.test(r)) return 'impact';
+  if(/shield|aura|healing|ward|flare/.test(r)) return 'defensive';
+  if(/projectile|lance|bolt|meteor|drill/.test(r)) return 'projectile';
+  if(/pillar|column|eruption|lightning strike|rain volley/.test(r)) return 'vertical';
+  if(/beam|cone|lash|wave|wall|tether|sweep|jet/.test(r)) return 'directional';
+  if(/pulse|ring|nova|ground decal|rune trap|curse mark/.test(r)) return 'radial';
+  return 'abstract';
+}
+function rollAnimeVfxForm(role){
+  const group=animeVfxFamilyGroup(role);
+  const primary=R(animeVfxFormFamilies[group]||animeVfxFormFamilies.abstract);
+  return {group,name:primary.name,directive:primary.directive};
+}
+
 function standardConcept(forceReroll=false){
   const old=state.current||{};
   const cat=ideaCategory(categoryEl.value, old);
@@ -1658,7 +1735,8 @@ function standardConcept(forceReroll=false){
   const loot=[`${ts[0]} ${R(['Core','Shard','Essence','Fang','Bloom','Rune'])}`,`${R(prefixes)} ${R(['Dust','Token','Fragment','Sap','Scale'])}`,`${R(['Cracked','Living','Ancient','Polished'])} ${R(['Gem','Bone','Medal','Spore','Sigil'])}`];
   const visual=(itemMode?[`${identity.wear} ${identity.materials}`,`${identity.construction} construction`,identity.visual]:[R(info.visual||['glowing runes']),R(['large readable silhouette','broad simple shapes','clear fantasy colors','chunky hand-painted forms']),R(['flat colored background','isolated game concept','low visual noise'])]).concat(ideaVisualBits());
   const palette=makePalette(ts,cat,identity);
-  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea()}; state.current=c; render(c);
+  const animeVfxForm=cat==='Anime Spell VFX'?(state.locks.role&&old.animeVfxForm?old.animeVfxForm:rollAnimeVfxForm(role)):null;
+  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea(),animeVfxForm}; state.current=c; render(c);
 }
 function concept(forceReroll=false){
   if(isCreatureCategory(categoryEl.value) || (state.locks.category && state.current && state.current.creatureMode)) return creatureConcept(forceReroll);
@@ -1798,7 +1876,12 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('Create one stylized real-time spell VFX concept intended to be implemented primarily with UV-panned textures on simple game meshes, ribbons, cones, rings, planes, cylinders, or billboards.');
    baseParts.push('This is a single continuous looping effect concept, not a flipbook, sprite sheet, animation timeline, or collection of unrelated spell moments. Show the effect itself clearly on a simple dark or neutral background.');
    baseParts.push('No character, no caster, no environment, no terrain, no cinematic scene, no interface, no labels, and no technical diagrams. The effect itself is the only subject.');
-   baseParts.push('Style direction: polished anime-inspired / Asian action-RPG spell VFX. Use clean graphic shapes, strong readable silhouettes, sweeping arcs, tapered ribbons, curling energy tongues, layered inner bands, controlled glow, decorative negative spaces, and graceful directional motion. Prioritize elegant designed shape language over realistic physical simulation.');
+   baseParts.push('Style direction: polished anime-inspired / Asian action-RPG spell VFX. Use clean graphic shapes, strong readable silhouettes, deliberate negative spaces, layered value bands, controlled glow, and graceful directional motion. Choose shape language appropriate to the selected construction family rather than defaulting to flames, ribbons, or lightning. Prioritize elegant designed forms over realistic physical simulation.');
+   if(c.animeVfxForm){
+     baseParts.push(`Primary effect construction family: ${c.animeVfxForm.name}. ${c.animeVfxForm.directive}.`);
+     baseParts.push('Build the entire effect around this primary family. Use at most one restrained supporting family, and do not replace the selected family with generic flame tongues, looping ribbons, branching lightning, or a tall glowing central column.');
+   }
+   baseParts.push('Variety rule: flame tongues, long orbiting ribbons, and lightning branches are not universal anime VFX language. Use them only when the element and role genuinely require them. Prefer discs, shells, plates, slashes, wedges, shards, petals, clouds, nodes, grids, symbols, membranes, panels, chains, or geometric fields when they better fit the selected family.');
    baseParts.push('Design the effect so it can realistically be reconstructed from approximately three to five shader layers. Give those layers visibly different roles, such as one broad outer body or primary energy mass, one smaller brighter inner core, one animated erosion or breakup layer, one flowing ribbon streak or accent layer when appropriate, and one subtle distortion, refraction, or surrounding glow layer when appropriate.');
    baseParts.push('The effect must be implementation-aware. Use broad continuous forms that can scroll, wrap, distort, and repeat through moving UV coordinates. Let the major shapes flow in a clear direction and overlap with different speeds. Use asymmetry, changing width, bends, pinches, curls, splits, and reconnections to imply motion.');
    baseParts.push('Keep all important forms readable at small gameplay scale. Approximately 70% of the visual identity should come from large shapes, 25% from medium shapes, and no more than 5% from tiny accents.');
@@ -2301,7 +2384,8 @@ function render(c){
    document.querySelector('#tech').parentElement.querySelector('h2').textContent='Item Stats & Identity';
    document.getElementById('tech').innerHTML=kv('Stats',c.itemStats.join(', '))+kv('Slot Group',c.itemSlot)+kv('Materials',c.identity.materials)+kv('Construction',c.identity.construction)+kv('Wear State',c.identity.wear)+kv('Complexity Budget','0 special mechanics');
  } else {
-   document.getElementById('details').innerHTML=kv('Role',c.role)+kv('Loot / Rewards',c.loot.join(', '))+kv('Visual Identity',c.visual.join(', '))+kv('Counterplay',c.tech.counterplay);
+   const animeFormRow=(c.category==='Anime Spell VFX'&&c.animeVfxForm)?kv('Effect Shape Family',c.animeVfxForm.name):'';
+   document.getElementById('details').innerHTML=kv('Role',c.role)+animeFormRow+kv('Loot / Rewards',c.loot.join(', '))+kv('Visual Identity',c.visual.join(', '))+kv('Counterplay',c.tech.counterplay);
    document.querySelector('#signature').parentElement.querySelector('h2').textContent=c.itemMode&&c.rarity==='Legendary'?'Legendary Effect':'Signature Mechanic';
    document.getElementById('signature').textContent=c.signature;
    document.querySelector('#tech').parentElement.querySelector('h2').textContent='Technical Mechanics';
@@ -2345,6 +2429,7 @@ function buildShaderMasksPrompt(c,palette,rarityText){
  lines.push('Do not merely convert the finished illustration to grayscale. Reinterpret each visual component as clean numerical shader data designed to combine with the other layers.');
  lines.push('First return a concise technical texture plan only. For each required texture, state: texture name; shader purpose; whether it is visible directly or used only as control data; required tiling direction; intended mesh or effect layer; suggested UV movement direction and relative speed; and whether it should be grayscale, alpha-only, or an RG vector map.');
  lines.push('Use only textures that materially contribute to reproducing this specific effect. Do not automatically include every possible map. Most effects should need approximately three to five textures.');
+ if(c.animeVfxForm) lines.push(`The reference concept uses this primary construction family: ${c.animeVfxForm.name}. Preserve that family in the mask plan rather than translating it into generic flames, ribbons, or lightning. ${c.animeVfxForm.directive}.`);
  lines.push('Possible texture roles include: BODY OR DENSITY MASK for the broad visible mass and main silhouette language; EROSION OR BREAKUP TILE for animated alpha subtraction and changing cavities; INNER CORE OR HIGHLIGHT MASK for a smaller brighter interior; ACCENT, RIBBON, OR STREAK MASK for a distinct secondary sweep, spiral, contour, or travelling arc; DISTORTION OR FLOW MAP for UV perturbation; and SOFT GLOW OR FALLOFF MASK only when bloom and the other masks cannot produce the required halo.');
  lines.push('After presenting the texture plan, do not generate any image yet. Stop and ask the user which texture from the plan should be generated first.');
  lines.push('When the user chooses a texture to generate, create only one texture per image and one image per response. Do not create a contact sheet, atlas, labelled diagram, comparison grid, or several maps on one canvas.');
@@ -2550,7 +2635,8 @@ function buildTimelinePrompt(c,palette,rarityText){
    lines.push('Very important: all frames must belong to one single continuous progression of the same effect. Do not mix several different spell moments or unrelated effects in the same sheet.');
    lines.push('Choose one readable progression only, such as projectile travel, charge-up to release, area pulse expansion, beam sweep, shield flare, rune activation, cone blast, arc lash, healing bloom, curse mark forming, impact burst, or dissipating fade.');
    lines.push('Use clear motion progression such as tiny start shape, build-up, active shape, peak frame, follow-through, and fade or dissipate.');
-   lines.push('Every frame should be a flat effect drawing with consistent framing and scale. Keep the style clean, graphic, and anime-inspired, with bold silhouettes, sweeping arcs, tapered ribbons, layered energy bands, decorative negative spaces, and graceful motion.');
+   lines.push('Every frame should be a flat effect drawing with consistent framing and scale. Keep the style clean, graphic, and anime-inspired, with bold silhouettes, layered value bands, decorative negative spaces, and graceful motion. Do not default every sequence to flame tongues, ribbons, or lightning.');
+   if(c.animeVfxForm) lines.push(`Preserve the selected construction family in every frame: ${c.animeVfxForm.name}. ${c.animeVfxForm.directive}.`);
    lines.push('No caster, no humanoid target, no creature, no pet, no environment, no terrain, no scenic background, no props, and no interface elements. The effect itself is the only subject.');
    lines.push('Do not default the sequence to a circular nova unless the role truly calls for a radial effect. If the role suggests a directional effect such as beam, projectile, cone, lash, wall, chain, column, or falling volley, keep the sequence directional and structured around that motion.');
    lines.push('Keep details production-friendly: large readable shapes, limited particle noise, no muddy rendering, no photorealistic fire or smoke, and no overly painterly 3D materials.');
@@ -2626,7 +2712,7 @@ function buildTimelinePrompt(c,palette,rarityText){
 function exportData(c){
  if(c.creatureMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,encounterTier:c.encounterTier,themes:c.themes,palette:c.palette,monsterRole:c.monsterRole,combatPersonality:c.combatPersonality,threatBudget:c.threatBudget,abilities:c.abilities,rotation:c.rotation,habitat:c.habitat,encounterUse:c.encounterUse,weakness:c.weakness,family:c.family,phases:c.phases||undefined,mechanic:c.tech||null,brainValidation:c.brainValidation,why:c.why};}
  if(c.narrativeMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,concept:c.signature,details:c.detailRows,structure:c.structureRows,visualIdentity:c.visual,mechanic:null,designRule:'No combat proc mechanics for narrative/environment categories.',why:c.why};}
- return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,itemSlot:c.itemSlot||undefined,affixCount:c.affixCount||undefined,itemStats:c.itemStats||undefined,visualIdentity:c.visual,mechanic:(c.itemMode&&!c.allowItemMechanic)?null:c.tech,designRule:c.itemMode?itemDesignFocus(c.rarity):undefined,why:c.why};}
+ return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,itemSlot:c.itemSlot||undefined,affixCount:c.affixCount||undefined,itemStats:c.itemStats||undefined,visualIdentity:c.visual,animeVfxForm:c.animeVfxForm||undefined,mechanic:(c.itemMode&&!c.allowItemMechanic)?null:c.tech,designRule:c.itemMode?itemDesignFocus(c.rarity):undefined,why:c.why};}
 function markdownNote(c){
  if(c.creatureMode){
    let out = '# '+c.name+'\n\n';
