@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.7</title>
+<title>Worldsmith v1.9.8</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.7";
+    content:"v1.9.8";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.7 adds role-aware Anime Spell VFX construction families for much broader effect variety, while keeping the existing shader-mask and timeline workflows intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.8 expands spell and spell-effect naming with role-aware projectile, impact, pillar, ward, field, movement, and rupture vocabulary, while keeping the Anime VFX construction, shader-mask, and timeline workflows intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -572,7 +572,8 @@
 • Added the experimental Anime Spell VFX category for clean anime / Asian action-RPG effects designed around UV-panned shader layers.
 • Added a dedicated Shader Masks Prompt tab for Anime Spell VFX. It analyzes the previously generated effect concept, proposes the minimum practical texture set, and asks which production-ready shader map to generate first.
 • Enabled the 4–6 frame Timeline Prompt for Anime Spell VFX so anime-style spell effects can also be explored as readable staged progressions.
-• Added role-aware Anime Spell VFX construction families to greatly reduce repeated flame, ribbon, and lightning designs. Concepts now select from discs, plates, shields, shards, slashes, petals, membranes, nodes, glyphs, lattices, clouds, chains, and other structures based on the effect role.</div></div>
+• Added role-aware Anime Spell VFX construction families to greatly reduce repeated flame, ribbon, and lightning designs. Concepts now select from discs, plates, shields, shards, slashes, petals, membranes, nodes, glyphs, lattices, clouds, chains, and other structures based on the effect role.
+• Expanded Spell, Skill, Spell VFX, and Anime Spell VFX naming with role-aware pools for bolts, arrows, pillars, shatters, ruptures, fields, wards, beams, torrents, volleys, spires, traps, movement skills, and many additional naming structures. Reduced reliance on Breath, Song, Mark, Cleave, Call, and Oath.</div></div>
   </section>
 </main>
 <script>
@@ -721,8 +722,52 @@ function isSpellVfxCategory(cat){return cat==='Spell VFX'||cat==='Anime Spell VF
 function isAnimeSpellVfxCategory(cat){return cat==='Anime Spell VFX';}
 function isAbilityCategory(cat){return cat==='Spell'||cat==='Skill'||isSpellVfxCategory(cat);}
 const nouns=['Warden','Seer','Maw','Keeper','Bloom','Sentinel','Hermit','Crown','Idol','Shard','Howler','Caller','Binder','Root','Glaive','Lantern','Oracle','Mire','Fang','Monolith'];
-const prefixes=['Ash','Frost','Thorn','Rot','Crystal','Moon','Blood','Storm','Sun','Bone','Void','Moss','Rune','Deep','Gloom','Amber','Iron','Pearl','Royal'];
-const suffixes=['of the Hollow','of Old Kings','of the Sleeping Grove','of the Broken Star','of the Mire','of the Last Flame','of the Deep Root','of the Glass Moon','of the Drowned Hall'];
+const prefixes=['Ash','Frost','Thorn','Rot','Crystal','Moon','Blood','Storm','Sun','Bone','Void','Moss','Rune','Deep','Gloom','Amber','Iron','Pearl','Royal','Verdant','Radiant','Umbral','Celestial','Sable','Ivory','Crimson','Silver','Golden','Ancient','Hollow','Waning','Drowned','Riven','Wild','Silent','Starless','Elder','Pale','Black','Bright'];
+const suffixes=['of the Hollow','of Old Kings','of the Sleeping Grove','of the Broken Star','of the Mire','of the Last Flame','of the Deep Root','of the Glass Moon','of the Drowned Hall','of the First Dawn','of the Thorn Court','of the Waning Sun','of the Iron Choir','of the Drowned Orchard','of the Silent Gate','of the Serpent Moon','of the Ashen Crown','of the Starless Deep','of the Glass Sea','of the Pale Stag','of the Black Tide','of the Last Oath','of the Fallen Tower','of the Ember Court','of the Silver Grove'];
+const abilityGeneralCores=['Bolt','Arrow','Pillar','Shatter','Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo','Spear','Spike','Shard','Volley','Barrage','Torrent','Wave','Rift','Halo','Seal','Sigil','Pulse','Flare','Geyser','Spire','Vortex','Tempest','Crash','Rupture','Fracture','Sweep','Lash','Beam','Comet','Meteor','Needle','Fan','Shell','Field','Veil','Mantle','Orbit','Disc','Glyph','Anchor','Surge','Arc','Ray','Thrust','Drill','Rain','Wall','Tether','Wake','Trail','Impact','Detonation','Eruption','Column','Quake','Fang','Crescent','Prism','Aegis','Bastion'];
+const abilityInvocationWords=['Call','Mark','Breath','Grip','Song','Oath','Rite','Edict','Decree','Judgement','Requiem','Chorus','Whisper','Roar','Dance','March','Descent','Awakening','Fall','Rising','Covenant','Canticle'];
+const abilityActionVerbs=['Shatter','Pierce','Raise','Split','Crack','Rend','Kindle','Break','Unmake','Sever','Open','Unleash','Sunder','Awaken','Strike','Crown','Bury','Scatter'];
+const abilityActionTargets=['the Sky','the Veil','the Crown','the Tide','the Root','the Moon','the Chain','the Gate','the Star','the Hollow','the Spire','the Deep','the Dawn','the Court','the World'];
+function abilityCorePool(cat,role){
+  const r=(role||'').toLowerCase();
+  if(cat==='Skill'){
+    if(r.includes('melee')||r.includes('cleave')||r.includes('finisher')) return ['Cleave','Arc','Sweep','Rend','Slash','Crosscut','Sever','Breaker','Reaver','Finality','Crescendo','Execution'];
+    if(r.includes('ranged')||r.includes('shot')) return ['Arrow','Bolt','Shot','Volley','Barrage','Needle','Piercer','Rain','Comet','Spear'];
+    if(r.includes('defensive')||r.includes('stance')) return ['Ward','Guard','Bastion','Bulwark','Aegis','Shell','Mantle','Barrier','Rampart'];
+    if(r.includes('dash')) return ['Rush','Step','Charge','Flash','Drive','Lunge','Passage','Crossing','Surge'];
+    if(r.includes('totem')) return ['Totem','Idol','Pillar','Standard','Beacon','Wardpost','Anchor'];
+    if(r.includes('channel')) return ['Beam','Torrent','Ray','Current','Conduit','Chorus','Stream'];
+  }
+  if(cat==='Spell'){
+    if(r.includes('projectile')) return ['Bolt','Arrow','Lance','Spear','Comet','Shard','Needle','Dart','Javelin','Orb'];
+    if(r.includes('area')) return ['Field','Pulse','Nova','Quake','Bloom','Rupture','Circle','Surge','Tempest'];
+    if(r.includes('curse')) return ['Hex','Brand','Mark','Seal','Blight','Doom','Chain','Geas','Scar'];
+    if(r.includes('buff')) return ['Ward','Mantle','Grace','Aegis','Crown','Vow','Aspect','Halo','Bastion'];
+    if(r.includes('summon')) return ['Gate','Host','Legion','Avatar','Manifestation','Convergence','Beacon','Court'];
+    if(r.includes('mobility')) return ['Step','Passage','Blink','Rush','Leap','Crossing','Flight','Drift','Flash'];
+    if(r.includes('trap')) return ['Snare','Mine','Seal','Cage','Lattice','Glyph','Ward','Ambush','Prison'];
+    if(r.includes('channel')) return ['Beam','Torrent','Ray','Current','Conduit','Stream','Pillar'];
+  }
+  if(r.includes('projectile')||r.includes('bolt')||r.includes('lance')||r.includes('meteor')||r.includes('rain')||r.includes('serpentine')||r.includes('trail')) return ['Bolt','Arrow','Lance','Spear','Comet','Needle','Dart','Javelin','Shard','Volley','Barrage','Meteor','Drill','Piercer'];
+  if(r.includes('impact')||r.includes('burst')||r.includes('nova')) return ['Shatter','Rupture','Crash','Detonation','Impact','Fracture','Break','Sundering','Burst','Quake','Starfall'];
+  if(r.includes('area')||r.includes('aura')||r.includes('ring')||r.includes('ground')||r.includes('rune')||r.includes('healing')||r.includes('curse')||r.includes('shield')) return ['Field','Halo','Ward','Seal','Sigil','Brand','Bloom','Sanctuary','Veil','Bastion','Circle','Lattice','Shell','Prism'];
+  if(r.includes('beam')||r.includes('jet')||r.includes('wave')||r.includes('cone')||r.includes('lash')||r.includes('wall')) return ['Beam','Torrent','Wave','Sweep','Lash','Fan','Ray','Arc','Surge','Crescent','Wall','Rend'];
+  if(r.includes('column')||r.includes('pillar')||r.includes('eruption')||r.includes('cyclone')||r.includes('vertical')) return ['Pillar','Spire','Column','Geyser','Ascension','Vortex','Tempest','Eruption','Tower','Upheaval'];
+  if(r.includes('charge')||r.includes('dissolve')||r.includes('orbit')) return ['Charge','Wake','Echo','Mantle','Orbit','Corona','Drift','Veil','Pulse','Refrain'];
+  if(r.includes('chain')||r.includes('tether')) return ['Chain','Tether','Link','Binding','Lattice','Snare','Conduit','Coil'];
+  return abilityGeneralCores;
+}
+function genAbilityName(cat,ts,role){
+  const core=R(abilityCorePool(cat,role));
+  const theme=ts&&ts.length?ts[0]:R(prefixes);
+  const roll=Math.random();
+  if(roll<0.44) return `${R(prefixes)} ${core}`;
+  if(roll<0.59) return `${theme} ${core}`;
+  if(roll<0.72) return `${core} ${R(suffixes)}`;
+  if(roll<0.84) return `${R(abilityActionVerbs)} ${R(abilityActionTargets)}`;
+  if(roll<0.93) return `${R(['The','Last','First','Final','Silent','Broken','Waning','Riven'])} ${core}`;
+  return `${R(abilityInvocationWords)} ${R(suffixes)}`;
+}
 const triggerPools={
   offensive:['When hit by an enemy','On critical hit','When an enemy enters range','Every 6 seconds in combat','When casting finishes','After blocking an enemy attack'],
   defensive:['When below 35% health','When an ally is hit nearby','After blocking','When standing still for 2 seconds','After healing an ally'],
@@ -826,7 +871,7 @@ function weightedThemes(rar, existing=[]){
 function themeInfo(ts){let first=ts.find(t=>byTheme[t])||'Arcane'; return byTheme[first]||byTheme.Arcane;}
 function genName(cat,ts,role){
   const t=ts[0];
-  if(isAbilityCategory(cat)) return R([`${R(prefixes)} ${R(['Burst','Lance','Bloom','Ward','Brand','Nova','Chain','Prison','Cleave','Echo'])}`,`${R(['Call','Mark','Breath','Grip','Song','Oath'])} ${R(suffixes)}`]);
+  if(isAbilityCategory(cat)) return genAbilityName(cat,ts,role);
   if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
   if(cat==='Texture') return R([`${t} ${role}`,`${capitalize(t)} ${role}`,`${R(prefixes)} ${role}`]);
   if(cat==='Flora') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
