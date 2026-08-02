@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.9</title>
+<title>Worldsmith v1.9.10</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.9";
+    content:"v1.9.10";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.9 bakes a rig-friendly wider A-pose into humanoid Monsters, NPCs, and body-armour prompts so upper arms stay clearly separated from the torso, while keeping the recent naming and Anime VFX workflows intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.10 adds flexible placeholder-name guidance across image prompts, so the image agent can let the final design influence a more fitting subject name while keeping the recent rigging and Anime VFX workflows intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -543,6 +543,7 @@
 • Added Portrait / Icon Prompt generation for all categories.
 • Improved armour prompt positioning for body armour, pants, gloves, and boots.
 • Refined sleeve/robe armour A-pose spacing: arms about 28–35° away from the torso with clear arm/torso separation for rigging.
+• Added flexible placeholder-name guidance across image prompts.
 • Refined texture prompts to avoid decorative inserts and keep textures as clean base materials.
 • Strengthened texture prompts further so concept/theme words are not interpreted as literal decorative motifs; textures now explicitly request only clean base materials.
 • Expanded the texture type pool and pushed texture prompts harder toward fewer, bigger repeating shapes for better readability at small sizes.
@@ -1856,6 +1857,10 @@ function spellVfxRoleIntent(role){
 
 
 function designStyleValue(){const el=document.getElementById('designStyle');return el?el.value:'fantastical';}
+function placeholderNameGuidance(){
+  return 'Naming guidance: treat the provided concept name as a loose seed rather than a strict requirement. Feel free to let the final visual design suggest a more fitting placeholder name or title for the subject if something more precise emerges while creating it. Use that improved fitting identity as creative guidance, but do not render name text, labels, or title cards in the image unless the prompt explicitly asks for text.';
+}
+
 function designStyleDirectives(cat){
   const style=designStyleValue();
   const isEffect=isAbilityCategory(cat);
@@ -1876,12 +1881,12 @@ function designStyleDirectives(cat){
 function buildVisualPrompt(c,palette,rarityText){
   const base=buildVisualPromptCore(c,palette,rarityText);
   const extra=designStyleDirectives(c.category);
-  return extra.length?base+' '+extra.join(' '):base;
+  return [base,...extra,placeholderNameGuidance()].join(' ');
 }
 function buildPortraitPrompt(c,palette,rarityText){
   const base=buildPortraitPromptCore(c,palette,rarityText);
   const extra=designStyleDirectives(c.category);
-  return extra.length?base+' '+extra.join(' '):base;
+  return [base,...extra,placeholderNameGuidance()].join(' ');
 }
 function buildVisualPromptCore(c,palette,rarityText){
  const cat=c.category;
