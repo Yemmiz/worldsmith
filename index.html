@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.8</title>
+<title>Worldsmith v1.9.9</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.8";
+    content:"v1.9.9";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.8 expands spell and spell-effect naming with role-aware projectile, impact, pillar, ward, field, movement, and rupture vocabulary, while keeping the Anime VFX construction, shader-mask, and timeline workflows intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.9 bakes a rig-friendly wider A-pose into humanoid Monsters, NPCs, and body-armour prompts so upper arms stay clearly separated from the torso, while keeping the recent naming and Anime VFX workflows intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -542,7 +542,7 @@
 • Added Flora category and Flora follow-up prompt for growth stages and harvest yields.
 • Added Portrait / Icon Prompt generation for all categories.
 • Improved armour prompt positioning for body armour, pants, gloves, and boots.
-• Refined sleeve/robe armour A-pose spacing: arms about 18–22° away from the torso with clear wrist/hip spacing.
+• Refined sleeve/robe armour A-pose spacing: arms about 28–35° away from the torso with clear arm/torso separation for rigging.
 • Refined texture prompts to avoid decorative inserts and keep textures as clean base materials.
 • Strengthened texture prompts further so concept/theme words are not interpreted as literal decorative motifs; textures now explicitly request only clean base materials.
 • Expanded the texture type pool and pushed texture prompts harder toward fewer, bigger repeating shapes for better readability at small sizes.
@@ -1246,7 +1246,7 @@ function itemSlotGroup(cat,role){
 }
 function armourPresentationGuidance(role, forIcon=false){
   const r=(role||'').toLowerCase();
-  const aPoseSleeves = 'Use a game-rig A-pose matching the player base model: upper arms angled about 18–22 degrees away from the torso on each side, elbows only slightly bent, wrists relaxed downward, with a visible armpit gap and the sleeve cuffs/hands not touching the hips. Aim for roughly one fist-width to one forearm-width of empty space between the inner wrist/cuff and the side of the torso.';
+  const aPoseSleeves = 'Use a game-rig A-pose matching the player base model: upper arms angled about 28–35 degrees away from the torso on each side, elbows only slightly bent, wrists relaxed downward, with clear visible negative space under the armpits. The upper arm silhouette must stay clearly separated from the chest and ribcage silhouette, and the sleeve cuffs/hands must not touch the hips. Aim for obvious empty space between the inner upper arm and the side of the torso so the arm mass and torso mass remain distinct for rigging.';
   const aPoseLegs = 'Use a game-rig A-pose lower-body stance: legs slightly apart, feet roughly shoulder-width, with a clear gap between the thighs so the pants silhouette is readable.';
   if(r.includes('helmet')) return forIcon
     ? 'Show the helmet by itself, centered and clearly readable, with the full helmet fully visible in frame.'
@@ -1270,8 +1270,8 @@ function armourPresentationGuidance(role, forIcon=false){
     ? 'Show the belt clearly by itself, laid out or slightly curved so the full shape and buckle area are readable.'
     : 'Presentation and positioning: show the belt clearly by itself, laid out or slightly curved so the full shape, buckle, and attachment details are readable.';
   return forIcon
-    ? 'Show the armour piece clearly, fully visible, centered, and easy to read. If it includes sleeves or arm coverage, use a relaxed A-pose with arms about 18–22 degrees away from the torso.'
-    : 'Presentation and positioning: show the armour piece clearly, fully visible, centered, and easy to read. If it includes sleeves or arm coverage, use a relaxed A-pose with arms about 18–22 degrees away from the torso.';
+    ? 'Show the armour piece clearly, fully visible, centered, and easy to read. If it includes sleeves or arm coverage, use a relaxed rig-friendly A-pose with arms about 28–35 degrees away from the torso, keeping clear negative space between the upper arms and the torso.'
+    : 'Presentation and positioning: show the armour piece clearly, fully visible, centered, and easy to read. If it includes sleeves or arm coverage, use a relaxed rig-friendly A-pose with arms about 28–35 degrees away from the torso, keeping clear negative space between the upper arms and the torso.';
 }
 
 function itemAffixCount(rar){
@@ -2095,6 +2095,7 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('Empty hands: do not place weapons, staffs, lanterns, books, maps, tools, bags, pets, mugs, scrolls, or props in the character\'s hands.');
    baseParts.push('If a prop is important to the character identity, render it separately beside the NPC as a small loose prop, clearly not held and not attached to the body.');
    baseParts.push('Keep the pose neutral and easy to model; prioritize silhouette, outfit, body shape, and materials. Use at most 3 views total; preferably a single large hero view, or one hero view plus up to two small supporting views.');
+   baseParts.push('If the NPC has humanoid arms, use a wider rig-friendly A-pose: upper arms angled about 28–35 degrees away from the torso, with visible negative space under the armpits and clear separation between the upper arms and the chest / ribcage silhouette. The arms must not touch, compress into, or visually merge with the torso.');
    baseParts.push(`NPC visual identity: ${c.visual.join(', ')}.`);
    if(c.role) baseParts.push(`NPC role: ${c.role}.`);
    const nProp=(c.detailRows||[]).find(r=>r[0]==='Signature Prop');
@@ -2112,6 +2113,7 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('Keep the design low-noise and model-friendly: strong primary shapes, only a few secondary shapes, broad surfaces, simplified anatomy, and minimal tiny detail. Surface treatment should still feel polished, with clean edge definition and readable material breakup.');
    baseParts.push('Avoid painterly rendering, smoky illustration effects, fur strand detail, micro cracks, excessive spikes, tiny surface ornaments, or noisy over-detail. If crystals, spikes, claws, fur, or armor plates appear, keep them fewer, larger, and chunkier. However, keep textures clean and high-quality: not blurry, not mushy, not low-resolution, with crisp forms and clear material definition.');
    baseParts.push('Keep the pose readable and model-friendly: mostly full-body, clear limbs, clear front or three-quarter silhouette, not hidden by smoke, environment, or overlapping props. Use at most 3 views total; preferably one large main render, or one main render plus up to two supporting views. Do not generate 4 or more turnarounds or many small repeated angles.');
+   baseParts.push('If the creature has humanoid-style arms or clearly separated front limbs, keep them posed clearly away from the torso or main body mass with visible negative space, so the limb silhouettes remain distinct and do not merge into the chest or side-body area. For humanoid or semi-humanoid creatures, prefer roughly 28–35 degrees of arm lift from the torso in a relaxed rig-friendly A-pose.');
    if(c.category==='Boss') baseParts.push('Make it feel larger and more imposing through silhouette, anatomy, posture, and a few bold standout features rather than extra environment or dense detail.');
    if(c.family && c.family.name) baseParts.push(`Belongs to the ${c.family.name} family.`);
    if(c.bodyPlan) baseParts.push(`Preferred creature frame: ${c.bodyPlan.label}. ${c.bodyPlan.prompt} Size guidance: ${c.bodyPlan.size}.`);
