@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.10</title>
+<title>Worldsmith v1.9.11</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.10";
+    content:"v1.9.11";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.10 adds flexible placeholder-name guidance across image prompts, so the image agent can let the final design influence a more fitting subject name while keeping the recent rigging and Anime VFX workflows intact.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.11 expands Anime Spell VFX construction-family variety with many more role-aware shape systems, reducing repetition and widening the available visual vocabulary beyond ribbons, flames, and lightning.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -573,7 +573,7 @@
 • Added the experimental Anime Spell VFX category for clean anime / Asian action-RPG effects designed around UV-panned shader layers.
 • Added a dedicated Shader Masks Prompt tab for Anime Spell VFX. It analyzes the previously generated effect concept, proposes the minimum practical texture set, and asks which production-ready shader map to generate first.
 • Enabled the 4–6 frame Timeline Prompt for Anime Spell VFX so anime-style spell effects can also be explored as readable staged progressions.
-• Added role-aware Anime Spell VFX construction families to greatly reduce repeated flame, ribbon, and lightning designs. Concepts now select from discs, plates, shields, shards, slashes, petals, membranes, nodes, glyphs, lattices, clouds, chains, and other structures based on the effect role.
+• Expanded role-aware Anime Spell VFX construction families with many more shape systems—such as knot wheels, lattices, veils, talisman darts, linked crescents, stepped lifts, petal craters, folded paper forms, lantern cores, and more—to further reduce repeated flame, ribbon, and lightning designs.
 • Expanded Spell, Skill, Spell VFX, and Anime Spell VFX naming with role-aware pools for bolts, arrows, pillars, shatters, ruptures, fields, wards, beams, torrents, volleys, spires, traps, movement skills, and many additional naming structures. Reduced reliance on Breath, Song, Mark, Cleave, Call, and Oath.</div></div>
   </section>
 </main>
@@ -1679,14 +1679,22 @@ const animeVfxFormFamilies={
     {name:'Runic stamp or seal',directive:'use one bold planar seal, stamped glyph mass, or layered symbol planes that activate, fracture, rotate, or expand'},
     {name:'Fractured ground field',directive:'use clustered spikes, broken planar shards, cracks, and uneven rising wedges distributed across the area'},
     {name:'Expanding membrane',directive:'use one broad translucent shell, liquid-like sheet, or pressure membrane that stretches and breaks into large sections'},
-    {name:'Orbiting fragment crown',directive:'use a small number of chunky orbiting shards, plates, petals, or nodes arranged around a quiet center'}
+    {name:'Orbiting fragment crown',directive:'use a small number of chunky orbiting shards, plates, petals, or nodes arranged around a quiet center'},
+    {name:'Braided knot wheel',directive:'use interwoven loops, braided arcs, or knotted circular paths with obvious crossings and open negative space'},
+    {name:'Concentric tile maze',directive:'use offset concentric lanes, stepped bands, and interrupted tiles to build a layered radial maze-like structure'},
+    {name:'Ripple basin',directive:'use a few broad nested ripple bands or bowl-like pressure rings with clear spacing and restrained splash forms'},
+    {name:'Floating monolith ring',directive:'use chunky standing blocks, steles, or monoliths distributed around a circular perimeter with deliberate empty sectors'}
   ],
   defensive:[
     {name:'Faceted dome shell',directive:'use a dome, partial shell, or curved shield made from broad faceted panels and clear gaps'},
     {name:'Interlocking ward plates',directive:'use layered plates, shields, scales, or floating panels that slide into a protective formation'},
     {name:'Woven energy lattice',directive:'use a clean grid, knot, cage, or braided field structure with deliberate crossings and open negative space'},
     {name:'Layered sigil planes',directive:'use two or three flat symbol planes, discs, or geometric sheets offset in depth and motion'},
-    {name:'Orbiting guardian nodes',directive:'use a few large nodes, stones, petals, blades, or glyph pieces circling a protected center'}
+    {name:'Orbiting guardian nodes',directive:'use a few large nodes, stones, petals, blades, or glyph pieces circling a protected center'},
+    {name:'Veil curtain shield',directive:'use one or two hanging translucent curtains, draped sheets, or protective veils with controlled folds and cutouts'},
+    {name:'Shell bloom',directive:'use layered shell petals or hinged shield leaves that open around the protected center like a restrained bloom'},
+    {name:'Brace-frame bastion',directive:'use large braces, brackets, gates, or support arms locking into a sturdy protective frame'},
+    {name:'Hanging charm canopy',directive:'use a few suspended tags, seals, leaves, or charm pieces forming a sparse protective canopy overhead'}
   ],
   projectile:[
     {name:'Faceted shard spear',directive:'use a hard-edged wedge, crystal spear, or arrowhead body with layered shell plates and a readable pointed travel direction'},
@@ -1694,7 +1702,11 @@ const animeVfxFormFamilies={
     {name:'Spinning disc projectile',directive:'use a disc, crescent wheel, saw-like halo, or flat rotating plate with a compact trail'},
     {name:'Linked-node bolt',directive:'use a chain of separated energy nodes, beads, plates, or pulses connected by short controlled bridges'},
     {name:'Split-blade projectile',directive:'use two or three parallel blade-like masses that converge, separate, or shear past one another'},
-    {name:'Hollow shell comet',directive:'use a hollow capsule, cage, or shell around a compact core, with torn planar wake pieces rather than long ribbons'}
+    {name:'Hollow shell comet',directive:'use a hollow capsule, cage, or shell around a compact core, with torn planar wake pieces rather than long ribbons'},
+    {name:'Talisman dart',directive:'use one or more stamped paper seals, cards, tags, or talisman slips as the main projectile body with a clean directional read'},
+    {name:'Harpoon fin bolt',directive:'use a narrow dart body with large readable fins, hooks, or stabilizer plates rather than a soft energy tail'},
+    {name:'Orb-and-cage shot',directive:'use a compact central orb enclosed by a sparse cage, collar, or orbiting frame that travels as one unit'},
+    {name:'Droplet lance',directive:'use a tear, droplet, or seed-like body sharpened into a forward lance with one restrained trailing contour'}
   ],
   directional:[
     {name:'Layered slash fan',directive:'use a fan of broad planar slashes, crescent cuts, or blade-shaped sheets with different lengths and timing'},
@@ -1702,7 +1714,11 @@ const animeVfxFormFamilies={
     {name:'Crescent wave',directive:'use one or two thick crescent masses with a clean inner cutout and restrained secondary accents'},
     {name:'Runic wavefront',directive:'use repeating symbol fragments, stamped bars, or geometric motifs carried along a broad moving front'},
     {name:'Petal sweep',directive:'use layered petal, leaf, feather, or scale-like wedges travelling as a coherent fan'},
-    {name:'Segmented wall',directive:'use separated vertical slabs, panels, spikes, or shield-like sections forming a moving line'}
+    {name:'Segmented wall',directive:'use separated vertical slabs, panels, spikes, or shield-like sections forming a moving line'},
+    {name:'Scissor plate sweep',directive:'use paired opening plates, crossed blades, or scissor-like sections cutting through space in a readable sweep'},
+    {name:'Linked crescent chain',directive:'use repeated crescent segments or hooked arcs advancing in sequence rather than one continuous ribbon'},
+    {name:'Tooth-row surge',directive:'use a marching row of wedges, teeth, fins, or triangular plates travelling together as a structured surge'},
+    {name:'Pressure ribbon slab',directive:'use one broad flattened band or sheet with stepped edges and pressure-like folding rather than a soft flowing ribbon'}
   ],
   vertical:[
     {name:'Ascending ring stack',directive:'use stacked rings, collars, hoops, or rotating bands climbing around a restrained core'},
@@ -1710,7 +1726,11 @@ const animeVfxFormFamilies={
     {name:'Glyph elevator',directive:'use layered symbols, runic plates, or stamped planes appearing and rising at different heights'},
     {name:'Clustered shard eruption',directive:'use several large uneven shard groups with varied height and spacing rather than one continuous flame pillar'},
     {name:'Pulsing node column',directive:'use separated energy nodes or compressed spheres travelling upward through a narrow field'},
-    {name:'Folding fan tower',directive:'use broad fan-shaped sheets or panels opening, folding, and rotating upward'}
+    {name:'Folding fan tower',directive:'use broad fan-shaped sheets or panels opening, folding, and rotating upward'},
+    {name:'Totem rise',directive:'use stacked idol pieces, medallions, blocks, or symbolic tiers rising one above another as a clear vertical build'},
+    {name:'Stepped plate lift',directive:'use broad platform-like steps, lifting shelves, or layered ledges climbing upward in a clean sequence'},
+    {name:'Bubble lift chain',directive:'use separated rounded cells, capsules, or soft bubbles rising in a clear vertical chain rather than a beam'},
+    {name:'Banner flare column',directive:'use a restrained vertical uplift body with one or two broad hanging banner-like sheets or crests lifting upward'}
   ],
   impact:[
     {name:'Star wedge impact',directive:'use a few large triangular wedges, spear-like rays, and a compressed central contact shape'},
@@ -1718,7 +1738,11 @@ const animeVfxFormFamilies={
     {name:'Ring-and-spike burst',directive:'combine one clean impact ring with a limited number of large uneven spikes or wedges'},
     {name:'Ink-blot splash',directive:'use bold calligraphic masses, rounded lobes, and a few tapered splashes rather than realistic liquid droplets'},
     {name:'Collapsed shell impact',directive:'show a compact shell or membrane crushing inward and rebounding into broad broken sections'},
-    {name:'Radial shard fan',directive:'use asymmetric clusters of large shards or blades with clear empty sectors between them'}
+    {name:'Radial shard fan',directive:'use asymmetric clusters of large shards or blades with clear empty sectors between them'},
+    {name:'Cross-cut detonation',directive:'use two or three broad crossing cuts or plus-shaped cleaves colliding at the center with restrained debris'},
+    {name:'Petal crater burst',directive:'use heavy petal-like plates, broad lobes, or leaf wedges thrown outward from a compressed center'},
+    {name:'Stamped burst field',directive:'use repeated stamp-like impressions, thick bars, or symbol blocks striking outward in a forceful spread'},
+    {name:'Ripple dent impact',directive:'use one compressed impact dent and a few heavy follow-on ripple bands instead of many spikes or fragments'}
   ],
   abstract:[
     {name:'Geometric prism field',directive:'use prisms, polygons, cubes, facets, or nested angular shells as the main identity'},
@@ -1728,7 +1752,11 @@ const animeVfxFormFamilies={
     {name:'Mechanical arc segments',directive:'use rotating arcs, cogs without teeth, brackets, rails, and segmented mechanical-looking energy pieces'},
     {name:'Floating stone or shard assembly',directive:'use a handful of chunky hovering fragments forming and dispersing around the effect'},
     {name:'Liquid sheet and crest',directive:'use broad wave sheets, crests, curls, and hollow foam-like cutouts without realistic water simulation'},
-    {name:'Chain or tether structure',directive:'use linked sections, knots, hooks, clasps, or connected nodes as the main readable structure'}
+    {name:'Chain or tether structure',directive:'use linked sections, knots, hooks, clasps, or connected nodes as the main readable structure'},
+    {name:'Moth-wing silhouette',directive:'use paired wing-like planes, powdery cutouts, or soft mirrored panels without turning into a literal creature'},
+    {name:'Folded paper geometry',directive:'use folded sheets, creases, talisman-like planes, and angular flaps as the main readable forms'},
+    {name:'Lantern core assembly',directive:'use one contained inner core surrounded by a few rigid frame pieces like a lantern, cage, or reliquary'},
+    {name:'Bone or branch lattice',directive:'use a sparse lattice of forked supports, branch-like struts, or bone-like members as the main structure'}
   ]
 };
 function animeVfxFamilyGroup(role){
