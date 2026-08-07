@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.12</title>
+<title>Worldsmith v1.9.13</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.12";
+    content:"v1.9.13";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.12 rebalances Spell VFX and Anime Spell VFX role pools toward more support and melee reads, adds smoother healing/buff and cleave-specific shape guidance, and reduces repeated lightning, ground-burst, and shattering tendencies.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.13 adds a Post-Texture Plan Instructions prompt for Anime Spell VFX, turning an established shader plan into individually optimized texture-generation prompts and enforcing critical production review after each generated map.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -512,6 +512,7 @@
         <button class="prompt-tab" data-prompt-tab="timelinePrompt">4–6 Frame Timeline</button>
         <button class="prompt-tab" data-prompt-tab="spellFlipbookPrompt">Spell Flipbook Prompt</button>
         <button class="prompt-tab" data-prompt-tab="shaderMasksPrompt">Shader Masks Prompt</button>
+        <button class="prompt-tab" data-prompt-tab="postTexturePlanPrompt">Post-Texture Plan Instructions</button>
         <button class="prompt-tab" data-prompt-tab="portraitPrompt">Portrait / Icon Prompt</button>
       </div>
       <textarea id="prompt" readonly></textarea>
@@ -519,6 +520,7 @@
       <textarea id="timelinePrompt" readonly style="display:none" placeholder="Generated for categories where a 4–6 frame timeline makes sense."></textarea>
       <textarea id="spellFlipbookPrompt" readonly style="display:none" placeholder="Generated for Spell VFX concepts."></textarea>
       <textarea id="shaderMasksPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Use it after generating the main effect concept."></textarea>
+      <textarea id="postTexturePlanPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Use this after the shader texture plan has already been established."></textarea>
       <textarea id="portraitPrompt" readonly style="display:none" placeholder="Generated for all categories with category-specific icon directions."></textarea>
       <div class="prompt-tab-row" id="audioPromptTabs" style="display:none">
         <button class="prompt-tab active" data-prompt-tab="sfxPrimaryPrompt">Primary One-shot</button>
@@ -531,7 +533,7 @@
       <textarea id="sfxLoopPrompt" readonly style="display:none" placeholder="ElevenLabs looping ambience prompt, generated where a continuous sound makes sense."></textarea>
       <textarea id="sfxUiPrompt" readonly style="display:none" placeholder="ElevenLabs UI / pickup sound prompt, generated for item-like categories."></textarea>
       <p class="prompt-panel-note sfx-settings-note" id="sfxSettingsNote" style="display:none"></p>
-      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Anime Spell VFX also provides a Shader Masks Prompt intended to be used after generating the main effect concept. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
+      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Anime Spell VFX also provides a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
@@ -572,6 +574,7 @@
 • Biome and Dungeon Room ambience is now generated as a labeled three-layer stack (base bed, mid texture, sparse details) with theme-aware air, water, and detail content, meant to be generated separately and layered in-engine with offset start times, with the one-shot tabs fired at random intervals on top.
 • Added the experimental Anime Spell VFX category for clean anime / Asian action-RPG effects designed around UV-panned shader layers.
 • Added a dedicated Shader Masks Prompt tab for Anime Spell VFX. It analyzes the previously generated effect concept, proposes the minimum practical texture set, and asks which production-ready shader map to generate first.
+• Added a Post-Texture Plan Instructions tab for Anime Spell VFX. It converts the established texture plan into individually optimized per-texture generation prompts, then requires critical production evaluation after each generated shader map.
 • Enabled the 4–6 frame Timeline Prompt for Anime Spell VFX so anime-style spell effects can also be explored as readable staged progressions.
 • Expanded role-aware Anime Spell VFX construction families with many more shape systems—including support-oriented soft rays, halo cradles, restorative wave bands, and melee-oriented cleave and cross-slash forms—to reduce repeated flame, ribbon, lightning, and ground-burst designs.
 • Expanded Spell, Skill, Spell VFX, and Anime Spell VFX naming with role-aware pools for bolts, arrows, pillars, shatters, ruptures, fields, wards, beams, torrents, volleys, spires, traps, movement skills, and many additional naming structures. Reduced reliance on Breath, Song, Mark, Cleave, Call, and Oath.</div></div>
@@ -586,7 +589,7 @@ const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=docume
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
 const state={current:null, activePromptTab:'prompt', promptMode:'visual', activeVisualTab:'prompt', activeAudioTab:'sfxPrimaryPrompt', locks:{category:false,themes:false,rarity:false,attitude:false,role:false,mechanic:false}};
 
-const visualPromptTabs=['prompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','portraitPrompt'];
+const visualPromptTabs=['prompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','postTexturePlanPrompt','portraitPrompt'];
 const audioPromptTabs=['sfxPrimaryPrompt','sfxSecondaryPrompt','sfxLoopPrompt','sfxUiPrompt'];
 const promptTabs=[...visualPromptTabs,...audioPromptTabs];
 const promptTabMeta={
@@ -595,6 +598,7 @@ const promptTabMeta={
   timelinePrompt:{title:'4–6 Frame Timeline Prompt',copyLabel:'📋 Copy Timeline Prompt'},
   spellFlipbookPrompt:{title:'Spell Flipbook Prompt',copyLabel:'📋 Copy Spell Flipbook Prompt'},
   shaderMasksPrompt:{title:'Shader Masks Prompt',copyLabel:'📋 Copy Shader Masks Prompt'},
+  postTexturePlanPrompt:{title:'Post-Texture Plan Instructions',copyLabel:'📋 Copy Post-Texture Plan Instructions'},
   portraitPrompt:{title:'Portrait / Icon Prompt',copyLabel:'📋 Copy Portrait / Icon Prompt'},
   sfxPrimaryPrompt:{title:'SFX — Primary One-shot',copyLabel:'📋 Copy Primary SFX Prompt'},
   sfxSecondaryPrompt:{title:'SFX — Secondary One-shot',copyLabel:'📋 Copy Secondary SFX Prompt'},
@@ -606,7 +610,7 @@ function promptTabAvailable(id){
   const el=document.getElementById(id);
   if(!el) return false;
   const value=(el.value||'').trim();
-  return value && !value.startsWith('Not generated for this category.') && !value.startsWith('Timeline prompt is only generated') && !value.startsWith('Follow-up prompt is only generated') && !value.startsWith('Spell flipbook prompt is only generated') && !value.startsWith('Shader masks prompt is only generated');
+  return value && !value.startsWith('Not generated for this category.') && !value.startsWith('Timeline prompt is only generated') && !value.startsWith('Follow-up prompt is only generated') && !value.startsWith('Spell flipbook prompt is only generated') && !value.startsWith('Shader masks prompt is only generated') && !value.startsWith('Post-texture plan instructions are only generated');
 }
 function setActivePromptTab(tabId){
   let nextTab=promptTabs.includes(tabId)?tabId:'prompt';
@@ -2501,12 +2505,14 @@ function render(c){
  const timelinePrompt=buildTimelinePrompt(c,palette,rarityText);
  const spellFlipbookPrompt=buildSpellFlipbookPrompt(c,palette,rarityText);
  const shaderMasksPrompt=buildShaderMasksPrompt(c,palette,rarityText);
+ const postTexturePlanPrompt=buildPostTexturePlanPrompt(c,palette,rarityText);
  const portraitPrompt=buildPortraitPrompt(c,palette,rarityText);
  document.getElementById('prompt').value=prompt;
  document.getElementById('followupPrompt').value=followupPrompt;
  document.getElementById('timelinePrompt').value=timelinePrompt;
  document.getElementById('spellFlipbookPrompt').value=spellFlipbookPrompt;
  document.getElementById('shaderMasksPrompt').value=shaderMasksPrompt;
+ document.getElementById('postTexturePlanPrompt').value=postTexturePlanPrompt;
  document.getElementById('portraitPrompt').value=portraitPrompt;
  const sfx=buildSfxPrompts(c);
  [['sfxPrimaryPrompt',sfx.primary],['sfxSecondaryPrompt',sfx.secondary],['sfxLoopPrompt',sfx.loop],['sfxUiPrompt',sfx.ui]].forEach(([id,d])=>{
@@ -2517,6 +2523,100 @@ function render(c){
  document.getElementById('stub').textContent=JSON.stringify(exportData(c),null,2);
 }
 
+
+function buildPostTexturePlanPrompt(c,palette,rarityText){
+ const cat=c.category;
+ if(cat!=='Anime Spell VFX') return 'Post-texture plan instructions are only generated for Anime Spell VFX concepts.';
+ return `Use the previously established shader texture plan for this Anime Spell VFX as the authoritative reference.
+
+Before generating any texture images, convert the texture plan into a set of individually optimized image-generation prompts: one specific prompt for each required texture.
+
+Do not use one generic shader-mask prompt for every texture. Each texture prompt must be written specifically for that texture's shader role, the reference spell's visual identity, its intended mesh, UV behavior, motion direction, tiling requirements, and the way it combines with the other planned layers.
+
+For each texture, write a concise but precise generation prompt that explicitly defines:
+
+- the exact texture name
+- its single shader purpose
+- whether it is visible shader data or control-only data
+- the dominant large and medium shapes it should contain
+- which features from the reference spell it is responsible for preserving
+- which features must instead come from geometry or other textures
+- the required directionality
+- whether it must tile horizontally or seamlessly on all four edges
+- whether it is grayscale, alpha-only, or a true RG vector map
+- how dense or sparse the information should be
+- what kind of negative spaces, cavities, tapering, pinches, channels, bends, or breakup are appropriate
+- what kinds of detail would be harmful for this particular map
+- any special constraints needed to make the texture useful when reduced to 128x128
+
+For grayscale or alpha textures:
+black = zero influence
+white = maximum influence
+grayscale = smooth intermediate values where useful.
+
+For RG flow maps:
+treat the image as actual numerical vector data.
+Neutral displacement must be approximately 0.5, 0.5.
+Use smooth low-frequency deviations around neutral.
+Do not create illustrative streamlines, painted flow lines, decorative rainbow gradients, normal-map-like presentation, or dense turbulence unless the actual shader role requires it.
+
+Very important:
+Every generated image must contain exactly ONE texture.
+Never create an atlas, contact sheet, duplicate copy, comparison image, labelled diagram, or multiple variations on one canvas.
+
+Every shader texture must be:
+
+1024x1024
+square 1:1
+flat texture data only
+no mesh
+no rendered spell
+no perspective
+no environment
+no lighting
+no shadows
+no baked bloom
+no border
+no frame
+no labels
+no text
+no decorative presentation
+
+The texture should look plain and functional by itself. Its purpose is to become attractive only when combined with the other shader layers.
+
+Preserve the reference spell's identity through the division of responsibilities between textures rather than trying to make each individual map resemble the complete finished spell.
+
+After writing the optimized prompts, stop. Do not generate any images yet.
+
+I will choose which texture to generate first.
+
+When I choose one:
+generate only that one texture.
+
+After every generated shader texture, critically evaluate the result before moving on. Judge it specifically as production shader data, not as artwork.
+
+Check:
+
+- whether it performs the intended shader role
+- whether it contains one texture only
+- whether the scale of detail is appropriate
+- whether the directionality matches the effect
+- whether the negative spaces and breakup fit the spell
+- whether it is too illustrative
+- whether it is too generic
+- whether it contains unnecessary micro-detail
+- whether its tiling requirements appear compatible with its intended use
+- whether an RG flow map actually behaves like coherent vector data
+- whether the result will still work at approximately 128x128
+- whether another iteration would materially improve the final effect
+
+If the result is good, say clearly that it should be kept and explain briefly why.
+
+If it is not good enough, identify the specific problems and propose a revised generation prompt aimed at correcting those problems.
+
+Do not accept a texture merely because it looks attractive.
+Prefer boring, clean, useful shader data over decorative artwork.`;
+}
 
 function buildShaderMasksPrompt(c,palette,rarityText){
  const cat=c.category;
