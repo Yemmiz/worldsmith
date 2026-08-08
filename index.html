@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.14</title>
+<title>Worldsmith v1.9.15</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.14";
+    content:"v1.9.15";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -564,6 +564,7 @@
 • Removed loop/looping wording from generated SFX prompt text, since seamless looping is an ElevenLabs setting rather than a prompt instruction. Ambience prompts now just describe a continuous steady sound with no fades.
 • Added Longbow, Shortbow, Recurve bow, and Repeating crossbow to the weapon type pool.
 • Added ranged weapon presentation guidance for bows, crossbows, and slingshots: clean unheld profile, string at rest, no archer or firing pose, and no nocked arrows, with ammunition rendered as a separate tidy set when relevant.
+• Updated tome, spellbook, and grimoire off-hand presentation to show two matching variants in one image: one closed and one open.
 • Added a Design Style control with three levels: Fantastical (current full-flair behaviour), Toned Down (mostly natural subject with one or two subtle accents), and Simple & Classic (a plain, believable, real-world version with fantasy details stripped out and natural colours).
 • Design Style applies to the image prompt and portrait prompt, adapts its wording for spell categories (simpler cleaner effects instead of no-glow), and re-renders the current concept live when changed, no reroll needed.
 • Rebalanced the Spell VFX shape pool away from circular auras and spheres: added Flame pillar, Single lightning bolt, Energy lance, Erupting ground spikes, Cyclone column, Piercing ice bolt, and Vertical eruption, and increased the odds of directional and columnar shapes overall.
@@ -1255,7 +1256,7 @@ function weaponPresentationGuidance(role){
   if(!isOffhand) return '';
   if(r.includes('mojo')) return 'Caster off-hand presentation: show one compact handheld mojo by itself, unheld and isolated. Favor a chunky fetish, charm-bundle, carved idol, wrapped effigy, bone-and-cloth focus, or similarly readable magical off-hand silhouette. Keep dangling pieces few, thick, and model-friendly; avoid a full character, hand, weapon pose, or excessive tiny charms.';
   if(r.includes('talisman')) return 'Caster off-hand presentation: show one compact talisman by itself, unheld and isolated. It may be a thick charm, medallion, carved plaque, bound token, hanging seal, or layered magical focus with one strong readable silhouette. Keep cords and hanging pieces simple and sparse; do not turn it into a necklace worn on a character.';
-  if(r.includes('tome')||r.includes('book')||r.includes('grimoire')) return 'Caster off-hand presentation: show one magical tome or spellbook by itself, unheld and isolated, in a clean three-quarter view. Keep the book closed or only very slightly parted unless the concept explicitly needs open pages. Emphasize the cover silhouette, spine, clasp, corner hardware, page block, and one or two bold magical motifs. Avoid loose flying pages, a reading character, or a desk scene.';
+  if(r.includes('tome')||r.includes('book')||r.includes('grimoire')) return 'Caster off-hand presentation: show exactly two versions of the same magical tome, spellbook, or grimoire in the same image, unheld and isolated: one closed version and one open version. Both must clearly be the same item design, with matching cover language, materials, trim, clasps or hardware, and overall silhouette logic. Show the closed version in a clean readable three-quarter view for icon-read and closed-item reference. Show the open version as a clear model-friendly open book reference, opened wide enough to read the page spread, inner cover structure, page block thickness, and hinge/spine behavior, suitable for being presented open in a character\'s palm in-game. Keep the open version clean and readable, not flopped flat and not exaggerated into a dramatic flying pose. Emphasize the cover silhouette, spine, clasp or closure logic, corner hardware, page block, and one or two bold magical motifs. Avoid loose flying pages, a reading character, a desk scene, or extra third variations.';
   if(r.includes('orb')) return 'Caster off-hand presentation: show one compact magical orb or sphere focus by itself, unheld and isolated. Give it a clear support structure such as a small cage, ring, claw setting, handle, or pedestal-like grip so it reads as an equippable off-hand item rather than a floating spell effect. Keep the silhouette chunky and model-friendly.';
   if(r.includes('focus')) return 'Caster off-hand presentation: show one compact arcane focus by itself, unheld and isolated. Use one strong readable form such as a crystal focus, rune frame, small relic device, geometric focus, or handheld magical apparatus. Keep it clearly item-like rather than a free-floating VFX effect.';
   if(r.includes('phylactery')) return 'Caster off-hand presentation: show one compact phylactery by itself, unheld and isolated. Favor a sealed vessel, reliquary, urn, chained capsule, rune jar, or soul-container silhouette with broad readable construction. Keep it clearly an equippable magical object, not a full shrine or environment prop.';
