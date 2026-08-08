@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.13</title>
+<title>Worldsmith v1.9.14</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.13";
+    content:"v1.9.14";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.13 adds a Post-Texture Plan Instructions prompt for Anime Spell VFX, turning an established shader plan into individually optimized texture-generation prompts and enforcing critical production review after each generated map.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.14 expands the Weapon category with caster off-hand types such as mojos, talismans, tomes, spellbooks, orbs, focuses, and grimoires, with dedicated presentation guidance for clean isolated item concepts.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -707,7 +707,7 @@ const roles={
  Skill:['Melee cleave','Ranged shot','Defensive stance','Dash attack','Totem skill','Channel skill','Combo finisher'],
  'Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Soothing aura','Gentle rays','Blessing veil','Restorative pulse','Buff halo','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Rain volley','Spiral drill','Flame pillar','Single lightning bolt','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption','Cleave arc','Heavy cleave','Cross slash','Blade sweep','Scythe sweep'],
  'Anime Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Soothing aura','Gentle rays','Blessing veil','Restorative pulse','Buff halo','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Rain volley','Spiral drill','Flame pillar','Single lightning bolt','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption','Cleave arc','Heavy cleave','Cross slash','Blade sweep','Scythe sweep'],
- Weapon:['One-handed sword','Two-handed axe','Wand','Staff','Bow','Dagger','Mace','Shield weapon'],
+ Weapon:['One-handed sword','Two-handed sword','One-handed axe','Two-handed axe','Mace','Hammer','Spear','Polearm','Dagger','Wand','Staff','Bow','Crossbow','Shield weapon','Mojo off-hand','Talisman off-hand','Tome off-hand','Spellbook off-hand','Orb off-hand','Arcane focus off-hand','Grimoire off-hand','Phylactery off-hand'],
  Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
  Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
  Potion:['Life flask','Mana flask','Utility flask','Antidote','Explosive bottle','Transformation brew'],
@@ -1245,9 +1245,21 @@ const itemVisualDetails=['plain but sturdy','worn but reliable','clean silhouett
 itemVisualDetails.push('oversized silhouette','clear icon-read shape','distinct handle wrap','single strong ornament','visible material contrast','simple heroic proportions','clean bright accent color');
 function itemSlotGroup(cat,role){
   const r=(role||'').toLowerCase();
-  if(cat==='Weapon'){ if(r.includes('wand')||r.includes('staff')) return 'caster'; if(r.includes('bow')) return 'ranged'; if(r.includes('shield')) return 'shield'; return 'melee'; }
+  if(cat==='Weapon'){ if(r.includes('mojo')||r.includes('talisman')||r.includes('tome')||r.includes('book')||r.includes('orb')||r.includes('focus')||r.includes('grimoire')||r.includes('phylactery')) return 'caster'; if(r.includes('wand')||r.includes('staff')) return 'caster'; if(r.includes('bow')||r.includes('crossbow')) return 'ranged'; if(r.includes('shield')) return 'shield'; return 'melee'; }
   if(cat==='Armour'){ if(r.includes('helmet')) return 'helmet'; if(r.includes('chest')) return 'chest'; if(r.includes('gloves')) return 'gloves'; if(r.includes('boots')) return 'boots'; if(r.includes('pants')) return 'pants'; if(r.includes('belt')) return 'belt'; if(r.includes('cloak')) return 'cloak'; return 'chest'; }
   return 'default';
+}
+function weaponPresentationGuidance(role){
+  const r=(role||'').toLowerCase();
+  const isOffhand=/mojo|talisman|tome|book|orb|focus|grimoire|phylactery/.test(r);
+  if(!isOffhand) return '';
+  if(r.includes('mojo')) return 'Caster off-hand presentation: show one compact handheld mojo by itself, unheld and isolated. Favor a chunky fetish, charm-bundle, carved idol, wrapped effigy, bone-and-cloth focus, or similarly readable magical off-hand silhouette. Keep dangling pieces few, thick, and model-friendly; avoid a full character, hand, weapon pose, or excessive tiny charms.';
+  if(r.includes('talisman')) return 'Caster off-hand presentation: show one compact talisman by itself, unheld and isolated. It may be a thick charm, medallion, carved plaque, bound token, hanging seal, or layered magical focus with one strong readable silhouette. Keep cords and hanging pieces simple and sparse; do not turn it into a necklace worn on a character.';
+  if(r.includes('tome')||r.includes('book')||r.includes('grimoire')) return 'Caster off-hand presentation: show one magical tome or spellbook by itself, unheld and isolated, in a clean three-quarter view. Keep the book closed or only very slightly parted unless the concept explicitly needs open pages. Emphasize the cover silhouette, spine, clasp, corner hardware, page block, and one or two bold magical motifs. Avoid loose flying pages, a reading character, or a desk scene.';
+  if(r.includes('orb')) return 'Caster off-hand presentation: show one compact magical orb or sphere focus by itself, unheld and isolated. Give it a clear support structure such as a small cage, ring, claw setting, handle, or pedestal-like grip so it reads as an equippable off-hand item rather than a floating spell effect. Keep the silhouette chunky and model-friendly.';
+  if(r.includes('focus')) return 'Caster off-hand presentation: show one compact arcane focus by itself, unheld and isolated. Use one strong readable form such as a crystal focus, rune frame, small relic device, geometric focus, or handheld magical apparatus. Keep it clearly item-like rather than a free-floating VFX effect.';
+  if(r.includes('phylactery')) return 'Caster off-hand presentation: show one compact phylactery by itself, unheld and isolated. Favor a sealed vessel, reliquary, urn, chained capsule, rune jar, or soul-container silhouette with broad readable construction. Keep it clearly an equippable magical object, not a full shrine or environment prop.';
+  return 'Caster off-hand presentation: show one compact magical off-hand item by itself, unheld and isolated, with a strong readable silhouette, broad shapes, and clear material separation. Keep it obviously equippable in one hand and avoid character hands, casting poses, or environment dressing.';
 }
 function armourPresentationGuidance(role, forIcon=false){
   const r=(role||'').toLowerCase();
@@ -2186,6 +2198,7 @@ function buildVisualPromptCore(c,palette,rarityText){
    if(c.role) baseParts.push(`Item type: ${c.role}.`);
    if(c.identity) baseParts.push(`Materials and construction: ${c.identity.materials}; ${c.identity.construction}; ${c.identity.wear}.`);
    if(cat==='Armour') baseParts.push(armourPresentationGuidance(c.role,false));
+   if(cat==='Weapon'){ const weaponGuide=weaponPresentationGuidance(c.role); if(weaponGuide) baseParts.push(weaponGuide); }
    if(cat==='Weapon' && /bow|crossbow|slingshot/i.test(c.role||'')){
      baseParts.push('Ranged weapon presentation: show the weapon in a clean side or three-quarter profile with the full limbs, stock, and string clearly visible and the string at rest, not drawn.');
      baseParts.push('Do not include hands, an archer, a shooting pose, motion lines, or a firing action scene. The weapon is unheld and isolated.');
