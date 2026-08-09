@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.16</title>
+<title>Worldsmith v1.9.17</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.16";
+    content:"v1.9.17";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -567,6 +567,7 @@
 • Added Longbow, Shortbow, Recurve bow, and Repeating crossbow to the weapon type pool.
 • Added ranged weapon presentation guidance for bows, crossbows, and slingshots: clean unheld profile, string at rest, no archer or firing pose, and no nocked arrows, with ammunition rendered as a separate tidy set when relevant.
 • Updated tome, spellbook, and grimoire off-hand presentation to show two matching variants in one image: one closed and one open.
+• Fixed Pants armour prompts to require the garment by itself with an invisible wearer: no visible mannequin, belly, skin, legs, feet, boots, shoes, or other armour pieces.
 • Upgraded the Spell / Skill / Spell VFX / Anime Spell VFX portrait prompt to a premium hero-icon style with darker more atmospheric backgrounds, layered glow, and stronger focal presentation, while preserving the older flatter wording in a separate Legacy Spell Icon Prompt tab.
 • Added a Design Style control with three levels: Fantastical (current full-flair behaviour), Toned Down (mostly natural subject with one or two subtle accents), and Simple & Classic (a plain, believable, real-world version with fantasy details stripped out and natural colours).
 • Design Style applies to the image prompt and portrait prompt, adapts its wording for spell categories (simpler cleaner effects instead of no-glow), and re-renders the current concept live when changed, no reroll needed.
@@ -1277,8 +1278,8 @@ function armourPresentationGuidance(role, forIcon=false){
     ? 'Show the body armour on a simple headless mannequin or invisible-body A-pose. If it has sleeves, pauldrons, arm guards, or robe sleeves, '+aPoseSleeves+' If it is a sleeveless vest or torso-only chest piece, keep the arms optional or minimal so the torso shape stays clear.'
     : 'Presentation and positioning: show the body armour on a simple headless mannequin or invisible-body A-pose. If it has sleeves, pauldrons, arm guards, or robe sleeves, '+aPoseSleeves+' If it is a sleeveless vest or torso-only chest piece, keep the arms optional or minimal so the torso shape stays clear.';
   if(r.includes('pants')) return forIcon
-    ? 'Show the pants on a simple lower-body mannequin in an A-pose stance. '+aPoseLegs
-    : 'Presentation and positioning: show the pants on a simple lower-body mannequin in an A-pose stance. '+aPoseLegs+' Keep the full silhouette, crotch area, knees, cuffs, and leg shapes clearly readable.';
+    ? 'Pants-only presentation: show ONLY the pants, isolated by themselves, arranged in a natural wearable lower-body shape as though supported by an invisible wearer. Do not show any mannequin, body, waist, belly, hips, skin, legs, feet, boots, shoes, or other armour pieces. Keep both pant legs separated with a clear gap so the silhouette reads cleanly. Show the complete waistband, crotch construction, knees, cuffs or hems, and full leg shapes clearly within frame.'
+    : 'Presentation and positioning: show ONLY the pants as one isolated garment, arranged in a natural wearable lower-body stance as though supported by an invisible wearer. Absolutely no visible mannequin or body: no belly, waist flesh, hips, skin, legs, feet, boots, shoes, greaves, or other armour pieces. The pants themselves must form the entire silhouette. Keep both pant legs slightly apart with a clear empty gap between them, and keep the complete waistband, crotch construction, knees, cuffs or hems, and full leg shapes clearly readable. Do not crop the waistband or cuffs.';
   if(r.includes('gloves')) return forIcon
     ? 'Show the gloves as a clearly separated left-and-right pair, palms angled slightly inward or three-quarter view, with both gloves fully visible and not overlapping.'
     : 'Presentation and positioning: show the gloves as a clearly separated left-and-right pair, palms angled slightly inward or three-quarter view, with both gloves fully visible, not overlapping, and easy to model individually.';
