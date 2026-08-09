@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.15</title>
+<title>Worldsmith v1.9.16</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.15";
+    content:"v1.9.16";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -514,6 +514,7 @@
         <button class="prompt-tab" data-prompt-tab="shaderMasksPrompt">Shader Masks Prompt</button>
         <button class="prompt-tab" data-prompt-tab="postTexturePlanPrompt">Post-Texture Plan Instructions</button>
         <button class="prompt-tab" data-prompt-tab="portraitPrompt">Portrait / Icon Prompt</button>
+        <button class="prompt-tab" data-prompt-tab="portraitPromptLegacy">Legacy Spell Icon Prompt</button>
       </div>
       <textarea id="prompt" readonly></textarea>
       <textarea id="followupPrompt" readonly style="display:none" placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea>
@@ -522,6 +523,7 @@
       <textarea id="shaderMasksPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Use it after generating the main effect concept."></textarea>
       <textarea id="postTexturePlanPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Use this after the shader texture plan has already been established."></textarea>
       <textarea id="portraitPrompt" readonly style="display:none" placeholder="Generated for all categories with category-specific icon directions."></textarea>
+      <textarea id="portraitPromptLegacy" readonly style="display:none" placeholder="Generated for Spell, Skill, Spell VFX, and Anime Spell VFX concepts as the older flatter icon style."></textarea>
       <div class="prompt-tab-row" id="audioPromptTabs" style="display:none">
         <button class="prompt-tab active" data-prompt-tab="sfxPrimaryPrompt">Primary One-shot</button>
         <button class="prompt-tab" data-prompt-tab="sfxSecondaryPrompt">Secondary One-shot</button>
@@ -533,7 +535,7 @@
       <textarea id="sfxLoopPrompt" readonly style="display:none" placeholder="ElevenLabs looping ambience prompt, generated where a continuous sound makes sense."></textarea>
       <textarea id="sfxUiPrompt" readonly style="display:none" placeholder="ElevenLabs UI / pickup sound prompt, generated for item-like categories."></textarea>
       <p class="prompt-panel-note sfx-settings-note" id="sfxSettingsNote" style="display:none"></p>
-      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Anime Spell VFX also provides a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
+      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, and Anime Spell VFX now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX also provides a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
@@ -565,6 +567,7 @@
 • Added Longbow, Shortbow, Recurve bow, and Repeating crossbow to the weapon type pool.
 • Added ranged weapon presentation guidance for bows, crossbows, and slingshots: clean unheld profile, string at rest, no archer or firing pose, and no nocked arrows, with ammunition rendered as a separate tidy set when relevant.
 • Updated tome, spellbook, and grimoire off-hand presentation to show two matching variants in one image: one closed and one open.
+• Upgraded the Spell / Skill / Spell VFX / Anime Spell VFX portrait prompt to a premium hero-icon style with darker more atmospheric backgrounds, layered glow, and stronger focal presentation, while preserving the older flatter wording in a separate Legacy Spell Icon Prompt tab.
 • Added a Design Style control with three levels: Fantastical (current full-flair behaviour), Toned Down (mostly natural subject with one or two subtle accents), and Simple & Classic (a plain, believable, real-world version with fantasy details stripped out and natural colours).
 • Design Style applies to the image prompt and portrait prompt, adapts its wording for spell categories (simpler cleaner effects instead of no-glow), and re-renders the current concept live when changed, no reroll needed.
 • Rebalanced the Spell VFX shape pool away from circular auras and spheres: added Flame pillar, Single lightning bolt, Energy lance, Erupting ground spikes, Cyclone column, Piercing ice bolt, and Vertical eruption, and increased the odds of directional and columnar shapes overall.
@@ -590,7 +593,7 @@ const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=docume
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
 const state={current:null, activePromptTab:'prompt', promptMode:'visual', activeVisualTab:'prompt', activeAudioTab:'sfxPrimaryPrompt', locks:{category:false,themes:false,rarity:false,attitude:false,role:false,mechanic:false}};
 
-const visualPromptTabs=['prompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','postTexturePlanPrompt','portraitPrompt'];
+const visualPromptTabs=['prompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','postTexturePlanPrompt','portraitPrompt','portraitPromptLegacy'];
 const audioPromptTabs=['sfxPrimaryPrompt','sfxSecondaryPrompt','sfxLoopPrompt','sfxUiPrompt'];
 const promptTabs=[...visualPromptTabs,...audioPromptTabs];
 const promptTabMeta={
@@ -601,6 +604,7 @@ const promptTabMeta={
   shaderMasksPrompt:{title:'Shader Masks Prompt',copyLabel:'📋 Copy Shader Masks Prompt'},
   postTexturePlanPrompt:{title:'Post-Texture Plan Instructions',copyLabel:'📋 Copy Post-Texture Plan Instructions'},
   portraitPrompt:{title:'Portrait / Icon Prompt',copyLabel:'📋 Copy Portrait / Icon Prompt'},
+  portraitPromptLegacy:{title:'Legacy Spell Icon Prompt',copyLabel:'📋 Copy Legacy Spell Icon Prompt'},
   sfxPrimaryPrompt:{title:'SFX — Primary One-shot',copyLabel:'📋 Copy Primary SFX Prompt'},
   sfxSecondaryPrompt:{title:'SFX — Secondary One-shot',copyLabel:'📋 Copy Secondary SFX Prompt'},
   sfxLoopPrompt:{title:'SFX — Ambience / Loop',copyLabel:'📋 Copy Loop SFX Prompt'},
@@ -1950,6 +1954,12 @@ function buildPortraitPrompt(c,palette,rarityText){
   const extra=designStyleDirectives(c.category);
   return [base,...extra,placeholderNameGuidance()].join(' ');
 }
+function buildPortraitPromptLegacy(c,palette,rarityText){
+  if(!isAbilityCategory(c.category)) return 'Not generated for this category.';
+  const base=buildLegacyAbilityPortraitPrompt(c,palette,rarityText);
+  const extra=designStyleDirectives(c.category);
+  return [base,...extra,placeholderNameGuidance()].join(' ');
+}
 function buildVisualPromptCore(c,palette,rarityText){
  const cat=c.category;
  const isSpellVfx=isSpellVfxCategory(cat);
@@ -2521,6 +2531,7 @@ function render(c){
  const shaderMasksPrompt=buildShaderMasksPrompt(c,palette,rarityText);
  const postTexturePlanPrompt=buildPostTexturePlanPrompt(c,palette,rarityText);
  const portraitPrompt=buildPortraitPrompt(c,palette,rarityText);
+ const portraitPromptLegacy=buildPortraitPromptLegacy(c,palette,rarityText);
  document.getElementById('prompt').value=prompt;
  document.getElementById('followupPrompt').value=followupPrompt;
  document.getElementById('timelinePrompt').value=timelinePrompt;
@@ -2528,6 +2539,7 @@ function render(c){
  document.getElementById('shaderMasksPrompt').value=shaderMasksPrompt;
  document.getElementById('postTexturePlanPrompt').value=postTexturePlanPrompt;
  document.getElementById('portraitPrompt').value=portraitPrompt;
+ document.getElementById('portraitPromptLegacy').value=portraitPromptLegacy;
  const sfx=buildSfxPrompts(c);
  [['sfxPrimaryPrompt',sfx.primary],['sfxSecondaryPrompt',sfx.secondary],['sfxLoopPrompt',sfx.loop],['sfxUiPrompt',sfx.ui]].forEach(([id,d])=>{
    const el=document.getElementById(id);
@@ -2700,7 +2712,7 @@ function buildPortraitPromptCore(c,palette,rarityText){
  const cat=c.category;
  const parts=[];
  const squareBase=[
-   'Create a square game-ready icon or portrait prompt, designed for readability at small size.',
+   isAbilityCategory(cat)?'Create a square game-ready spell / skill icon or portrait prompt, designed for strong readability at small size while looking dramatic and premium at full resolution.':'Create a square game-ready icon or portrait prompt, designed for readability at small size.',
    `Use this defining colour palette: ${palettePrompt(palette)}.`,
    `Concept: ${c.name}, ${rarityText} ${c.category}.`,
    `Themes: ${c.themes.join(', ')}.`
@@ -2754,10 +2766,16 @@ function buildPortraitPromptCore(c,palette,rarityText){
    return parts.join(' ');
  }
  if(isAbilityCategory(cat)){
-   parts.push('Create a square spell/skill icon that clearly communicates the magical or combat identity at a glance.');
-   parts.push('Use one centered readable motif, strong silhouette, bold shape language, and clean contrast.');
-   parts.push('Keep the icon simple, readable, and suitable for a fantasy ARPG hotbar or ability panel.');
-   parts.push('Avoid UI text, borders, or an overly busy composition.');
+   parts.push('Create a square spell icon that clearly communicates the magical or combat identity at a glance. Use one dominant centered motif with strong silhouette, bold shape language, clean contrast, and a polished high-fantasy / high-impact magical presentation. The icon should feel more epic, refined, and visually premium than a simple flat VFX sketch.');
+   parts.push('Style direction: polished fantasy spell icon art; large readable shapes; dramatic focal point; strong value separation; crisp bright magical core; controlled glow and bloom; elegant supporting wisps, arcs, rings, or sigils; premium hero-ability-icon presentation; readable at small size and impressive at large size.');
+   parts.push('Composition guidance: keep one clear central action or magical event. Use a dark or very subdued background so the bright effect reads clearly. Frame the subject with subtle supporting energy, mist, smoke, rays, or curved flourishes. Let the icon feel vertically or radially organized around the main magical event. Prioritize one strong focal center, with secondary support shapes guiding the eye inward.');
+   parts.push('Rendering guidance: use a bright magical impact point, core, orb, rune, crest, beam, projectile, burst, healing source, or transmutation focus depending on the spell. Support it with elegant secondary energy shapes such as swirling wisps, halos, sigils, curved streaks, or impact rings. Keep the center bright and powerful. Use layered glow: bright white-hot or pale center, then coloured glow, then darker surrounding atmosphere. Make the shapes feel magical and premium, not flat or placeholder-like. Add restrained spark or dust accents only if they improve focus; never let particles dominate.');
+   parts.push("Readability rules: approximately 70% of the icon's identity should come from large shapes, approximately 25% from medium support shapes, and no more than 5% from tiny accents. Avoid muddy overlap, clutter, noisy texture, and too many separate elements. Keep the silhouette and focal idea obvious at hotbar size.");
+   if(isSpellVfxCategory(cat)) parts.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
+   else parts.push(`Visual intent: ${c.role ? `show the spell as ${spellVfxRoleIntent(c.role)}` : 'show one clear magical or combat event as the icon main focal idea'}.`);
+   if(c.visual&&c.visual.length) parts.push(`Visual identity: ${c.visual.join(', ')}.`);
+   const roleGuide=spellVfxRoleShapeGuidance(c.role); if(roleGuide) parts.push(roleGuide);
+   parts.push('Do not include UI frame, text, labels, cooldown numbers, a character portrait, a full character body, an environment scene, unnecessary background detail, excessive particles, or messy visual noise.');
    return parts.join(' ');
  }
  if(cat==='Quest'){
@@ -2780,6 +2798,21 @@ function buildPortraitPromptCore(c,palette,rarityText){
  }
  parts.push('Create a square icon or portrait prompt that keeps the subject centered, readable, and easy to recognize at small size.');
  parts.push('Use a simple clean background, avoid busy environment details, and focus on crisp shapes and strong readability.');
+ return parts.join(' ');
+}
+
+
+function buildLegacyAbilityPortraitPrompt(c,palette,rarityText){
+ const parts=[];
+ parts.push('Create a square game-ready icon or portrait prompt, designed for readability at small size.');
+ parts.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+ parts.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+ parts.push(`Themes: ${c.themes.join(', ')}.`);
+ const ideaLine=ideaPromptLineFor(c); if(ideaLine) parts.push(ideaLine);
+ parts.push('Create a square spell/skill icon that clearly communicates the magical or combat identity at a glance.');
+ parts.push('Use one centered readable motif, strong silhouette, bold shape language, and clean contrast.');
+ parts.push('Keep the icon simple, readable, and suitable for a fantasy ARPG hotbar or ability panel.');
+ parts.push('Avoid UI text, borders, or an overly busy composition.');
  return parts.join(' ');
 }
 
