@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.26</title>
+<title>Worldsmith v1.9.27</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.26";
+    content:"v1.9.27";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.26 adds a dedicated Hair category for standalone stylized 3D hairstyle assets, including model-friendly clump construction and optional restrained ribbons, clasps, beads, pins, cords, and binding wraps.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.27 adds a Hair-only Greyscale Prompt for dye-friendly neutral hair bases while keeping the original coloured concept prompt intact.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -508,6 +508,7 @@
       </div>
       <div class="prompt-tab-row" id="promptTabs">
         <button class="prompt-tab active" data-prompt-tab="prompt">Image Prompt</button>
+        <button class="prompt-tab" data-prompt-tab="hairGreyscalePrompt">Greyscale Prompt</button>
         <button class="prompt-tab" data-prompt-tab="followupPrompt">Follow-up Prompt</button>
         <button class="prompt-tab" data-prompt-tab="timelinePrompt">4–6 Frame Timeline</button>
         <button class="prompt-tab" data-prompt-tab="spellFlipbookPrompt">Spell Flipbook Prompt</button>
@@ -517,6 +518,7 @@
         <button class="prompt-tab" data-prompt-tab="portraitPromptLegacy">Legacy Spell Icon Prompt</button>
       </div>
       <textarea id="prompt" readonly></textarea>
+      <textarea id="hairGreyscalePrompt" readonly style="display:none" placeholder="Generated only for Hair concepts. Creates a neutral dye-friendly greyscale version of the same hairstyle."></textarea>
       <textarea id="followupPrompt" readonly style="display:none" placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea>
       <textarea id="timelinePrompt" readonly style="display:none" placeholder="Generated for categories where a 4–6 frame timeline makes sense."></textarea>
       <textarea id="spellFlipbookPrompt" readonly style="display:none" placeholder="Generated for Spell VFX concepts."></textarea>
@@ -535,10 +537,11 @@
       <textarea id="sfxLoopPrompt" readonly style="display:none" placeholder="ElevenLabs looping ambience prompt, generated where a continuous sound makes sense."></textarea>
       <textarea id="sfxUiPrompt" readonly style="display:none" placeholder="ElevenLabs UI / pickup sound prompt, generated for item-like categories."></textarea>
       <p class="prompt-panel-note sfx-settings-note" id="sfxSettingsNote" style="display:none"></p>
-      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, and Anime Spell VFX now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX also provides a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
+      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, and Anime Spell VFX now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX also provides a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added a dedicated Hair category for standalone stylized 3D hairstyle assets with no visible head, face, scalp, mannequin, or body.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added a Hair-only Greyscale Prompt tab beside the normal Image Prompt. It preserves the same hairstyle, construction, views, and accessories while rendering the hair material itself in neutral greyscale for clean in-engine dye/tint workflows.
+• Added a dedicated Hair category for standalone stylized 3D hairstyle assets with no visible head, face, scalp, mannequin, or body.
 • Hair generation now rolls hairstyle archetype, length, structure, colour, shape language, and restrained optional decorations such as ribbons, clasps, beads, pins, cords, and binding wraps.
 • Hair image prompts use exactly three matching views and strongly prioritize fewer, larger sculpted clumps for image-to-3D readability.
 • Added generated colour palettes with named swatches and usage roles.
@@ -598,11 +601,12 @@ const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=docume
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
 const state={current:null, activePromptTab:'prompt', promptMode:'visual', activeVisualTab:'prompt', activeAudioTab:'sfxPrimaryPrompt', locks:{category:false,themes:false,rarity:false,attitude:false,role:false,mechanic:false}};
 
-const visualPromptTabs=['prompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','postTexturePlanPrompt','portraitPrompt','portraitPromptLegacy'];
+const visualPromptTabs=['prompt','hairGreyscalePrompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','postTexturePlanPrompt','portraitPrompt','portraitPromptLegacy'];
 const audioPromptTabs=['sfxPrimaryPrompt','sfxSecondaryPrompt','sfxLoopPrompt','sfxUiPrompt'];
 const promptTabs=[...visualPromptTabs,...audioPromptTabs];
 const promptTabMeta={
   prompt:{title:'Image Prompt',copyLabel:'📋 Copy Image Prompt'},
+  hairGreyscalePrompt:{title:'Hair Greyscale Prompt',copyLabel:'📋 Copy Greyscale Prompt'},
   followupPrompt:{title:'Follow-up Prompt',copyLabel:'📋 Copy Follow-up Prompt'},
   timelinePrompt:{title:'4–6 Frame Timeline Prompt',copyLabel:'📋 Copy Timeline Prompt'},
   spellFlipbookPrompt:{title:'Spell Flipbook Prompt',copyLabel:'📋 Copy Spell Flipbook Prompt'},
@@ -620,7 +624,7 @@ function promptTabAvailable(id){
   const el=document.getElementById(id);
   if(!el) return false;
   const value=(el.value||'').trim();
-  return value && !value.startsWith('Not generated for this category.') && !value.startsWith('Timeline prompt is only generated') && !value.startsWith('Follow-up prompt is only generated') && !value.startsWith('Spell flipbook prompt is only generated') && !value.startsWith('Shader masks prompt is only generated') && !value.startsWith('Post-texture plan instructions are only generated');
+  return value && !value.startsWith('Not generated for this category.') && !value.startsWith('Greyscale prompt is only generated') && !value.startsWith('Timeline prompt is only generated') && !value.startsWith('Follow-up prompt is only generated') && !value.startsWith('Spell flipbook prompt is only generated') && !value.startsWith('Shader masks prompt is only generated') && !value.startsWith('Post-texture plan instructions are only generated');
 }
 function setActivePromptTab(tabId){
   let nextTab=promptTabs.includes(tabId)?tabId:'prompt';
@@ -1971,6 +1975,53 @@ function buildVisualPrompt(c,palette,rarityText){
   const extra=designStyleDirectives(c.category);
   return [base,...extra,placeholderNameGuidance()].join(' ');
 }
+function buildHairGreyscalePrompt(c,palette,rarityText){
+  if(c.category!=='Hair') return 'Greyscale prompt is only generated for Hair concepts.';
+  const hStyle=(c.detailRows||[]).find(r=>r[0]==='Hairstyle');
+  const hLength=(c.detailRows||[]).find(r=>r[0]==='Hair Length');
+  const hStructure=(c.detailRows||[]).find(r=>r[0]==='Hair Structure');
+  const hShape=(c.structureRows||[]).find(r=>r[0]==='Shape Language');
+  const hDecoration=(c.structureRows||[]).find(r=>r[0]==='Decoration');
+  const parts=[
+    'Stylized fantasy 3D game model reference for asset creation, not a painterly illustration or splash art.',
+    'Use neutral studio presentation, even lighting, large readable shapes, simple geometric forms, broad planes, minimal surface noise, chunky stylized proportions, and model-friendly construction.',
+    'Keep the shapes simplified and sculptable, but maintain high-quality game-ready surface treatment: crisp edges, clean material separation, clear forms, and polished readable textures.',
+    'Do not make the textures blurry, muddy, mushy, low-resolution, or overly smudged. This should feel like a clean stylized 3D model with good texture clarity rather than a painterly drawing.',
+    'If showing multiple views, keep it to a maximum of 3 total views or poses. Prefer one large main view, or one main view plus up to two supporting views. Do not create 4 or more views, turnarounds, or many repeated poses.',
+    `Concept: ${c.name}, ${rarityText} Hair.`,
+    `Themes: ${c.themes.join(', ')}.`,
+    'Production mode: DYE-FRIENDLY GREYSCALE HAIR BASE. Render the hairstyle itself only in neutral achromatic greyscale so it can be recoloured cleanly later with an in-engine hair-colour slider, tint, gradient map, or palette-swatch system.',
+    'Do not use the concept hair colour on the hair material in this version. Do not tint the hair brown, blonde, red, blue, green, purple, gold, or any other hue. Do not let theme colours bleed into the hair through coloured reflections, rim light, ambient light, subsurface colour, or baked highlights.',
+    'Use a balanced neutral value structure: medium grey as the main hair value, darker neutral grey for roots, undersides, deep overlaps, and interior-facing surfaces, and lighter neutral grey for broad sculpted highlights and selected tips. Keep useful midtone information; avoid crushed pure-black shadows and avoid large clipped pure-white highlights.',
+    'Suggested value targets: main hair around neutral #808080, darker roots / undersides around #4A4A4A, and lighter tips / broad highlights around #B8B8B8. These are value targets, not decorative colour accents.',
+    'Hair material response should be matte-to-soft-satin and non-metallic, with neutral white studio lighting. Shading must describe the sculpted form without baking a specific hair colour into the texture.',
+    'Theme palette rule for this greyscale version: the broader concept palette must NOT colour the hair itself. If the hairstyle includes a separate ribbon, clasp, bead, pin, cord, or binding wrap, that physically separate accessory may retain restrained theme colours so it can be masked or assigned a separate material later. If there is no accessory, keep the entire asset achromatic.',
+    'Create an isolated standalone hairstyle asset intended to be placed onto a separate humanoid character model.',
+    'Very important: show the hair only. Do not render a head, face, scalp, ears, neck, shoulders, bust, mannequin, character, skin, eyes, facial features, skull, sphere, head-shaped filler, or body underneath it. The hairstyle must appear as a self-supporting hollow hair shell or wig-like game asset floating by itself on the background.'
+  ];
+  const directedLine=ideaPromptLineFor(c); if(directedLine) parts.push(directedLine);
+  if(hStyle) parts.push(`Hair style: ${hStyle[1]}.`);
+  if(hLength) parts.push(`Hair length: ${hLength[1]}.`);
+  if(hStructure) parts.push(`Hair texture / structure: ${hStructure[1]}.`);
+  if(hShape) parts.push(`Overall shape language: ${hShape[1]}.`);
+  parts.push('Build the hairstyle from fewer, larger sculpted hair clumps rather than many thin strands. Use broad locks, chunky layered masses, tapered wedges, curved ribbon-like sections, simplified spikes, large curls, or thick braid segments depending on the selected hairstyle. Each major clump must have a clear beginning and ending and enough thickness to read as modeled geometry rather than a flat hair card.');
+  parts.push('Preserve a believable overall hairline and skull-fitting volume even though no head or scalp is visible. The empty interior opening where the hairstyle would fit over a character skull may be subtly visible from underneath or behind, but it must remain empty.');
+  parts.push('Prioritize a strong overall silhouette, recognizable hairstyle shape, readable fringe or bangs where applicable, clear side sections, clear crown volume, readable rear silhouette, clean separation between overlapping hair masses, simplified geometry, and strong thickness in every major lock.');
+  parts.push('Avoid realistic individual hair strands, hair-card transparency, flyaway strand noise, excessively thin locks, fuzzy edges, photorealistic hair simulation, painterly brush strokes, tiny wispy hairs, excessive micro-braiding, and anatomy of any kind.');
+  if(hDecoration && hDecoration[1]!=='None'){
+    parts.push(`Small separate decoration: ${hDecoration[1]}. Keep it restrained, clearly attached to the hair, and limited to one small decoration family. The decoration may use restrained concept-theme colour because it should read as a separately maskable / separately materialed accessory; do not tint the surrounding hair.`);
+  } else {
+    parts.push('No hair decoration or accessory. Keep the hairstyle itself as the entire asset, fully achromatic.');
+  }
+  parts.push('Create a clean isolated asset concept on a simple flat neutral background with no environment, no floor plane, and no cast shadow. Use neutral white/grey lighting only.');
+  parts.push('Show exactly three views of the same hairstyle: one large front three-quarter hero view, one smaller rear three-quarter view, and one smaller side view. All three views must show the exact same hairstyle with identical clump placement, silhouette, neutral hair values, decoration, and construction. Do not create three hairstyle variants.');
+  parts.push('For the main view, use a slightly elevated front three-quarter camera angle that clearly communicates the fringe, crown, side volume, rear mass, and hollow fitted construction simultaneously.');
+  parts.push(`Hair asset visual identity: ${c.visual.join(', ')}.`);
+  parts.push('Important: this must resemble a stylized 3D game hair model reference, not an illustration, fashion photograph, salon photograph, character portrait, concept sketch, or wig catalogue image. The final result should feel like a polished in-engine hairstyle asset with clean readable forms and a dye-ready neutral material base.');
+  parts.push('No head. No face. No scalp. No ears. No neck. No shoulders. No bust. No mannequin. No humanoid body. No character underneath the hair. No UI text, labels, title cards, or technical notes.');
+  return [parts.join(' '),...designStyleDirectives(c.category),placeholderNameGuidance()].join(' ');
+}
+
 function buildPortraitPrompt(c,palette,rarityText){
   const base=buildPortraitPromptCore(c,palette,rarityText);
   const extra=designStyleDirectives(c.category);
@@ -2580,6 +2631,7 @@ function render(c){
  document.getElementById('dnaText').textContent=c.dna.map(d=>`${d.l} ${d.v}%`).join(' • ');
  const rarityText=c.creatureMode?`${c.encounterTier} encounter-tier`:c.rarity;
  const prompt=buildVisualPrompt(c,palette,rarityText);
+ const hairGreyscalePrompt=buildHairGreyscalePrompt(c,palette,rarityText);
  const followupPrompt=buildFollowupPrompt(c,palette,rarityText);
  const timelinePrompt=buildTimelinePrompt(c,palette,rarityText);
  const spellFlipbookPrompt=buildSpellFlipbookPrompt(c,palette,rarityText);
@@ -2588,6 +2640,7 @@ function render(c){
  const portraitPrompt=buildPortraitPrompt(c,palette,rarityText);
  const portraitPromptLegacy=buildPortraitPromptLegacy(c,palette,rarityText);
  document.getElementById('prompt').value=prompt;
+ document.getElementById('hairGreyscalePrompt').value=hairGreyscalePrompt;
  document.getElementById('followupPrompt').value=followupPrompt;
  document.getElementById('timelinePrompt').value=timelinePrompt;
  document.getElementById('spellFlipbookPrompt').value=spellFlipbookPrompt;
