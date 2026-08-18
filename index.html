@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.25</title>
+<title>Worldsmith v1.9.26</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.25";
+    content:"v1.9.26";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -458,7 +458,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.14 expands the Weapon category with caster off-hand types such as mojos, talismans, tomes, spellbooks, orbs, focuses, and grimoires, with dedicated presentation guidance for clean isolated item concepts.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.26 adds a dedicated Hair category for standalone stylized 3D hairstyle assets, including model-friendly clump construction and optional restrained ribbons, clasps, beads, pins, cords, and binding wraps.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -538,7 +538,10 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, and Anime Spell VFX now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX also provides a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added generated colour palettes with named swatches and usage roles.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added a dedicated Hair category for standalone stylized 3D hairstyle assets with no visible head, face, scalp, mannequin, or body.
+• Hair generation now rolls hairstyle archetype, length, structure, colour, shape language, and restrained optional decorations such as ribbons, clasps, beads, pins, cords, and binding wraps.
+• Hair image prompts use exactly three matching views and strongly prioritize fewer, larger sculpted clumps for image-to-3D readability.
+• Added generated colour palettes with named swatches and usage roles.
 • Added palette data to prompts, markdown notes, and implementation JSON.
 • Pushed the concept card closer to a darker fantasy tool / item-card presentation.
 • Kept v1.0 layout improvements and v0.95 sanity validation intact.
@@ -589,7 +592,7 @@
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Anime Spell VFX','Weapon','Armour','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Anime Spell VFX','Weapon','Armour','Hair','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
@@ -716,6 +719,7 @@ const roles={
  'Anime Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Soothing aura','Gentle rays','Blessing veil','Restorative pulse','Buff halo','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Rain volley','Spiral drill','Flame pillar','Single lightning bolt','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption','Cleave arc','Heavy cleave','Cross slash','Blade sweep','Scythe sweep'],
  Weapon:['One-handed sword','Two-handed sword','One-handed axe','Two-handed axe','Mace','Hammer','Spear','Polearm','Dagger','Wand','Staff','Bow','Crossbow','Shield weapon','Mojo off-hand','Talisman off-hand','Tome off-hand','Spellbook off-hand','Orb off-hand','Arcane focus off-hand','Grimoire off-hand','Phylactery off-hand'],
  Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
+ Hair:['Short tousled crop','Medium swept layers','Long layered flow','Side-parted adventurer cut','Asymmetrical fringe','High ponytail','Low ponytail','Half-up tied style','Braided crown','Side braid','Twin braids','Messy bun','Elegant bun','Spiky anime-inspired style','Wavy shoulder-length cut','Curly layered bob','Undercut with swept top','Thick warrior braid'],
  Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
  Potion:['Life flask','Mana flask','Utility flask','Antidote','Explosive bottle','Transformation brew'],
  'Crafting Material':['Monster organ','Gemstone','Enchanted timber','Metal ingot','Boss shard','Rare herb'],
@@ -886,6 +890,7 @@ function genName(cat,ts,role){
   if(isAbilityCategory(cat)) return genAbilityName(cat,ts,role);
   if(['Weapon','Armour','Relic'].includes(cat)) return `${R(prefixes)} ${R(['Edge','Aegis','Crown','Grasp','Mantle','Idol','Rod','Compass'])} ${R(suffixes)}`;
   if(cat==='Texture') return R([`${t} ${role}`,`${capitalize(t)} ${role}`,`${R(prefixes)} ${role}`]);
+  if(cat==='Hair') return R([`${t} ${R(['Sweep','Layers','Locks','Braid','Fringe','Cascade','Crown','Tail','Coil','Topknot'])}`,`${R(prefixes)} ${R(['Sweep','Braid','Locks','Fringe','Cascade','Tress','Knot'])}`]);
   if(cat==='Flora') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
   if(cat==='Companion') return R([`${t} ${R(['Pup','Sprite','Wisp','Totemkin','Nibbler','Scamper','Mite','Blinker','Sniffler','Hopper','Cubbie','Companion'])}`,`${R(prefixes)} ${R(['Familiar','Critter','Scoutling','Mote','Whisker','Buddy'])}`]);
   if(cat==='Decoration') return R([`${t} ${R(['Fence','Signpost','Statue','Lamp','Carpet','Chair','Table','Banner','Crate','Barrel','Torch','Bookshelf','Marker','Shrine','Obelisk','Pillar'])}`,`${R(prefixes)} ${R(['Fence','Sign','Lantern','Seat','Stand','Idol','Carpet','Stool','Wardpost','Marker'])} ${R(suffixes)}`]);
@@ -1395,7 +1400,7 @@ Object.assign(themePalettes,{
  Machine:{base:['Oiled Metal','#24282C'],mid:['Brass Plate','#9B743C'],accent:['Warning Copper','#D0833F'],glow:['Arc Lamp','#8BDFFF']}
 });
 const neutralPalettes={
- Weapon:['Dark Grip','#2A2020'], Armour:['Underlayer Cloth','#282634'], Relic:['Aged Parchment','#BFA774'], Potion:['Glass Shadow','#243342'], 'Crafting Material':['Raw Material','#5B5143'], Currency:['Stamped Metal','#B7934B'], Monster:['Body Mass','#3D3A32'], Boss:['Boss Mass','#2B2235'], Spell:['Magic Core','#1D2444'], Skill:['Motion Trail','#383040'], NPC:['Cloth Base','#50433C'], Quest:['Quest Parchment','#8F7954'], Vendor:['Shop Cloth','#5A3B31'], Biome:['Ground Base','#4E493B'], 'Dungeon Room':['Dungeon Stone','#45414A'], 'Random Event':['Event Smoke','#393246']
+ Weapon:['Dark Grip','#2A2020'], Armour:['Underlayer Cloth','#282634'], Hair:['Hair Base','#5A463D'], Relic:['Aged Parchment','#BFA774'], Potion:['Glass Shadow','#243342'], 'Crafting Material':['Raw Material','#5B5143'], Currency:['Stamped Metal','#B7934B'], Monster:['Body Mass','#3D3A32'], Boss:['Boss Mass','#2B2235'], Spell:['Magic Core','#1D2444'], Skill:['Motion Trail','#383040'], NPC:['Cloth Base','#50433C'], Quest:['Quest Parchment','#8F7954'], Vendor:['Shop Cloth','#5A3B31'], Biome:['Ground Base','#4E493B'], 'Dungeon Room':['Dungeon Stone','#45414A'], 'Random Event':['Event Smoke','#393246']
 };
 function paletteEntry(role,name,hex){return {role,name,hex};}
 function makePalette(ts,cat,identity=null){
@@ -1445,7 +1450,7 @@ function itemDesignFocus(rar){
 
 
 function isNarrativeCategory(cat){
-  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Flora','Companion','Decoration','Texture','Random Event'].includes(cat);
+  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Hair','Flora','Companion','Decoration','Texture','Random Event'].includes(cat);
 }
 function categorySpecificContent(cat,ts,rar,role,att,info){
   const themeText=ts.join(', ').toLowerCase();
@@ -1499,6 +1504,20 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='NPC concepts become stronger when they have a motive and a secret. That gives them a reason to exist in quests or towns.';
     detailRows=[['NPC Role',role],['Motivation',motivation],['Signature Prop',prop],['Secret',secret]];
     structureRows=[['Likely Use',R(['quest giver','vendor unlock','dungeon clue','faction contact','comic relief','tragic lore source','crafting trainer'])],['Attitude',att],['Visual Priority','Full-body character concept with props']];
+  } else if(cat==='Hair'){
+    const roleLower=(role||'').toLowerCase();
+    const length = /long|ponytail|braid|bun|half-up/.test(roleLower) ? R(['medium-long, extending behind the neck when worn','long, with a clear hanging or gathered rear mass','long enough to support the tied or braided structure']) : /short|crop|undercut/.test(roleLower) ? R(['short, fitted close around the skull volume','short with a slightly fuller crown','short-to-medium with compact side and rear masses']) : /shoulder|bob|medium/.test(roleLower) ? R(['medium, approximately upper-neck to shoulder length when worn','medium with a readable rear silhouette','medium-length with layered side and rear masses']) : R(['medium, approximately upper-neck length when worn','medium-long with readable layered volume','short-to-medium with a clear crown and fringe']);
+    const structure = /braid/.test(roleLower) ? R(['thick simplified braid sections with large readable woven masses','bold braided structure with very few oversized braid segments']) : /curly/.test(roleLower) ? R(['chunky grouped curls with broad S-shaped masses','large simplified curl clusters rather than individual ringlets']) : /spiky/.test(roleLower) ? R(['large tapered spikes grouped into a few major clumps','chunky angular spikes with broad bases and clean separation']) : /wavy/.test(roleLower) ? R(['broad wavy locks with gentle bends and clear layered overlap','soft large wave sections with very little strand noise']) : /bun|topknot/.test(roleLower) ? R(['large gathered sections feeding into one simple sculpted knot','broad swept masses gathered cleanly into a compact bun']) : R(['mostly straight with slight natural bends and chunky layered locks','soft layered locks built from broad tapered wedges','slightly windswept large clumps with clean overlapping sections']);
+    const shapeLanguage=R(['broad tapered wedges and soft angular clumps','rounded layered masses with a few clean pointed tips','windswept asymmetric clumps with a strong directional sweep','heavy layered sections with a compact readable crown','elegant curved ribbons translated into thick sculpted hair masses','bold anime-inspired clumps with restrained exaggeration']);
+    const hairColour=R(['Deep Black (#1E2027)','Dark Chestnut (#4A332A)','Warm Brown (#6A4935)','Copper Auburn (#9A5438)','Honey Blond (#C9A86B)','Pale Blond (#DED1AA)','Silver Ash (#B7BAC1)','Cool Grey (#777D87)','White Silver (#D8DCE2)','Deep Blue-Black (#252B3A)','Muted Rose Brown (#8C5E64)']);
+    const secondaryTone=R(['slightly darker roots and undersides','subtle lighter tips on the largest clumps','a very soft cool shadow tone beneath overlapping layers','a slightly warmer underside tone','minimal tonal variation; keep the colour mostly uniform']);
+    const decoration=R(['None','None','None','None','None','None','narrow cloth ribbon tie','small metal clasp','two or three simple hair beads','single carved hair pin','thin braided cord','small leather binding wrap','single polished stone bead']);
+    const decorationPlacement=decoration==='None'?'No decoration':R(['at the base of the main tied section','around one rear gathering point','at the end of the main braid','on one side lock only','at the base of the bun or knot','on a single small secondary braid']);
+    signature=`Hair Identity: ${role.toLowerCase()} with ${length}, ${structure}, ${shapeLanguage}, and ${decoration==='None'?'no decoration':`${decoration} ${decorationPlacement}`}.`;
+    desc=`A ${rar.toLowerCase()} standalone hairstyle asset built around ${themeText} fantasy. It focuses on a strong readable silhouette, large sculpted hair clumps, clean layered volume, and reliable model-friendly construction with no visible character underneath.`;
+    why='Hair assets need to survive both small gameplay scale and image-to-3D interpretation. This category prioritizes fewer larger clumps, clear overlap, a believable hollow skull-fitting volume, and optional restrained decorations that can be modeled cleanly.';
+    detailRows=[['Hairstyle',role],['Hair Length',length],['Hair Structure',structure],['Hair Colour',hairColour],['Secondary Tone',secondaryTone]];
+    structureRows=[['Shape Language',shapeLanguage],['Decoration',decoration==='None'?'None':`${decoration}; ${decorationPlacement}`],['Clump Strategy','Fewer, larger sculpted clumps with clear beginnings, endings, thickness, and overlap. Avoid individual strand noise.'],['Asset Rule','Standalone hollow hair shell only. No visible head, face, scalp, ears, neck, shoulders, bust, mannequin, skin, or body.']];
   } else if(cat==='Flora'){
     const growth=R(['low creeping growth','upright clustered stalks','broad layered leaves','hanging vine drape','mushroom shelf formation','root-heavy trunk form','spiral flower structure','tufted field-crop silhouette','thick bulbous base','thorned branching shape']);
     const habitat=R(['old farm edges','moonlit forest floors','damp cave beds','ruined gardens','windswept cliffs','bog margins','sunlit terraces','graveyard soil','ancient temple cracks','riverbank reeds']);
@@ -1629,6 +1648,7 @@ function directedIdea(){
     [/quest|hunt|rescue|recover|find|investigate|escort/, 'Quest'],
     [/room|chamber|hall|dungeon|crypt|vault|arena|corridor/, 'Dungeon Room'],
     [/crop|plant|tree|flower|herb|mushroom|fungus|vine|bush|shrub|sapling|fern|reed|blossom/, 'Flora'],
+    [/hair|hairstyle|haircut|ponytail|braid|braided|bangs|fringe|undercut|topknot|hair bun|pigtail|twin tail/, 'Hair'],
     [/pet|companion|critter|familiar|cub|pup|kit|helper|friend/, 'Companion'],
     [/decoration|decor|object|prop|fence|sign|signpost|statue|lamp|lantern|carpet|rug|chair|table|crate|barrel|banner|torch|bookshelf|shelf|stool|bench|pillar|obelisk|marker/, 'Decoration'],
     [/texture|tile|tiling|uv|seamless|brick wall|wall brick|wall texture|floor tile|cobblestone|wood plank|wooden plank|roof shingle|ground texture|bark texture|stone bricks/, 'Texture'],
@@ -1835,7 +1855,7 @@ function standardConcept(forceReroll=false){
     why=`${tech.profileWhy} In play, the mechanic should target the correct side of combat: harmful effects pressure enemies/players, helpful effects support self/allies, and reward triggers pay the owner. The validator helps avoid nonsense ally/enemy pairings.`;
   }
   const loot=[`${ts[0]} ${R(['Core','Shard','Essence','Fang','Bloom','Rune'])}`,`${R(prefixes)} ${R(['Dust','Token','Fragment','Sap','Scale'])}`,`${R(['Cracked','Living','Ancient','Polished'])} ${R(['Gem','Bone','Medal','Spore','Sigil'])}`];
-  const visual=(itemMode?[`${identity.wear} ${identity.materials}`,`${identity.construction} construction`,identity.visual]:[R(info.visual||['glowing runes']),R(['large readable silhouette','broad simple shapes','clear fantasy colors','chunky hand-painted forms']),R(['flat colored background','isolated game concept','low visual noise'])]).concat(ideaVisualBits());
+  const visual=(itemMode?[`${identity.wear} ${identity.materials}`,`${identity.construction} construction`,identity.visual]:(cat==='Hair'?['large readable sculpted hair clumps','clear layered silhouette and crown volume','standalone hollow hairstyle asset on a flat background']:[R(info.visual||['glowing runes']),R(['large readable silhouette','broad simple shapes','clear fantasy colors','chunky hand-painted forms']),R(['flat colored background','isolated game concept','low visual noise'])])).concat(ideaVisualBits());
   const palette=makePalette(ts,cat,identity);
   const animeVfxForm=cat==='Anime Spell VFX'?(state.locks.role&&old.animeVfxForm?old.animeVfxForm:rollAnimeVfxForm(role)):null;
   const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea(),animeVfxForm}; state.current=c; render(c);
@@ -1966,7 +1986,7 @@ function buildVisualPromptCore(c,palette,rarityText){
  const cat=c.category;
  const isSpellVfx=isSpellVfxCategory(cat);
  const isAnimeSpellVfx=isAnimeSpellVfxCategory(cat);
- const isModelSubject=['Monster','Boss','NPC','Vendor','Flora','Companion','Decoration'].includes(cat);
+ const isModelSubject=['Monster','Boss','NPC','Vendor','Hair','Flora','Companion','Decoration'].includes(cat);
  const baseParts=isSpellVfx?[
    'Stylized fantasy 2D spell VFX concept sheet for game production, not a 3D in-world scene, cinematic illustration, or isometric spell preview.',
    'Use flat 2D presentation, orthographic or front-facing/top-down effect design, large readable shapes, clean crisp edges, low visual noise, and production-friendly readability.',
@@ -2098,6 +2118,39 @@ function buildVisualPromptCore(c,palette,rarityText){
    if(qComplication) baseParts.push(`Story complication or twist: ${qComplication[1]}.`);
    baseParts.push('Compose the scene so the location, threat, and objective are all visually understandable at a glance.');
    baseParts.push('Do not include quest text, stat text, or UI interface elements.');
+   return baseParts.join(' ');
+ }
+ if(cat==='Hair'){
+   const hStyle=(c.detailRows||[]).find(r=>r[0]==='Hairstyle');
+   const hLength=(c.detailRows||[]).find(r=>r[0]==='Hair Length');
+   const hStructure=(c.detailRows||[]).find(r=>r[0]==='Hair Structure');
+   const hColour=(c.detailRows||[]).find(r=>r[0]==='Hair Colour');
+   const hTone=(c.detailRows||[]).find(r=>r[0]==='Secondary Tone');
+   const hShape=(c.structureRows||[]).find(r=>r[0]==='Shape Language');
+   const hDecoration=(c.structureRows||[]).find(r=>r[0]==='Decoration');
+   baseParts.push('Create an isolated standalone hairstyle asset intended to be placed onto a separate humanoid character model.');
+   baseParts.push('Very important: show the hair only. Do not render a head, face, scalp, ears, neck, shoulders, bust, mannequin, character, skin, eyes, facial features, skull, sphere, head-shaped filler, or body underneath it. The hairstyle must appear as a self-supporting hollow hair shell or wig-like game asset floating by itself on the background.');
+   if(hStyle) baseParts.push(`Hair style: ${hStyle[1]}.`);
+   if(hLength) baseParts.push(`Hair length: ${hLength[1]}.`);
+   if(hStructure) baseParts.push(`Hair texture / structure: ${hStructure[1]}.`);
+   if(hShape) baseParts.push(`Overall shape language: ${hShape[1]}.`);
+   if(hColour) baseParts.push(`Primary hair colour: ${hColour[1]}. Treat this as the dominant hair colour; use the broader theme palette mainly for restrained accents and supporting tonal relationships.`);
+   if(hTone) baseParts.push(`Secondary hair tone: ${hTone[1]}.`);
+   baseParts.push('Build the hairstyle from fewer, larger sculpted hair clumps rather than many thin strands. Use broad locks, chunky layered masses, tapered wedges, curved ribbon-like sections, simplified spikes, large curls, or thick braid segments depending on the selected hairstyle. Each major clump must have a clear beginning and ending and enough thickness to read as modeled geometry rather than a flat hair card.');
+   baseParts.push('Preserve a believable overall hairline and skull-fitting volume even though no head or scalp is visible. The empty interior opening where the hairstyle would fit over a character skull may be subtly visible from underneath or behind, but it must remain empty.');
+   baseParts.push('Prioritize a strong overall silhouette, recognizable hairstyle shape, readable fringe or bangs where applicable, clear side sections, clear crown volume, readable rear silhouette, clean separation between overlapping hair masses, simplified geometry, and strong thickness in every major lock.');
+   baseParts.push('Avoid realistic individual hair strands, hair-card transparency, flyaway strand noise, excessively thin locks, fuzzy edges, photorealistic hair simulation, painterly brush strokes, tiny wispy hairs, excessive micro-braiding, and anatomy of any kind.');
+   if(hDecoration && hDecoration[1]!=='None'){
+     baseParts.push(`Small decoration: ${hDecoration[1]}. Keep it restrained, clearly attached to the hair, and limited to one small decoration family. Use ribbons, clasps, beads, pins, cords, or binding wraps only as a secondary accent; do not turn it into a crown, helmet, large headpiece, or dense ornament cluster.`);
+   } else {
+     baseParts.push('No hair decoration or accessory. Keep the hairstyle itself as the entire asset.');
+   }
+   baseParts.push('Create a clean isolated asset concept on a simple flat neutral background with no environment, no floor plane, and no cast shadow.');
+   baseParts.push('Show exactly three views of the same hairstyle: one large front three-quarter hero view, one smaller rear three-quarter view, and one smaller side view. All three views must show the exact same hairstyle with identical clump placement, silhouette, colour, decoration, and construction. Do not create three hairstyle variants.');
+   baseParts.push('For the main view, use a slightly elevated front three-quarter camera angle that clearly communicates the fringe, crown, side volume, rear mass, and hollow fitted construction simultaneously.');
+   baseParts.push(`Hair asset visual identity: ${c.visual.join(', ')}.`);
+   baseParts.push('Important: this must resemble a stylized 3D game hair model reference, not an illustration, fashion photograph, salon photograph, character portrait, concept sketch, or wig catalogue image. The final result should feel like a polished in-engine hairstyle asset with clean readable forms.');
+   baseParts.push('No head. No face. No scalp. No ears. No neck. No shoulders. No bust. No mannequin. No humanoid body. No character underneath the hair. No UI text, labels, title cards, or technical notes.');
    return baseParts.join(' ');
  }
  if(cat==='Decoration'){
@@ -2737,6 +2790,16 @@ function buildPortraitPromptCore(c,palette,rarityText){
    parts.push('Do not place equipped weapons, tools, staffs, lanterns, books, or other held props in the hands or across the portrait unless absolutely essential to identity.');
    parts.push('Prioritize a clean stylized fantasy game portrait icon feel: large readable shapes, low visual noise, crisp edges, clear materials, and strong readability at small size.');
    parts.push('Avoid full-body scenes, action scenes, crowded composition, tiny background details, UI text, borders, labels, or cinematic storytelling.');
+   return parts.join(' ');
+ }
+ if(cat==='Hair'){
+   const hDecoration=(c.structureRows||[]).find(r=>r[0]==='Decoration');
+   parts.push('Create a square icon showing the isolated hairstyle asset only, with no character underneath it.');
+   parts.push('Show one clear front three-quarter view of the complete hairstyle, centered and fully contained inside the square.');
+   parts.push('Very important: no head, face, scalp, ears, neck, shoulders, bust, mannequin, skin, skull, sphere, or humanoid body. The hair must read as a standalone hollow fitted hair mesh.');
+   parts.push('Use fewer, larger sculpted clumps with crisp edges and strong silhouette readability. Avoid individual strand noise, flyaway hairs, transparency cards, and photorealistic hair simulation.');
+   if(hDecoration && hDecoration[1]!=='None') parts.push(`Preserve the same small decoration from the concept: ${hDecoration[1]}. Keep it restrained and attached to the hair.`);
+   parts.push('Use a flat cutout-friendly background and no cast shadow, labels, border, UI text, or character portrait framing.');
    return parts.join(' ');
  }
  if(['Weapon','Potion','Armour','Relic','Decoration','Crafting Material','Currency'].includes(cat)){
