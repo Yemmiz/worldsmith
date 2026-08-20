@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.28</title>
+<title>Worldsmith v1.9.29</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.28";
+    content:"v1.9.29";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.28 keeps the Hair-only Greyscale Prompt for dye-friendly neutral hair bases and adds browser-independent dark dropdown styling for reliable readability.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.29 keeps the Hair-only Greyscale Prompt for dye-friendly neutral hair bases and adds browser-independent dark dropdown styling for reliable readability.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -544,8 +544,8 @@
       <textarea id="followupPrompt" readonly style="display:none" placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea>
       <textarea id="timelinePrompt" readonly style="display:none" placeholder="Generated for categories where a 4–6 frame timeline makes sense."></textarea>
       <textarea id="spellFlipbookPrompt" readonly style="display:none" placeholder="Generated for Spell VFX concepts."></textarea>
-      <textarea id="shaderMasksPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Use it after generating the main effect concept."></textarea>
-      <textarea id="postTexturePlanPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX concepts. Use this after the shader texture plan has already been established."></textarea>
+      <textarea id="shaderMasksPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX and VFX Arc concepts. Use it after generating the main effect concept."></textarea>
+      <textarea id="postTexturePlanPrompt" readonly style="display:none" placeholder="Generated for Anime Spell VFX and VFX Arc concepts. Use this after the shader texture plan has already been established."></textarea>
       <textarea id="portraitPrompt" readonly style="display:none" placeholder="Generated for all categories with category-specific icon directions."></textarea>
       <textarea id="portraitPromptLegacy" readonly style="display:none" placeholder="Generated for Spell, Skill, Spell VFX, and Anime Spell VFX concepts as the older flatter icon style."></textarea>
       <div class="prompt-tab-row" id="audioPromptTabs" style="display:none">
@@ -559,7 +559,7 @@
       <textarea id="sfxLoopPrompt" readonly style="display:none" placeholder="ElevenLabs looping ambience prompt, generated where a continuous sound makes sense."></textarea>
       <textarea id="sfxUiPrompt" readonly style="display:none" placeholder="ElevenLabs UI / pickup sound prompt, generated for item-like categories."></textarea>
       <p class="prompt-panel-note sfx-settings-note" id="sfxSettingsNote" style="display:none"></p>
-      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, and Anime Spell VFX now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX also provides a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
+      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
     <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added browser-independent dark dropdown styling with explicit option colours and a custom gold arrow, improving readability when browser themes override native select controls.
@@ -618,7 +618,7 @@
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Anime Spell VFX','Weapon','Armour','Hair','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Anime Spell VFX','VFX Arc','Weapon','Armour','Hair','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
@@ -744,6 +744,7 @@ const roles={
  Skill:['Melee cleave','Ranged shot','Defensive stance','Dash attack','Totem skill','Channel skill','Combo finisher'],
  'Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Soothing aura','Gentle rays','Blessing veil','Restorative pulse','Buff halo','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Rain volley','Spiral drill','Flame pillar','Single lightning bolt','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption','Cleave arc','Heavy cleave','Cross slash','Blade sweep','Scythe sweep'],
  'Anime Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Soothing aura','Gentle rays','Blessing veil','Restorative pulse','Buff halo','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Rain volley','Spiral drill','Flame pillar','Single lightning bolt','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption','Cleave arc','Heavy cleave','Cross slash','Blade sweep','Scythe sweep'],
+ 'VFX Arc':['Light slash arc','Heavy cleave arc','Cross slash','Blade sweep','Scythe sweep','Uppercut arc','Overhead chop arc','Spin slash ring','Thrust streak','Lunging arc','Dash slash arc','Guard counter arc','Parry riposte slash','Shockwave cleave','Infusion slash arc','Conversion slash arc'],
  Weapon:['One-handed sword','Two-handed sword','One-handed axe','Two-handed axe','Mace','Hammer','Spear','Polearm','Dagger','Wand','Staff','Bow','Crossbow','Shield weapon','Mojo off-hand','Talisman off-hand','Tome off-hand','Spellbook off-hand','Orb off-hand','Arcane focus off-hand','Grimoire off-hand','Phylactery off-hand'],
  Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
  Hair:['Short tousled crop','Medium swept layers','Long layered flow','Side-parted adventurer cut','Asymmetrical fringe','High ponytail','Low ponytail','Half-up tied style','Braided crown','Side braid','Twin braids','Messy bun','Elegant bun','Spiky anime-inspired style','Wavy shoulder-length cut','Curly layered bob','Undercut with swept top','Thick warrior braid'],
@@ -763,7 +764,9 @@ const roles={
 };
 function isSpellVfxCategory(cat){return cat==='Spell VFX'||cat==='Anime Spell VFX';}
 function isAnimeSpellVfxCategory(cat){return cat==='Anime Spell VFX';}
-function isAbilityCategory(cat){return cat==='Spell'||cat==='Skill'||isSpellVfxCategory(cat);}
+function isVfxArcCategory(cat){return cat==='VFX Arc';}
+function isAdvancedRealtimeVfxCategory(cat){return cat==='Anime Spell VFX'||cat==='VFX Arc';}
+function isAbilityCategory(cat){return cat==='Spell'||cat==='Skill'||isSpellVfxCategory(cat)||isVfxArcCategory(cat);}
 const nouns=['Warden','Seer','Maw','Keeper','Bloom','Sentinel','Hermit','Crown','Idol','Shard','Howler','Caller','Binder','Root','Glaive','Lantern','Oracle','Mire','Fang','Monolith'];
 const prefixes=['Ash','Frost','Thorn','Rot','Crystal','Moon','Blood','Storm','Sun','Bone','Void','Moss','Rune','Deep','Gloom','Amber','Iron','Pearl','Royal','Verdant','Radiant','Umbral','Celestial','Sable','Ivory','Crimson','Silver','Golden','Ancient','Hollow','Waning','Drowned','Riven','Wild','Silent','Starless','Elder','Pale','Black','Bright'];
 const suffixes=['of the Hollow','of Old Kings','of the Sleeping Grove','of the Broken Star','of the Mire','of the Last Flame','of the Deep Root','of the Glass Moon','of the Drowned Hall','of the First Dawn','of the Thorn Court','of the Waning Sun','of the Iron Choir','of the Drowned Orchard','of the Silent Gate','of the Serpent Moon','of the Ashen Crown','of the Starless Deep','of the Glass Sea','of the Pale Stag','of the Black Tide','of the Last Oath','of the Fallen Tower','of the Ember Court','of the Silver Grove'];
@@ -1885,7 +1888,8 @@ function standardConcept(forceReroll=false){
   const visual=(itemMode?[`${identity.wear} ${identity.materials}`,`${identity.construction} construction`,identity.visual]:(cat==='Hair'?['large readable sculpted hair clumps','clear layered silhouette and crown volume','standalone hollow hairstyle asset on a flat background']:[R(info.visual||['glowing runes']),R(['large readable silhouette','broad simple shapes','clear fantasy colors','chunky hand-painted forms']),R(['flat colored background','isolated game concept','low visual noise'])])).concat(ideaVisualBits());
   const palette=makePalette(ts,cat,identity);
   const animeVfxForm=cat==='Anime Spell VFX'?(state.locks.role&&old.animeVfxForm?old.animeVfxForm:rollAnimeVfxForm(role)):null;
-  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea(),animeVfxForm}; state.current=c; render(c);
+  const arcVfxForm=cat==='VFX Arc'?(state.locks.role&&old.arcVfxForm?old.arcVfxForm:rollVfxArcForm(role)):null;
+  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea(),animeVfxForm,arcVfxForm}; state.current=c; render(c);
 }
 function concept(forceReroll=false){
   if(isCreatureCategory(categoryEl.value) || (state.locks.category && state.current && state.current.creatureMode)) return creatureConcept(forceReroll);
@@ -1969,6 +1973,81 @@ function spellVfxRoleShapeGuidance(role){
   if(/cleave|slash|blade sweep|scythe sweep|arc lash|beam sweep/.test(r)) return 'Melee-shape guidance: prefer broad readable sweeping arcs, cleave fans, crescent cuts, blade planes, shearing sheets, or a few heavy directional slash forms with a strong line of action. Make the effect feel like a committed weapon swing or melee skill, not a ground decal or random burst field.';
   if(/projectile|bolt|lance|serpentine|meteor|drill/.test(r)) return 'Projectile-shape guidance: prioritize a clear travel direction, readable head shape, and compact controlled tail rather than a wide ground effect or radial burst.';
   return '';
+}
+
+
+function vfxArcRoleIntent(role){
+  const r=(role||'').toLowerCase();
+  if(r.includes('heavy cleave')||r.includes('shockwave')) return 'a broad heavy melee arc with a thick luminous body, strong line of action, short lingering mass, and a forceful outward sweep that reads as weight rather than speed alone';
+  if(r.includes('cross slash')||r.includes('riposte')) return 'a paired or intersecting slash effect built from two clean authored cuts with obvious directional timing and a readable crossing center';
+  if(r.includes('scythe')) return 'a long elegant reaping crescent with a hooked sweep, tapering tail, and a graceful but threatening curve';
+  if(r.includes('uppercut')) return 'a rising slash arc that climbs sharply upward, with a clear bottom-to-top motion and a focused launch apex';
+  if(r.includes('overhead')) return 'a descending chop arc with a strong top-down sweep, compact origin, and forceful follow-through';
+  if(r.includes('spin')) return 'a near-ring or broad circular slash band suggesting a spinning attack, with a clean circumference, directional reveal, and only restrained secondary fragments';
+  if(r.includes('thrust')) return 'a narrow forward streak or piercing slash with a strong tip, compressed body, and clear travel axis rather than a broad crescent';
+  if(r.includes('dash')||r.includes('lunging')) return 'a fast committed travel slash with a stretched leading edge, directional flow, and a quick trailing dissolve';
+  if(r.includes('guard counter')||r.includes('parry')) return 'a tight decisive counter-slash effect that feels fast, clean, and controlled, with one dominant cut and minimal clutter';
+  if(r.includes('infusion')||r.includes('conversion')) return 'a melee slash arc whose base swing remains readable while a clear secondary elemental or magical layer rides along the arc edge, core, or trailing breakup';
+  return 'a clean authored melee slash arc with a readable crescent or blade-plane silhouette, quick reveal, bright peak, and trailing dissolve designed to sell speed and impact without being a literal weapon trail';
+}
+function vfxArcRoleShapeGuidance(role){
+  const r=(role||'').toLowerCase();
+  if(/spin|ring/.test(r)) return 'Arc-shape guidance: prefer a near-complete ring, broad circular band, or wrapped crescent with one clear open sector or directional emphasis. Keep the circumference smooth and readable rather than noisy or spiky.';
+  if(/thrust|lunge/.test(r)) return 'Arc-shape guidance: prioritize a narrow linear streak, tapered spear-like slash, or compressed forward sheet with very strong directionality. Avoid turning it into a wide circular sweep.';
+  if(/cross|riposte/.test(r)) return 'Arc-shape guidance: use two or at most three authored slash planes with clear timing and overlap. The crossing must read immediately, without becoming a messy starburst.';
+  if(/heavy|overhead|shockwave/.test(r)) return 'Arc-shape guidance: use thick broad crescents, pressure sheets, cleave fans, or heavy blade planes with a strong weighted sweep and minimal micro-noise.';
+  if(/infusion|conversion/.test(r)) return 'Arc-shape guidance: keep one primary slash silhouette as the base identity, then add one restrained secondary infusion layer such as a bright edge, inner core, elemental fringe, or conversion glow. Do not bury the slash under unrelated particles.';
+  return 'Arc-shape guidance: prefer one strong authored slash silhouette or a small set of coordinated slash planes. Use broad readable crescents, blade sheets, arc fans, or pressure planes with a clear start, sweep direction, peak read, and trailing fade.';
+}
+const vfxArcFormFamilies={
+  sweep:[
+    {name:'Clean crescent blade',directive:'use one dominant clean crescent slash with a sharp tip, readable inner cutout, and a tapered trailing tail'},
+    {name:'Layered slash fan',directive:'use two or three coordinated slash planes or crescent blades with staggered length and timing rather than one blurry ribbon'},
+    {name:'Pressure sheet arc',directive:'use a broad shearing sheet or pressure plane with stepped thickness and a clean directional sweep'},
+    {name:'Hooked reaper curve',directive:'use a longer hooked crescent with a graceful pulling curve and a reaping finish'},
+    {name:'Split-edge sweep',directive:'use one primary slash body with a clearly separated bright leading edge or split accent contour'},
+    {name:'Toothed cleave fan',directive:'use a heavy cleave fan with a few large segmented bites or stepped edge cuts rather than soft flame-like fuzz'}
+  ],
+  heavy:[
+    {name:'Broad cleave slab',directive:'use one or two thick cleaving slabs with a weighted body and minimal clutter'},
+    {name:'Impact crescent wall',directive:'use a dense crescent wall with a compressed front edge and a forceful body that reads as heavy momentum'},
+    {name:'Segmented chop plates',directive:'use large separated chop plates or stepped blade sections reinforcing a brutal heavy swing'},
+    {name:'Shock-front wedge',directive:'use a cleaving wedge-front with a slight shockwave feel and a wide readable sweep'}
+  ],
+  thrust:[
+    {name:'Piercing thrust streak',directive:'use a long narrow streak with a sharp tip, compressed body, and a clean forward axis'},
+    {name:'Blade-lance sheet',directive:'use a thin blade-like sheet or lance plane with a bright core line and restrained breakup'},
+    {name:'Needle burst arc',directive:'use a compact entry burst feeding into one dominant piercing streak rather than a wide fan'}
+  ],
+  ring:[
+    {name:'Spin ring band',directive:'use a near-complete circular band or wrapped slash ring with a readable open sector and strong motion direction'},
+    {name:'Broken halo sweep',directive:'use an interrupted circular ring made from broad arc segments that imply spin without becoming a full aura'},
+    {name:'Double ring scythe',directive:'use an outer slash ring with one restrained inner supporting ring or smaller parallel band'}
+  ],
+  cross:[
+    {name:'Cross-cut pair',directive:'use two clean intersecting slash planes crossing at one readable impact center'},
+    {name:'Scissor shear',directive:'use paired crossing blades or shearing arcs opening past each other in a decisive cut'},
+    {name:'Triple execution fan',directive:'use up to three coordinated slash planes with readable timing and clean spacing, never a chaotic burst'}
+  ],
+  infused:[
+    {name:'Infused edge arc',directive:'keep one primary slash body while a bright infused edge or rim carries the elemental identity'},
+    {name:'Dual-layer conversion arc',directive:'use a physical base slash plus one clearly separate magical conversion layer with its own speed or fade behavior'},
+    {name:'Core-and-fringe blade',directive:'use a clean slash body with a restrained inner core and one subtle elemental fringe or breakup contour'}
+  ]
+};
+function vfxArcFamilyGroup(role){
+  const r=(role||'').toLowerCase();
+  if(/spin|ring/.test(r)) return 'ring';
+  if(/thrust|lunge/.test(r)) return 'thrust';
+  if(/cross|riposte|parry/.test(r)) return 'cross';
+  if(/heavy|overhead|shockwave/.test(r)) return 'heavy';
+  if(/infusion|conversion/.test(r)) return 'infused';
+  return 'sweep';
+}
+function rollVfxArcForm(role){
+  const group=vfxArcFamilyGroup(role);
+  const primary=R(vfxArcFormFamilies[group]||vfxArcFormFamilies.sweep);
+  return {group,name:primary.name,directive:primary.directive};
 }
 
 function designStyleValue(){const el=document.getElementById('designStyle');return el?el.value:'fantastical';}
@@ -2060,6 +2139,7 @@ function buildVisualPromptCore(c,palette,rarityText){
  const cat=c.category;
  const isSpellVfx=isSpellVfxCategory(cat);
  const isAnimeSpellVfx=isAnimeSpellVfxCategory(cat);
+ const isArcVfx=isVfxArcCategory(cat);
  const isModelSubject=['Monster','Boss','NPC','Vendor','Hair','Flora','Companion','Decoration'].includes(cat);
  const baseParts=isSpellVfx?[
    'Stylized fantasy 2D spell VFX concept sheet for game production, not a 3D in-world scene, cinematic illustration, or isometric spell preview.',
@@ -2115,6 +2195,35 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push(`Visual intent: ${spellVfxRoleIntent(c.role)}.`);
    baseParts.push(`Anime Spell VFX visual identity: ${c.visual.join(', ')}.`);
    baseParts.push('Do not include the square ability icon in this main Anime Spell VFX prompt. The icon is handled by the Portrait / Icon tab.');
+   baseParts.push('Do not include stat text, cooldowns, damage numbers, technical mechanics, captions, UI frames, or interface elements.');
+   return baseParts.join(' ');
+ }
+
+ if(cat==='VFX Arc'){
+   baseParts.length=0;
+   baseParts.push('Create one stylized real-time melee slash / weapon-arc VFX concept intended to be implemented primarily with UV-panned textures on simple game meshes such as curved arc planes, crescent sheets, slash fans, ribbons, rings, cylinders, and billboards.');
+   baseParts.push('This is a single authored attack-arc effect concept, not a flipbook, sprite sheet, animation timeline, or collection of unrelated attack moments. Show the effect itself clearly on a simple dark or neutral background.');
+   baseParts.push('No character, no weapon, no wielder, no environment, no terrain, no cinematic scene, no interface, no labels, and no technical diagrams. The effect itself is the only subject.');
+   baseParts.push('Style direction: polished anime-inspired / Asian action-RPG melee VFX. Use clean graphic shapes, strong readable silhouettes, deliberate negative spaces, layered value bands, controlled glow, and graceful but forceful directional motion. Prioritize authored slash shapes over literal recorded motion trails.');
+   const arcRoleGuidance=vfxArcRoleShapeGuidance(c.role); if(arcRoleGuidance) baseParts.push(arcRoleGuidance);
+   if(c.arcVfxForm){
+     baseParts.push(`Primary arc construction family: ${c.arcVfxForm.name}. ${c.arcVfxForm.directive}.`);
+     baseParts.push('Build the effect around this primary family. Use at most one restrained supporting family, and do not replace the selected family with generic flames, random ribbons, or particle clouds.');
+   }
+   baseParts.push('Design the slash as an idealized authored force-path rather than a literal raw weapon trail. The effect may be cleaner, smoother, and more confident than the exact animation that triggered it, as long as the swing direction remains readable.');
+   baseParts.push('Design the effect so it can realistically be reconstructed from approximately three to five shader layers. Give those layers visibly different jobs, such as one broad outer slash body, one smaller brighter inner core or hot edge, one erosion or breakup layer, one accent streak or secondary cut when appropriate, and one subtle distortion or surrounding glow layer when appropriate.');
+   baseParts.push('The effect must be implementation-aware. Use broad continuous forms that can reveal, scroll, erode, pulse, and fade through moving UV coordinates. Let the major shapes flow in a clear direction. Use asymmetry, changing width, tapering, bends, cut-ins, splits, and reconnections to imply a committed swing.');
+   baseParts.push('Typical arc behavior should suggest a quick reveal or draw-on, a bright peak slash moment, and a trailing dissolve or erosion in the same sweep direction. If the role implies travel, the arc may drift or push outward slightly, but keep the authored slash silhouette primary.');
+   baseParts.push('Keep all important forms readable at small gameplay scale. Approximately 70% of the visual identity should come from large shapes, 25% from medium shapes, and no more than 5% from tiny accents.');
+   baseParts.push('Avoid relying on one static pasted crescent with no life. Avoid dense particle noise, hundreds of sparks, literal weapon models, realistic smoke, photorealistic flames, muddy transparency, excessive bloom, or decorative detail that would not survive small gameplay scale.');
+   baseParts.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+   baseParts.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+   baseParts.push(`Themes: ${c.themes.join(', ')}.`);
+   const arcIdeaLine=ideaPromptLineFor(c); if(arcIdeaLine) baseParts.push(arcIdeaLine);
+   baseParts.push(`VFX Arc role: ${c.role}.`);
+   baseParts.push(`Visual intent: ${vfxArcRoleIntent(c.role)}.`);
+   baseParts.push(`VFX Arc visual identity: ${c.visual.join(', ')}.`);
+   baseParts.push('Do not include the square ability icon in this main VFX Arc prompt. The icon is handled by the Portrait / Icon tab.');
    baseParts.push('Do not include stat text, cooldowns, damage numbers, technical mechanics, captions, UI frames, or interface elements.');
    return baseParts.join(' ');
  }
@@ -2640,8 +2749,8 @@ function render(c){
    document.querySelector('#tech').parentElement.querySelector('h2').textContent='Item Stats & Identity';
    document.getElementById('tech').innerHTML=kv('Stats',c.itemStats.join(', '))+kv('Slot Group',c.itemSlot)+kv('Materials',c.identity.materials)+kv('Construction',c.identity.construction)+kv('Wear State',c.identity.wear)+kv('Complexity Budget','0 special mechanics');
  } else {
-   const animeFormRow=(c.category==='Anime Spell VFX'&&c.animeVfxForm)?kv('Effect Shape Family',c.animeVfxForm.name):'';
-   document.getElementById('details').innerHTML=kv('Role',c.role)+animeFormRow+kv('Loot / Rewards',c.loot.join(', '))+kv('Visual Identity',c.visual.join(', '))+kv('Counterplay',c.tech.counterplay);
+   const effectFormRow=(c.category==='Anime Spell VFX'&&c.animeVfxForm)?kv('Effect Shape Family',c.animeVfxForm.name):(c.category==='VFX Arc'&&c.arcVfxForm)?kv('Arc Shape Family',c.arcVfxForm.name):'';
+   document.getElementById('details').innerHTML=kv('Role',c.role)+effectFormRow+kv('Loot / Rewards',c.loot.join(', '))+kv('Visual Identity',c.visual.join(', '))+kv('Counterplay',c.tech.counterplay);
    document.querySelector('#signature').parentElement.querySelector('h2').textContent=c.itemMode&&c.rarity==='Legendary'?'Legendary Effect':'Signature Mechanic';
    document.getElementById('signature').textContent=c.signature;
    document.querySelector('#tech').parentElement.querySelector('h2').textContent='Technical Mechanics';
@@ -2683,8 +2792,8 @@ function render(c){
 
 function buildPostTexturePlanPrompt(c,palette,rarityText){
  const cat=c.category;
- if(cat!=='Anime Spell VFX') return 'Post-texture plan instructions are only generated for Anime Spell VFX concepts.';
- return `Use the previously established shader texture plan for this Anime Spell VFX as the authoritative reference.
+ if(!isAdvancedRealtimeVfxCategory(cat)) return 'Post-texture plan instructions are only generated for Anime Spell VFX and VFX Arc concepts.';
+ return `Use the previously established shader texture plan for this ${cat} as the authoritative reference.
 
 Before generating any texture images, convert the texture plan into a set of individually optimized image-generation prompts: one specific prompt for each required texture.
 
@@ -2777,7 +2886,38 @@ Prefer boring, clean, useful shader data over decorative artwork.`;
 
 function buildShaderMasksPrompt(c,palette,rarityText){
  const cat=c.category;
- if(cat!=='Anime Spell VFX') return 'Shader masks prompt is only generated for Anime Spell VFX concepts.';
+ if(cat==='VFX Arc'){
+  const lines=[];
+  lines.push('Use the previously generated VFX Arc concept as the exact visual target for a real-time game shader effect, and keep the exact same slash identity, silhouette language, sweep direction, shape vocabulary, layering, and anime-inspired / Asian action-RPG melee VFX style.');
+  lines.push('Study the reference concept carefully and determine the smallest practical set of texture masks needed to reproduce its identity using UV panning, alpha shaping, directional reveal, erosion, emissive colour ramps, distortion, and simple game meshes such as curved arc planes, slash ribbons, crescent sheets, rings, planes, and billboards.');
+  lines.push("Preserve the reference image's exact attack identity, broad silhouette language, sweep direction, curved slash vocabulary, internal layering, decorative negative spaces, balance between outer body and inner core, palette relationships, and polished anime-inspired / Asian action-RPG VFX style.");
+  lines.push('Do not merely convert the finished illustration to grayscale. Reinterpret each visual component as clean numerical shader data designed to combine with the other layers.');
+  lines.push('First return a concise technical texture plan only. For each required texture, state: texture name; shader purpose; whether it is visible directly or used only as control data; required tiling direction; intended mesh or effect layer; suggested UV movement direction and relative speed; and whether it should be grayscale, alpha-only, or an RG vector map.');
+  lines.push('Use only textures that materially contribute to reproducing this specific effect. Do not automatically include every possible map. Most VFX arcs should need approximately three to five textures.');
+  if(c.arcVfxForm) lines.push(`The reference concept uses this primary construction family: ${c.arcVfxForm.name}. Preserve that family in the mask plan rather than translating it into a generic swoosh. ${c.arcVfxForm.directive}.`);
+  lines.push('Possible texture roles include: ARC BODY OR DENSITY MASK for the broad visible slash mass and main silhouette language; HOT EDGE OR INNER CORE MASK for a smaller brighter leading edge or inner blade; EROSION OR BREAKUP TILE for animated alpha subtraction and changing cavities; ACCENT STREAK OR SECONDARY CUT MASK for a distinct supporting sweep, crossing slash, or infused layer; DISTORTION OR FLOW MAP for UV perturbation and directional motion; and SOFT GLOW OR FALLOFF MASK only when bloom and the other masks cannot produce the required halo.');
+  lines.push('After presenting the texture plan, do not generate any image yet. Stop and ask the user which texture from the plan should be generated first.');
+  lines.push('When the user chooses a texture to generate, create only one texture per image and one image per response. Do not create a contact sheet, atlas, labelled diagram, comparison grid, or several maps on one canvas.');
+  lines.push('General requirements for every generated shader texture: square 1:1 image; 1024x1024; flat texture data only; no mesh; no environment; no rendered slash effect; no perspective; no lighting; no cast shadow; no baked bloom; no decorative presentation; no frame; no border; no labels; and no text.');
+  lines.push('For grayscale and alpha masks, black represents zero influence, white represents maximum influence, and grayscale represents smooth intermediate values. Use large and medium forms with very little micro-detail, and keep every important structure readable when reduced to 128x128.');
+  lines.push("For an arc body or density mask, use large connected slash forms, broad tapering crescents, clean inner cutouts, stepped widths, cut-ins, splits, and decorative negative spaces that preserve the reference effect's authored melee shape language. It must define shader mass rather than depict one finished VFX illustration. If it wraps along a ribbon or curved mesh, make the horizontal axis genuinely seamless when appropriate.");
+  lines.push('For an erosion or breakup tile, create abstract directional breakup rather than visible weapon art. Make it perfectly seamless on all four edges, with broad cavities, medium channels, soft threshold-friendly transitions, and minimal high-frequency noise.');
+  lines.push('For a hot edge or inner core mask, keep it clearly narrower, simpler, and less extensive than the outer body. Avoid making it a full duplicate of the outer silhouette.');
+  lines.push('For an accent streak or secondary cut mask, include it only when the reference contains a clearly separate supporting sweep, crossing slash, or infused layer. Keep it sparse and suitable for a different UV speed, direction, or mesh.');
+  lines.push('For a distortion or flow map, do not render it visibly. Use smooth low-frequency directional motion. A true RG flow map should use coherent vector data with neutral displacement near 0.5, 0.5; do not fake it as a pretty painted grayscale image.');
+  lines.push('Do not bake the full palette into every texture. Apply colour mainly through shader gradients, colour ramps, emissive parameters, and layer tinting unless the reference genuinely requires a coloured texture.');
+  lines.push('The maps should look plain and abstract individually. Their purpose is to combine into the attractive effect shown in the previously generated reference. Avoid realistic smoke, muddy transparency, tiny particles, dense static, repeated hard stripes, unrelated symbols, and decorative details added only to make a mask look attractive.');
+  lines.push(`Reference concept: ${c.name}, ${rarityText} ${c.category}.`);
+  lines.push(`VFX Arc role: ${c.role}.`);
+  lines.push(`Visual intent: ${vfxArcRoleIntent(c.role)}.`);
+  lines.push(`Themes: ${c.themes.join(', ')}.`);
+  lines.push(`Reference palette: ${palettePrompt(palette)}.`);
+  lines.push(`Reference visual identity: ${c.visual.join(', ')}.`);
+  const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
+  lines.push('Begin by returning only the texture plan, then ask which texture should be generated first.');
+  return lines.join(' ');
+ }
+ if(cat!=='Anime Spell VFX') return 'Shader masks prompt is only generated for Anime Spell VFX and VFX Arc concepts.';
  const lines=[];
  lines.push('Use the previously generated Anime Spell VFX concept as the exact visual target for a real-time game shader effect, and keep the exact same effect identity, silhouette language, motion direction, shape vocabulary, layering, and anime-inspired / Asian action-RPG style.');
  lines.push('Study the reference concept carefully and determine the smallest practical set of texture masks needed to reproduce its identity using UV panning, alpha shaping, erosion, emissive colour ramps, distortion, and simple game meshes such as cones, cylinders, rings, ribbons, planes, and billboards.');
@@ -2812,7 +2952,7 @@ function buildShaderMasksPrompt(c,palette,rarityText){
 
 function buildSpellFlipbookPrompt(c,palette,rarityText){
  const cat=c.category;
- if(cat!=='Spell VFX') return 'Spell flipbook prompt is only generated for Spell VFX concepts. Anime Spell VFX uses the dedicated Shader Masks Prompt tab instead.';
+ if(cat!=='Spell VFX') return 'Spell flipbook prompt is only generated for Spell VFX concepts. Anime Spell VFX and VFX Arc use the dedicated Shader Masks Prompt tab instead.';
  const lines=[];
  lines.push('Use the previously generated Spell VFX concept as the reference and keep the exact same abstract effect identity, symbol language, theme, palette, elemental logic, and emotional intent.');
  lines.push('Create a readable flat 2D spell VFX flipbook / sprite-sheet for game production. This must be effect-only, not a 3D scene and not an in-world spell cast.');
@@ -2906,8 +3046,20 @@ function buildPortraitPromptCore(c,palette,rarityText){
    parts.push('Avoid tiny clutter, UI text, labels, or an overly detailed landscape painting.');
    return parts.join(' ');
  }
+
+ if(cat==='VFX Arc'){
+   parts.push('Create a square combat icon that clearly communicates a melee slash or attack-arc identity at a glance. Use one dominant centered slash event with strong silhouette, a bright focal edge or core, and premium action-RPG presentation.');
+   parts.push('Style direction: polished fantasy combat icon art; large readable shapes; one strong authored arc, cleave, thrust streak, or crossing cut; dramatic focal point; strong value separation; controlled glow and bloom; premium hero-ability-icon presentation; readable at small size and impressive at large size.');
+   parts.push('Composition guidance: keep one clear slash event in the center against a dark or subdued background. Let the icon feel directional and energetic. Use subtle supporting sparks, motes, or energy curls only when they improve the main read; never let particles dominate.');
+   parts.push("Readability rules: approximately 70% of the icon's identity should come from large slash shapes, approximately 25% from medium support shapes, and no more than 5% from tiny accents. Avoid muddy overlap, clutter, noisy texture, and too many separate strokes.");
+   parts.push(`Visual intent: ${vfxArcRoleIntent(c.role)}.`);
+   if(c.visual&&c.visual.length) parts.push(`Visual identity: ${c.visual.join(', ')}.`);
+   const arcRoleGuide=vfxArcRoleShapeGuidance(c.role); if(arcRoleGuide) parts.push(arcRoleGuide);
+   parts.push('Do not include UI frame, text, labels, cooldown numbers, a full character body, an environment scene, unnecessary background detail, or messy visual noise.');
+   return parts.join(' ');
+ }
  if(isAbilityCategory(cat)){
-   parts.push('Create a square spell icon that clearly communicates the magical or combat identity at a glance. Use one dominant centered motif with strong silhouette, bold shape language, clean contrast, and a polished high-fantasy / high-impact magical presentation. The icon should feel more epic, refined, and visually premium than a simple flat VFX sketch.');
+   parts.push('Create a square game-ready ability or VFX icon that clearly communicates the magical or combat identity at a glance. Use one dominant centered motif with strong silhouette, bold shape language, clean contrast, and a polished high-fantasy / high-impact magical presentation. The icon should feel more epic, refined, and visually premium than a simple flat VFX sketch.');
    parts.push('Style direction: polished fantasy spell icon art; large readable shapes; dramatic focal point; strong value separation; crisp bright magical core; controlled glow and bloom; elegant supporting wisps, arcs, rings, or sigils; premium hero-ability-icon presentation; readable at small size and impressive at large size.');
    parts.push('Composition guidance: keep one clear central action or magical event. Use a dark or very subdued background so the bright effect reads clearly. Frame the subject with subtle supporting energy, mist, smoke, rays, or curved flourishes. Let the icon feel vertically or radially organized around the main magical event. Prioritize one strong focal center, with secondary support shapes guiding the eye inward.');
    parts.push('Rendering guidance: use a bright magical impact point, core, orb, rune, crest, beam, projectile, burst, healing source, or transmutation focus depending on the spell. Support it with elegant secondary energy shapes such as swirling wisps, halos, sigils, curved streaks, or impact rings. Keep the center bright and powerful. Use layered glow: bright white-hot or pale center, then coloured glow, then darker surrounding atmosphere. Make the shapes feel magical and premium, not flat or placeholder-like. Add restrained spark or dust accents only if they improve focus; never let particles dominate.');
@@ -2975,7 +3127,7 @@ function buildFollowupPrompt(c,palette,rarityText){
    const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
    return lines.join(' ');
  }
- if(cat==='Anime Spell VFX') return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts. Anime Spell VFX uses the dedicated Shader Masks Prompt tab after the main effect concept has been generated.';
+ if(cat==='Anime Spell VFX' || cat==='VFX Arc') return `Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts. ${cat} uses the dedicated Timeline, Shader Masks Prompt, and Post-Texture Plan Instructions tabs after the main effect concept has been generated.`;
   if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Follow-up prompt is only generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
@@ -3037,6 +3189,30 @@ function buildTimelinePrompt(c,palette,rarityText){
    lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
    return lines.join(' ');
  }
+
+ if(cat==='VFX Arc'){
+   const lines=[];
+   lines.push('Use the previously generated VFX Arc concept as the reference and keep the exact same slash identity, silhouette language, sweep direction, layering, palette relationships, and anime-inspired / Asian action-RPG melee VFX style.');
+   lines.push('Create a readable 4 to 6 frame attack-arc timeline sheet for game production. This must be effect-only, not a 3D scene and not an in-world character attack.');
+   lines.push('Show 4 to 6 clear key stages total, arranged in one clean sequence with clear spacing and chronological numbering.');
+   lines.push('Very important: all frames must belong to one single continuous progression of the same slash effect. Do not mix several different attack moments or unrelated effects in the same sheet.');
+   lines.push('Choose one readable progression only, such as reveal-in, sweep, bright peak, trailing dissolve, traveling push-out, crossing slash overlap, spin-ring continuation, or thrust streak release and fade.');
+   lines.push('Use clear motion progression such as tiny start shape, initial reveal, active slash, peak frame, follow-through, and fade or dissipate.');
+   lines.push('Every frame should be a flat effect drawing with consistent framing and scale. Keep the style clean, graphic, and anime-inspired, with bold silhouettes, layered value bands, decorative negative spaces, and obvious directional motion.');
+   if(c.arcVfxForm) lines.push(`Preserve the selected construction family in every frame: ${c.arcVfxForm.name}. ${c.arcVfxForm.directive}.`);
+   lines.push('No character, no weapon, no target, no creature, no environment, no terrain, no scenic background, no props, and no interface elements. The slash effect itself is the only subject.');
+   lines.push('Do not turn the sequence into a generic full ring or explosion unless the selected role truly calls for it. If the role suggests a directional slash, cleave, thrust, uppercut, overhead chop, dash arc, or crossing cut, keep the sequence directional and structured around that motion.');
+   lines.push('Keep details production-friendly: large readable shapes, limited particle noise, no muddy rendering, no realistic smoke, and no overly painterly materials.');
+   lines.push('Keep the background plain and production-friendly so each frame reads clearly as a separate stage of one effect.');
+   const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
+   lines.push(`VFX Arc role: ${c.role}.`);
+   lines.push(`Visual intent: ${vfxArcRoleIntent(c.role)}.`);
+   lines.push(`VFX Arc visual identity: ${c.visual.join(', ')}.`);
+   lines.push(`Concept: ${c.name}, ${rarityText} ${c.category}.`);
+   lines.push(`Themes: ${c.themes.join(', ')}.`);
+   lines.push(`Use this defining colour palette: ${palettePrompt(palette)}.`);
+   return lines.join(' ');
+ }
  if(cat==='Flora'){
    const lines=[];
    lines.push('Use the previously generated flora image as the reference and keep the exact same plant identity, silhouette, species logic, palette, materials, and overall design language.');
@@ -3056,7 +3232,7 @@ function buildTimelinePrompt(c,palette,rarityText){
    const ideaLine=ideaFollowupLineFor(c); if(ideaLine) lines.push(ideaLine);
    return lines.join(' ');
  }
- if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Timeline prompt is only generated for Monster, Boss, NPC, Vendor, Companion, Flora, and Anime Spell VFX concepts.';
+ if(!['Monster','Boss','NPC','Vendor','Companion'].includes(cat)) return 'Timeline prompt is only generated for Monster, Boss, NPC, Vendor, Companion, Flora, Anime Spell VFX, and VFX Arc concepts.';
  const lines=[];
  lines.push('Use the previously generated character/creature image as the reference and keep the exact same model identity, silhouette, proportions, outfit, anatomy, palette, materials, and overall design language.');
  lines.push('The reference image is the primary and authoritative source. Do not redesign, replace, or reinterpret it into a different species, body plan, creature family, or character. If any text detail conflicts with the reference image, follow the reference image.');
@@ -3099,7 +3275,7 @@ function buildTimelinePrompt(c,palette,rarityText){
 function exportData(c){
  if(c.creatureMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,encounterTier:c.encounterTier,themes:c.themes,palette:c.palette,monsterRole:c.monsterRole,combatPersonality:c.combatPersonality,threatBudget:c.threatBudget,abilities:c.abilities,rotation:c.rotation,habitat:c.habitat,encounterUse:c.encounterUse,weakness:c.weakness,family:c.family,phases:c.phases||undefined,mechanic:c.tech||null,brainValidation:c.brainValidation,why:c.why};}
  if(c.narrativeMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,concept:c.signature,details:c.detailRows,structure:c.structureRows,visualIdentity:c.visual,mechanic:null,designRule:'No combat proc mechanics for narrative/environment categories.',why:c.why};}
- return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,itemSlot:c.itemSlot||undefined,affixCount:c.affixCount||undefined,itemStats:c.itemStats||undefined,visualIdentity:c.visual,animeVfxForm:c.animeVfxForm||undefined,mechanic:(c.itemMode&&!c.allowItemMechanic)?null:c.tech,designRule:c.itemMode?itemDesignFocus(c.rarity):undefined,why:c.why};}
+ return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,itemSlot:c.itemSlot||undefined,affixCount:c.affixCount||undefined,itemStats:c.itemStats||undefined,visualIdentity:c.visual,animeVfxForm:c.animeVfxForm||undefined,arcVfxForm:c.arcVfxForm||undefined,mechanic:(c.itemMode&&!c.allowItemMechanic)?null:c.tech,designRule:c.itemMode?itemDesignFocus(c.rarity):undefined,why:c.why};}
 function markdownNote(c){
  if(c.creatureMode){
    let out = '# '+c.name+'\n\n';
