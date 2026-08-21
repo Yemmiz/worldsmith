@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.29</title>
+<title>Worldsmith v1.9.30</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.29";
+    content:"v1.9.30";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.29 keeps the Hair-only Greyscale Prompt for dye-friendly neutral hair bases and adds browser-independent dark dropdown styling for reliable readability.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.30 adds explicit apparent life-stage casting for NPCs and Vendors so professions no longer default characters toward elderly appearances.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -562,7 +562,10 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added browser-independent dark dropdown styling with explicit option colours and a custom gold arrow, improving readability when browser themes override native select controls.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added explicit apparent life-stage generation for NPCs and Vendors: Young Adult 25%, Adult 40%, Mature 25%, Elderly 10%, while explicitly age-named roles such as Village Elder still remain elderly.
+• Added strong NPC/Vendor prompt guidance that profession, archetype, and theme do not imply age; the rolled life stage is authoritative and prevents roles such as Hermit, Scholar, Priest, Midwife, Smith, Trainer, Merchant, or Caretaker from defaulting to elderly appearances.
+• NPC/Vendor portrait, follow-up, and timeline prompts now preserve the same apparent life stage instead of silently aging characters between prompt modes.
+• Added browser-independent dark dropdown styling with explicit option colours and a custom gold arrow, improving readability when browser themes override native select controls.
 • Added a Hair-only Greyscale Prompt tab beside the normal Image Prompt. It preserves the same hairstyle, construction, views, and accessories while rendering the hair material itself in neutral greyscale for clean in-engine dye/tint workflows.
 • Added a dedicated Hair category for standalone stylized 3D hairstyle assets with no visible head, face, scalp, mannequin, or body.
 • Hair generation now rolls hairstyle archetype, length, structure, colour, shape language, and restrained optional decorations such as ribbons, clasps, beads, pins, cords, and binding wraps.
@@ -707,6 +710,26 @@ const complexityProfiles={
 };
 function profileFor(r){return complexityProfiles[r]||complexityProfiles.Rare;}
 const attitudes=['Friendly','Neutral','Hostile','Corrupted','Curious','Cowardly','Aggressive','Wise','Playful','Insane','Secretive'];
+
+const npcLifeStages=[
+  {label:'Young Adult',range:'roughly 20–29 in human-equivalent appearance',weight:25,prompt:'Clearly a young adult. Keep the face and posture youthful-adult rather than adolescent or elderly. Do not add heavy wrinkles, age spots, stooped posture, or grey/white hair merely as an age cue.'},
+  {label:'Adult',range:'roughly 30–44 in human-equivalent appearance',weight:40,prompt:'Clearly an established adult, not elderly. Use normal adult facial structure and posture. Do not default to grey/white hair, deep wrinkles, age spots, or an aged stoop.'},
+  {label:'Mature',range:'roughly 45–59 in human-equivalent appearance',weight:25,prompt:'Clearly mature but not automatically elderly or frail. Some age lines or weathering are appropriate, but avoid extreme wrinkles, stooped posture, or very old facial proportions unless another explicit concept detail calls for them.'},
+  {label:'Elderly',range:'roughly 60+ in human-equivalent appearance',weight:10,prompt:'Clearly elderly. Visible age cues such as grey/white hair, wrinkles, and mature facial structure are appropriate, but keep the character capable and naturally posed unless the concept explicitly calls for frailty.'}
+];
+function npcLifeStageInfo(label){return npcLifeStages.find(x=>x.label===label)||npcLifeStages[1];}
+function rollNpcLifeStage(role){
+  const r=(role||'').toLowerCase();
+  if(/\b(village elder|elderly|elder)\b/.test(r)) return npcLifeStageInfo('Elderly');
+  let roll=Math.random()*100;
+  for(const stage of npcLifeStages){roll-=stage.weight;if(roll<0)return stage;}
+  return npcLifeStages[1];
+}
+function npcLifeStagePrompt(c){
+  if(!c||!['NPC','Vendor'].includes(c.category)||!c.lifeStage) return '';
+  const stage=npcLifeStageInfo(c.lifeStage);
+  return `Apparent life stage: ${stage.label} — ${stage.range}. ${stage.prompt} The character's profession, social role, magical theme, or archetype does not imply age. Do not make the character older simply because they are a hermit, scholar, priest, midwife, smith, trainer, merchant, caretaker, researcher, or similar role. Treat this rolled life stage as authoritative unless the directed idea explicitly states a different age.`;
+}
 const byTheme={
  Fire:{effects:['Burn','Scorch','Ignite','Ashen Weakness'],visual:['ember cracks','charred horns','smoke trails','molten seams'],biome:['volcanic ruins','ash fields'],counter:['Frost damage','standing in water']},
  Frost:{effects:['Chill','Freeze','Brittle','Frostbite'],visual:['ice crystals','frosted fur','blue-white glow','frozen breath'],biome:['glacier caves','snowy pine forests'],counter:['Fire damage','movement skills']},
@@ -1860,6 +1883,7 @@ function standardConcept(forceReroll=false){
   const ts=state.locks.themes&&old.themes?old.themes:ideaThemes(weightedThemes(rar),rar);
   const att=state.locks.attitude&&old.attitude?old.attitude:R(attitudes);
   const role=state.locks.role&&old.role?old.role:R(roles[cat]||roles.Monster);
+  const lifeStage=['NPC','Vendor'].includes(cat)?rollNpcLifeStage(role):null;
   const info=themeInfo(ts);
   const itemMode=isItemCategory(cat);
   const narrativeMode=isNarrativeCategory(cat);
@@ -1870,6 +1894,10 @@ function standardConcept(forceReroll=false){
   const name=ideaName(cat,itemMode?genItemName(cat,rar,ts,role,identity):genName(cat,ts,role),ts,rar);
   const itemStats=itemMode?itemStatPackage(cat,rar,ts,role):null;
   const narrative=narrativeMode?categorySpecificContent(cat,ts,rar,role,att,info):null;
+  if(narrative&&lifeStage){
+    narrative.detailRows=[['Apparent Life Stage',`${lifeStage.label} — ${lifeStage.range}`],...(narrative.detailRows||[])];
+    narrative.structureRows=[...(narrative.structureRows||[]),['Age Casting Rule','Profession and archetype do not imply age. The rolled apparent life stage is authoritative unless the directed idea explicitly states a different age.']];
+  }
   let signature='', desc='', why='';
   if(narrativeMode){
     signature=narrative.signature;
@@ -1889,7 +1917,7 @@ function standardConcept(forceReroll=false){
   const palette=makePalette(ts,cat,identity);
   const animeVfxForm=cat==='Anime Spell VFX'?(state.locks.role&&old.animeVfxForm?old.animeVfxForm:rollAnimeVfxForm(role)):null;
   const arcVfxForm=cat==='VFX Arc'?(state.locks.role&&old.arcVfxForm?old.arcVfxForm:rollVfxArcForm(role)):null;
-  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea(),animeVfxForm,arcVfxForm}; state.current=c; render(c);
+  const c={category:cat,themes:ts,rarity:rar,attitude:att,role,lifeStage:lifeStage?lifeStage.label:null,lifeStageRange:lifeStage?lifeStage.range:null,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea(),animeVfxForm,arcVfxForm}; state.current=c; render(c);
 }
 function concept(forceReroll=false){
   if(isCreatureCategory(categoryEl.value) || (state.locks.category && state.current && state.current.creatureMode)) return creatureConcept(forceReroll);
@@ -2394,8 +2422,10 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('Empty hands: do not place weapons, tools, bags, lanterns, books, staffs, mugs, signs, or merchandise in the character\'s hands.');
    baseParts.push('If wares, tools, bags, weapons, books, potions, or shop props are important, render them as a small separate tidy prop set beside the character, clearly not held and not attached to the body.');
    baseParts.push('Keep the pose relaxed, neutral, and easy to model. Use at most 3 views total; preferably a single large hero view, or one hero view plus up to two small supporting views.');
+   baseParts.push('If the vendor has humanoid arms, use a wider rig-friendly A-pose: upper arms angled about 28–35 degrees away from the torso, with visible negative space under the armpits and clear separation between the upper arms and the chest / ribcage silhouette. The arms must not touch, compress into, or visually merge with the torso.');
    baseParts.push(`Vendor visual identity: ${c.visual.join(', ')}.`);
    if(c.role) baseParts.push(`Vendor profession: ${c.role}.`);
+   const vendorAge=npcLifeStagePrompt(c); if(vendorAge) baseParts.push(vendorAge);
    const vWares=(c.detailRows||[]).find(r=>r[0]==='Wares');
    const vShop=(c.detailRows||[]).find(r=>r[0]==='Shop Setup');
    if(vWares) baseParts.push(`Separate prop set suggestion: ${vWares[1]}.`);
@@ -2415,6 +2445,7 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('If the NPC has humanoid arms, use a wider rig-friendly A-pose: upper arms angled about 28–35 degrees away from the torso, with visible negative space under the armpits and clear separation between the upper arms and the chest / ribcage silhouette. The arms must not touch, compress into, or visually merge with the torso.');
    baseParts.push(`NPC visual identity: ${c.visual.join(', ')}.`);
    if(c.role) baseParts.push(`NPC role: ${c.role}.`);
+   const npcAge=npcLifeStagePrompt(c); if(npcAge) baseParts.push(npcAge);
    const nProp=(c.detailRows||[]).find(r=>r[0]==='Signature Prop');
    if(nProp) baseParts.push(`Optional separate prop beside character: ${nProp[1]}.`);
    baseParts.push('Important: this must resemble a stylized 3D game character model reference, not an illustration. The result should feel like a polished in-engine asset presentation with clean readable textures. Fewer, larger views are better than many small ones.');
@@ -3000,6 +3031,7 @@ function buildPortraitPromptCore(c,palette,rarityText){
  }
  if(['Monster','Boss','NPC','Vendor','Companion'].includes(cat)){
    parts.push('Create a portrait icon of the subject, focused on the face, head, and upper torso rather than a full-body scene.');
+   if(cat==='NPC'||cat==='Vendor'){const ageLine=npcLifeStagePrompt(c);if(ageLine)parts.push(ageLine);}
    parts.push('Show a clear readable face, expression, and silhouette, with the head large in frame and easy to recognize at a glance.');
    parts.push('Use a simple front or three-quarter portrait view. Keep the portrait centered and not too zoomed out.');
    parts.push('Keep the background extremely simple and not busy: use a flat cutout-friendly background color, a soft gradient, or a clean chroma-style backdrop. Do not create a full environment.');
@@ -3152,6 +3184,7 @@ function buildFollowupPrompt(c,palette,rarityText){
  }
  if(cat==='NPC' || cat==='Vendor'){
    lines.push('Keep the same exact character design and clothing silhouette.');
+   if(c.lifeStage) lines.push(`Preserve the same apparent life stage exactly: ${c.lifeStage} — ${c.lifeStageRange||npcLifeStageInfo(c.lifeStage).range}. Do not age the character up or down between the reference and these poses.`);
    lines.push('The walk poses should show readable body mechanics. The attack poses should be simple key action poses that fit the character identity, such as an unarmed strike, magical gesture, shove, or body-driven attack.');
    lines.push('Do not add new equipped weapons, tools, or props into the hands unless they already existed as a defined separate prop and are essential to the action.');
  }
@@ -3258,6 +3291,7 @@ function buildTimelinePrompt(c,palette,rarityText){
  }
  if(cat==='NPC' || cat==='Vendor'){
    lines.push('Keep the same exact character design and clothing silhouette.');
+   if(c.lifeStage) lines.push(`Preserve the same apparent life stage exactly: ${c.lifeStage} — ${c.lifeStageRange||npcLifeStageInfo(c.lifeStage).range}. Do not make later frames visibly older or younger.`);
    lines.push('The chosen sequence can be a walk cycle or one simple gesture/action that fits the character identity, such as a wave, cast gesture, shove, brace, or unarmed strike.');
    lines.push('Do not add new equipped weapons, tools, or props into the hands unless they already existed as a defined separate prop and are essential to the action.');
  }
@@ -3274,7 +3308,7 @@ function buildTimelinePrompt(c,palette,rarityText){
 
 function exportData(c){
  if(c.creatureMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,encounterTier:c.encounterTier,themes:c.themes,palette:c.palette,monsterRole:c.monsterRole,combatPersonality:c.combatPersonality,threatBudget:c.threatBudget,abilities:c.abilities,rotation:c.rotation,habitat:c.habitat,encounterUse:c.encounterUse,weakness:c.weakness,family:c.family,phases:c.phases||undefined,mechanic:c.tech||null,brainValidation:c.brainValidation,why:c.why};}
- if(c.narrativeMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,concept:c.signature,details:c.detailRows,structure:c.structureRows,visualIdentity:c.visual,mechanic:null,designRule:'No combat proc mechanics for narrative/environment categories.',why:c.why};}
+ if(c.narrativeMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,lifeStage:c.lifeStage||undefined,lifeStageRange:c.lifeStageRange||undefined,concept:c.signature,details:c.detailRows,structure:c.structureRows,visualIdentity:c.visual,mechanic:null,designRule:'No combat proc mechanics for narrative/environment categories.',why:c.why};}
  return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,itemSlot:c.itemSlot||undefined,affixCount:c.affixCount||undefined,itemStats:c.itemStats||undefined,visualIdentity:c.visual,animeVfxForm:c.animeVfxForm||undefined,arcVfxForm:c.arcVfxForm||undefined,mechanic:(c.itemMode&&!c.allowItemMechanic)?null:c.tech,designRule:c.itemMode?itemDesignFocus(c.rarity):undefined,why:c.why};}
 function markdownNote(c){
  if(c.creatureMode){
