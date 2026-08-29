@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.37</title>
+<title>Worldsmith v1.9.38</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.37";
+    content:"v1.9.38";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.37 refines Structure exploded views so the roof is fully detached with no linking geometry, and any accidental visible floor is suppressed or blended to the background colour.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.38 refines Structure presentation with a higher top-down isometric camera and a restrained window budget so footprints read more clearly and facades keep broad usable wall sections.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -562,7 +562,9 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.37 — Refined roof-separated Structure prompts so the roof and main building body must be completely detached, with no connecting mesh, posts, wall stubs, or linking geometry bridging the gap between them.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.38 — Structure concepts now use a more elevated top-down isometric / three-quarter camera so the building footprint, wall thickness, open top, and roof alignment are easier to understand for image-to-3D workflows.
+• Added a strict sparse-window rule: use only a few purposeful windows, leave broad uninterrupted wall sections, avoid filling every wall bay, and avoid repeated rows of identical windows or excessive dormers.
+• v1.9.37 — Refined roof-separated Structure prompts so the roof and main building body must be completely detached, with no connecting mesh, posts, wall stubs, or linking geometry bridging the gap between them.
 • Added stronger floor suppression guidance: if any accidental floor or base plane becomes visible inside the structure body, it should be omitted or rendered in the same flat neutral colour as the background so it effectively disappears.
 • This keeps the exploded view more useful for post assembly, roof hiding, and image-to-3D interpretation without unwanted interior slabs or connecting structure.
 • v1.9.36 — Updated Structure prompts to support a roof-separated exploded/isometric presentation, where the roof is shown as a distinct lifted piece above the main structure body while remaining aligned to the building footprint.
@@ -2437,8 +2439,9 @@ function buildVisualPromptCore(c,palette,rarityText){
  if(cat==='Structure'){
    baseParts.push('Create a standalone exterior structure / building concept for a stylized fantasy RPG world.');
    baseParts.push('Show one full building or architectural structure clearly, with the overall silhouette, footprint, roofline, entrance placement, window rhythm, and major construction materials easy to understand.');
-   baseParts.push('Use a clean readable isometric or slightly angled three-quarter presentation that feels useful for 3D modelling or set-building reference.');
+   baseParts.push('Use a clearly elevated top-down isometric or high three-quarter camera, looking down at the structure rather than viewing it near eye level. Aim for roughly 35–50 degrees of downward viewing angle so the building footprint, upper wall perimeter, wall thickness, open top, roof alignment, and major layout are easy to understand for 3D modelling. Keep enough side visibility to read facade construction; do not use a near-vertical orthographic top view.');
    baseParts.push('Keep the structure reasonably compact, readable, and game-ready. Favor one primary building mass and only limited secondary attachments when needed. Avoid overly massive sprawling compounds, oversized multi-wing complexes, or elaborate add-on sections that would make image-to-3D conversion difficult.');
+   baseParts.push('Keep windows deliberately sparse. Use only a few purposeful windows appropriate to the building type, typically around 2–4 clearly visible windows on a modest structure from the chosen camera angle. Leave broad uninterrupted wall sections between openings. Do not place a window in every wall bay, do not create long repeated rows of identical windows, and avoid excessive roof dormers or decorative window clusters. One strong window placement is better than many repeated ones.');
    baseParts.push('Very important: present the structure as a roof-separated exploded building view. Show the main wall/body shell as one clear part, and show the roof as a separate aligned piece lifted above it or slightly offset upward, so the overall roof shape and building layout are both readable at the same time.');
    baseParts.push('The roof must still match the building correctly in scale, footprint, and silhouette, but it must be 100% visually detached from the wall body. There must be no connecting mesh, no support links, no wall stubs, no roof-contact geometry, no bridging beams, and no structural pieces linking the roof to the body in the exploded presentation. Treat them as two completely separate parts.');
    baseParts.push('The main structure body below the roof should remain fully readable with its upper wall lines, doorway placement, openings, and overall massing visible. Do not let the lifted roof completely obscure the body below.');
@@ -3236,8 +3239,9 @@ function buildPortraitPromptCore(c,palette,rarityText){
  }
  if(cat==='Structure'){
    parts.push('Create a square icon showing the full exterior of the building or structure clearly.');
-   parts.push('Show one readable simplified isometric or three-quarter exploded view with the roof separated from the main wall/body shell.');
+   parts.push('Show one readable simplified elevated isometric / high three-quarter exploded view, looking downward enough to understand the footprint and open wall shell, with the roof separated from the main wall/body shell.');
    parts.push('Keep the silhouette, roofline, entrance, and main material breakup clear and iconic.');
+   parts.push('Keep windows sparse and purposeful; avoid repeated rows, window spam, or filling every available wall bay.');
    parts.push('Prefer a compact readable building mass rather than a huge sprawling complex.');
    parts.push('The roof and body should be 100% detached in the exploded view, with no connecting geometry or linking pieces between them.');
    parts.push('Where a doorway appears, prefer an open doorway cutout rather than a closed modeled door.');
