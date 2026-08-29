@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.31</title>
+<title>Worldsmith v1.9.32</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.31";
+    content:"v1.9.32";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.31 expands armour archetypes with explicit construction and coverage rules so gloves, gauntlets, sandals, greaves, robes, jerkins, mail, and other gear generate as genuinely different pieces.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.32 adds a dedicated Structure category for standalone buildings such as huts, houses, taverns, barns, windmills, towers, and workshops, with building-specific role pools and prompt guidance.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -562,7 +562,10 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.31 — Expanded Armour into distinct construction archetypes across hands, feet, head, body, legs, shoulders, and shields, including Gauntlets, Bracers, Vambraces, Handwraps, Sandals, Slippers, Shoes, Sabatons, Greaves, Gambeson, Cuirass, Brigandine, Hauberk, Tunic, Vest, and more.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.32 — Added a dedicated Structure category for standalone buildings and architectural structures, including huts, houses, taverns, inns, barns, windmills, chapels, stables, workshops, towers, and similar readable exterior building concepts.
+• Structure concepts now generate building-specific descriptive data and image prompts focused on silhouette, footprint, roofline, entrance placement, construction materials, and clear 3D-friendly presentation rather than treating buildings like small props or full biome scenes.
+• Directed Idea now recognizes building / structure requests such as hut, house, tavern, inn, barn, windmill, chapel, stable, watchtower, farmhouse, and workshop, and preserves the requested structure type as the selected role.
+• v1.9.31 — Expanded Armour into distinct construction archetypes across hands, feet, head, body, legs, shoulders, and shields, including Gauntlets, Bracers, Vambraces, Handwraps, Sandals, Slippers, Shoes, Sabatons, Greaves, Gambeson, Cuirass, Brigandine, Hauberk, Tunic, Vest, and more.
 • Added armour-archetype construction rules so body pieces no longer default to the same full chest-and-arms silhouette: Leather Jerkins stay short and mostly sleeveless, Scale Mail uses visible overlapping scales, Chainmail stays flexible ring-mail, Breastplates remain torso-focused, Robes vary sleeve and hem coverage, and specialist pieces preserve their actual body coverage.
 • Added dedicated presentation rules for gauntlets/gloves, forearm guards, footwear, greaves, head pieces, lower-body garments, shoulders, and shields, plus proper armour stat-slot mapping for pants and shields.
 • Directed Idea now recognizes the expanded armour vocabulary and preserves explicitly requested subtypes such as “gauntlets”, “sandals”, “scale mail”, or “leather jerkin” instead of categorizing them as Armour and then rolling a different random armour role.
@@ -625,7 +628,7 @@
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Anime Spell VFX','VFX Arc','Weapon','Armour','Hair','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
+const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Anime Spell VFX','VFX Arc','Weapon','Armour','Hair','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Structure','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
@@ -951,6 +954,7 @@ function genName(cat,ts,role){
   if(cat==='Flora') return R([`${t} ${R(['Bloom','Sprout','Bellflower','Glowcap','Rootvine','Moonpetal','Bramble','Sapling','Fernroot','Grainstalk','Sunleaf','Thorncap','Reedbloom','Mossbud'])}`,`${R(prefixes)} ${R(['Bramble','Petal','Root','Blossom','Moss','Leaf','Vine','Cap'])}`]);
   if(cat==='Companion') return R([`${t} ${R(['Pup','Sprite','Wisp','Totemkin','Nibbler','Scamper','Mite','Blinker','Sniffler','Hopper','Cubbie','Companion'])}`,`${R(prefixes)} ${R(['Familiar','Critter','Scoutling','Mote','Whisker','Buddy'])}`]);
   if(cat==='Decoration') return R([`${t} ${R(['Fence','Signpost','Statue','Lamp','Carpet','Chair','Table','Banner','Crate','Barrel','Torch','Bookshelf','Marker','Shrine','Obelisk','Pillar'])}`,`${R(prefixes)} ${R(['Fence','Sign','Lantern','Seat','Stand','Idol','Carpet','Stool','Wardpost','Marker'])} ${R(suffixes)}`]);
+  if(cat==='Structure') return R([`${t} ${R(['Hut','House','Tavern','Inn','Barn','Windmill','Workshop','Tower','Hall','Mill','Chapel','Stable'])}`,`${R(prefixes)} ${R(['House','Hall','Tavern','Mill','Manor','Tower','Workshop'])} ${R(suffixes)}`]);
   return `${t} ${R(nouns)} ${Math.random()<.45?R(suffixes):''}`.trim();
 }
 function mechanicName(effect,ts){return R([`${ts[0]} ${R(['Brand','Bloom','Oath','Echo','Hex','Pulse','Ward','Bite'])}`,`${effect} ${R(['Sigil','Mark','Curse','Resonance','Pact','Thorn'])}`,`${R(prefixes)} ${R(['Reprisal','Bloom','Judgement','Snare','Backlash'])}`]);}
@@ -1572,7 +1576,7 @@ function itemDesignFocus(rar){
 
 
 function isNarrativeCategory(cat){
-  return ['Quest','Biome','Dungeon Room','Vendor','NPC','Hair','Flora','Companion','Decoration','Texture','Random Event'].includes(cat);
+  return ['Quest','Biome','Dungeon Room','Structure','Vendor','NPC','Hair','Flora','Companion','Decoration','Texture','Random Event'].includes(cat);
 }
 function categorySpecificContent(cat,ts,rar,role,att,info){
   const themeText=ts.join(', ').toLowerCase();
@@ -1608,6 +1612,17 @@ function categorySpecificContent(cat,ts,rar,role,att,info){
     why='Dungeon rooms need readable layout more than abstract mechanics. This gives the room a physical structure a level designer can actually build.';
     detailRows=[['Room Type',role],['Layout',layout],['Focal Feature',feature],['Hazard / Pressure',hazard]];
     structureRows=[['Reward Hook',R(['visible chest behind danger','shortcut unlock','lore object','rare resource node','mini-boss key','hidden side path'])],['Best Camera Read','Angled or isometric room concept'],['Player Decision',R(['rush the objective','clear enemies first','disable hazard','search for hidden path','kite around central feature'])]];
+  } else if(cat==='Structure'){
+    const footprint=R(['compact single-room footprint','rectangular multi-room footprint','L-shaped footprint','tall narrow footprint','broad low footprint','front-facing roadside footprint','barn-like long rectangular footprint','tower-like vertical footprint']);
+    const roofline=R(['simple pitched roof','steep fantasy gabled roof','broad barn roof','layered timber roof','curved shingled roof','tall windmill cap roof','small chapel roofline','stacked roof tiers']);
+    const primaryMaterial=R(['timber frame with plaster infill','stone foundation with timber upper walls','chunky stone masonry','painted wood planks','weathered timber','brick and stone facade','wattle-and-daub with timber posts','coastal wood with stone footings']);
+    const structureUse=R(['serves travelers and townsfolk','supports farm work and storage','acts as a local trade hub','marks a small settlement center','functions as a practical roadside building','anchors a village skyline','reads clearly as a usable gameplay landmark','adds believable settlement life']);
+    const setting=R(['small village edge','roadside hamlet','farmstead','dockside lane','market square','windy hill','chapel yard','rural crossroads','town district','riverbank']);
+    signature=`Structure Identity: A ${role.toLowerCase()} with a ${footprint}, ${roofline}, built primarily from ${primaryMaterial}, suited for a ${setting}, and it ${structureUse}.`;
+    desc=`A ${rar.toLowerCase()} structure concept built around ${themeText} fantasy. It focuses on one readable building or architectural structure with clear exterior silhouette, practical function, and model-friendly construction.`;
+    why='Structures should read first as usable buildings with clear footprint, roofline, and material hierarchy. This category is for exterior buildings and small architectural structures rather than tiny props, interiors, or full environment scenes.';
+    detailRows=[['Structure Type',role],['Footprint',footprint],['Roofline',roofline],['Primary Construction',primaryMaterial]];
+    structureRows=[['Typical Setting',setting],['World Use',structureUse],['Scale Cue',R(['small single-occupant building','modest village building','human-scale work building','larger settlement landmark','tall narrow utility structure'])],['Prompt Note','Treat it like a clean building / structure concept with the full exterior visible, not a tiny prop and not a huge scenic biome.']];
   } else if(cat==='Vendor'){
     const wares=R([`${ts[0]} potions and charms`,`${ts[0]} weapons`,`${ts[0]} salvage`,`${ts[0]} maps and keys`,`monster trophies`,`strange currencies`,`camp supplies`,`enchanted trinkets`,`questionable relics`,`forged documents`,`rare bait and traps`,`festival masks`,`clockwork parts`,`grave candles`,`dragon-scale polish`,`rune ink`,`pirate maps`,`dwarven tools`,`faerie bargains`]);
     const stall=R(['folding market stall','backpack shop','wagon full of junk','tiny shrine counter','black-market tent','floating lantern cart','smithing tarp','half-sunken boat shop','walking chest on legs','mushroom-roofed kiosk','armored caravan wagon','bell-covered pushcart','bookshop tent','fishbone booth','clockwork vending shrine','portable forge','graveyard blanket stall','hanging birdcage shop']);
@@ -1769,6 +1784,7 @@ function directedIdea(){
     [/statue|idol|relic|totem|altar|obelisk|monolith|compass|mirror|lantern|bell|book/, 'Relic'],
     [/quest|hunt|rescue|recover|find|investigate|escort/, 'Quest'],
     [/room|chamber|hall|dungeon|crypt|vault|arena|corridor/, 'Dungeon Room'],
+    [/structure|building|hut|house|home|cottage|farmhouse|tavern|inn|barn|windmill|stable|watchtower|tower|chapel|workshop|warehouse|gatehouse|lighthouse|mill/, 'Structure'],
     [/crop|plant|tree|flower|herb|mushroom|fungus|vine|bush|shrub|sapling|fern|reed|blossom/, 'Flora'],
     [/hair|hairstyle|haircut|ponytail|braid|braided|bangs|fringe|undercut|topknot|hair bun|pigtail|twin tail/, 'Hair'],
     [/pet|companion|critter|familiar|cub|pup|kit|helper|friend/, 'Companion'],
@@ -1799,6 +1815,12 @@ function ideaRole(cat, defaultRole){
       [/hoods?/, 'Hood'],[/cowls?/, 'Cowl'],[/circlets?/, 'Circlet'],[/coifs?/, 'Coif'],[/war masks?/, 'War mask'],[/masks?/, 'Mask'],[/helmets?|\\bhelms?\\b/, 'Helmet'],[/cloaks?/, 'Cloak'],[/belts?/, 'Belt']
     ];
     for(const [rx,role] of armourMatches){ if(rx.test(lower)) return role; }
+  }
+  if(cat==='Structure'){
+    const structureMatches=[
+      [/small huts?|huts?/, 'Small hut'],[/cottages?/, 'Cottage house'],[/town houses?/, 'Town house'],[/farm ?houses?/, 'Farmhouse'],[/taverns?/, 'Tavern'],[/inns?/, 'Inn'],[/barns?/, 'Barn'],[/windmills?/, 'Windmill'],[/stables?/, 'Stable'],[/blacksmith( shop| workshop)?s?/, 'Blacksmith workshop'],[/watch ?towers?/, 'Watchtower'],[/chapels?|churches?/, 'Chapel'],[/warehouses?/, 'Warehouse'],[/gate ?houses?/, 'Gatehouse'],[/dock buildings?/, 'Dock building'],[/market stalls?/, 'Market stall'],[/library halls?|libraries?/, 'Library hall'],[/mage towers?|wizard towers?/, 'Mage tower'],[/lighthouses?/, 'Lighthouse'],[/mills?/, 'Mill'],[/houses?/, 'Town house'],[/towers?/, 'Watchtower'],[/workshops?/, 'Blacksmith workshop']
+    ];
+    for(const [rx,role] of structureMatches){ if(rx.test(lower)) return role; }
   }
   return defaultRole;
 }
@@ -2399,6 +2421,26 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('No UI text, no technical notes, just the room concept.');
    return baseParts.join(' ');
  }
+ if(cat==='Structure'){
+   baseParts.push('Create a standalone exterior structure / building concept for a stylized fantasy RPG world.');
+   baseParts.push('Show one full building or architectural structure clearly, with the overall silhouette, footprint, roofline, entrance placement, window rhythm, and major construction materials easy to understand.');
+   baseParts.push('Use a clean readable three-quarter or slightly angled presentation that shows the full exterior clearly and feels useful for 3D modelling or set-building reference.');
+   baseParts.push('Focus on the building itself rather than on a large scenic environment. A small amount of simple ground contact or minimal context is acceptable, but do not turn it into a full biome vista or busy story scene.');
+   baseParts.push(`Structure identity: ${c.visual.join(', ')}.`);
+   if(c.role) baseParts.push(`Structure type: ${c.role}.`);
+   const sFoot=(c.detailRows||[]).find(r=>r[0]==='Footprint');
+   const sRoof=(c.detailRows||[]).find(r=>r[0]==='Roofline');
+   const sMat=(c.detailRows||[]).find(r=>r[0]==='Primary Construction');
+   const sUse=(c.structureRows||[]).find(r=>r[0]==='World Use');
+   const sSet=(c.structureRows||[]).find(r=>r[0]==='Typical Setting');
+   if(sFoot) baseParts.push(`Building footprint: ${sFoot[1]}.`);
+   if(sRoof) baseParts.push(`Roofline: ${sRoof[1]}.`);
+   if(sMat) baseParts.push(`Primary construction: ${sMat[1]}.`);
+   if(sUse) baseParts.push(`World use or fantasy role: ${sUse[1]}.`);
+   if(sSet) baseParts.push(`Typical setting: ${sSet[1]}.`);
+   baseParts.push('No cutaway interior, no floorplan diagram, no UI text, and no technical notes. Keep it as a clear exterior building concept only.');
+   return baseParts.join(' ');
+ }
  if(cat==='Quest'){
    baseParts.push('Create a narrative quest illustration rather than a UI scroll or text card.');
    baseParts.push('Show the key visual premise of the quest: the setting, the central problem, and a strong story hook in one readable scene.');
@@ -2806,6 +2848,10 @@ function buildSfxPrompts(c){
     out.primary=sfxEntry(`Heavy dungeon mechanism activating, stone and metal grinding into motion with a final locking thunk, ${tex}`,SFX_DRY,'stinger');
     out.secondary=sfxEntry(`Dungeon trap triggering, sharp mechanical snap with a fast dangerous release, ${tex}`,SFX_DRY,'oneshot');
     out.loop=sfxAmbienceLayers(c,'dungeon');
+  } else if(cat==='Structure'){
+    out.primary=sfxEntry(`Exterior building interaction for a fantasy structure, firm wooden or stone door movement with a readable architectural body resonance, ${tex}`,SFX_DRY,'oneshot');
+    out.secondary=sfxEntry(`Construction ambience detail from a fantasy structure, brief creak, sign rattle, windmill groan, or timber settle depending on the building, ${tex}`,SFX_DRY,'oneshot');
+    out.loop=sfxEntry(`Subtle exterior ambience around a fantasy building or structure, light architectural creaks, faint wind through gaps, and gentle settlement presence, ${tex}`,SFX_LOOP,'loop');
   } else if(cat==='Biome'){
     out.primary=sfxEntry(`Signature wildlife or nature event from a fantasy biome, single distinctive call or natural occurrence, ${tex}`,SFX_DRY,'oneshot');
     out.secondary=sfxEntry(`Distant dramatic event in a fantasy biome, far-off rumble or disturbance rolling across the landscape, ${tex}`,SFX_DRY,'stinger');
@@ -3162,6 +3208,14 @@ function buildPortraitPromptCore(c,palette,rarityText){
    parts.push('Treat it like a stylized environment icon or tile: a compact scenic glimpse with large readable forms, clear mood, and a strong sense of place.');
    parts.push('Keep composition simple and iconic rather than detailed or panoramic. The biome should be readable at a glance and at small size.');
    parts.push('Avoid tiny clutter, UI text, labels, or an overly detailed landscape painting.');
+   return parts.join(' ');
+ }
+ if(cat==='Structure'){
+   parts.push('Create a square icon showing the full exterior of the building or structure clearly.');
+   parts.push('Show one readable simplified three-quarter view of the whole structure, centered and fully contained inside the square.');
+   parts.push('Keep the silhouette, roofline, entrance, and main material breakup clear and iconic.');
+   parts.push('Use a simple cutout-friendly or softly graded background, with no cast shadow, labels, or busy surrounding environment.');
+   parts.push('Avoid full scenic landscape, interior cutaway views, UI text, or tiny clutter.');
    return parts.join(' ');
  }
 
