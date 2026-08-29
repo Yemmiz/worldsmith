@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.30</title>
+<title>Worldsmith v1.9.31</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.30";
+    content:"v1.9.31";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.30 adds explicit apparent life-stage casting for NPCs and Vendors so professions no longer default characters toward elderly appearances.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.31 expands armour archetypes with explicit construction and coverage rules so gloves, gauntlets, sandals, greaves, robes, jerkins, mail, and other gear generate as genuinely different pieces.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -562,7 +562,11 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• Added explicit apparent life-stage generation for NPCs and Vendors: Young Adult 25%, Adult 40%, Mature 25%, Elderly 10%, while explicitly age-named roles such as Village Elder still remain elderly.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.31 — Expanded Armour into distinct construction archetypes across hands, feet, head, body, legs, shoulders, and shields, including Gauntlets, Bracers, Vambraces, Handwraps, Sandals, Slippers, Shoes, Sabatons, Greaves, Gambeson, Cuirass, Brigandine, Hauberk, Tunic, Vest, and more.
+• Added armour-archetype construction rules so body pieces no longer default to the same full chest-and-arms silhouette: Leather Jerkins stay short and mostly sleeveless, Scale Mail uses visible overlapping scales, Chainmail stays flexible ring-mail, Breastplates remain torso-focused, Robes vary sleeve and hem coverage, and specialist pieces preserve their actual body coverage.
+• Added dedicated presentation rules for gauntlets/gloves, forearm guards, footwear, greaves, head pieces, lower-body garments, shoulders, and shields, plus proper armour stat-slot mapping for pants and shields.
+• Directed Idea now recognizes the expanded armour vocabulary and preserves explicitly requested subtypes such as “gauntlets”, “sandals”, “scale mail”, or “leather jerkin” instead of categorizing them as Armour and then rolling a different random armour role.
+• Added explicit apparent life-stage generation for NPCs and Vendors: Young Adult 25%, Adult 40%, Mature 25%, Elderly 10%, while explicitly age-named roles such as Village Elder still remain elderly.
 • Added strong NPC/Vendor prompt guidance that profession, archetype, and theme do not imply age; the rolled life stage is authoritative and prevents roles such as Hermit, Scholar, Priest, Midwife, Smith, Trainer, Merchant, or Caretaker from defaulting to elderly appearances.
 • NPC/Vendor portrait, follow-up, and timeline prompts now preserve the same apparent life stage instead of silently aging characters between prompt modes.
 • Added browser-independent dark dropdown styling with explicit option colours and a custom gold arrow, improving readability when browser themes override native select controls.
@@ -769,7 +773,7 @@ const roles={
  'Anime Spell VFX':['Projectile trail','Impact burst','Area pulse','Aura ring','Shield flare','Rune trap','Beam sweep','Cone blast','Arc lash','Healing bloom','Soothing aura','Gentle rays','Blessing veil','Restorative pulse','Buff halo','Curse mark','Ground decal','Charge-up glow','Dissolve fade','Orbiting wisps','Nova burst','Lightning strike','Fire jet','Flame wave','Chain tether','Meteor fall','Wall line','Serpentine bolt','Column burst','Rain volley','Spiral drill','Flame pillar','Single lightning bolt','Energy lance','Erupting ground spikes','Cyclone column','Piercing ice bolt','Vertical eruption','Cleave arc','Heavy cleave','Cross slash','Blade sweep','Scythe sweep'],
  'VFX Arc':['Light slash arc','Heavy cleave arc','Cross slash','Blade sweep','Scythe sweep','Uppercut arc','Overhead chop arc','Spin slash ring','Thrust streak','Lunging arc','Dash slash arc','Guard counter arc','Parry riposte slash','Shockwave cleave','Infusion slash arc','Conversion slash arc'],
  Weapon:['One-handed sword','Two-handed sword','One-handed axe','Two-handed axe','Mace','Hammer','Spear','Polearm','Dagger','Wand','Staff','Bow','Crossbow','Shield weapon','Mojo off-hand','Talisman off-hand','Tome off-hand','Spellbook off-hand','Orb off-hand','Arcane focus off-hand','Grimoire off-hand','Phylactery off-hand'],
- Armour:['Helmet','Chest armour','Gloves','Boots','Pants','Cloak','Belt'],
+ Armour:['Helmet','Chest armour','Gloves','Gauntlets','Bracers','Boots','Sandals','Slippers','Shoes','Sabatons','Greaves','Pants','Trousers','Leggings','Cloak','Belt','Robe','Leather jerkin','Scale mail','Chainmail','Breastplate','Gambeson','Tunic','Vest'],
  Hair:['Short tousled crop','Medium swept layers','Long layered flow','Side-parted adventurer cut','Asymmetrical fringe','High ponytail','Low ponytail','Half-up tied style','Braided crown','Side braid','Twin braids','Messy bun','Elegant bun','Spiky anime-inspired style','Wavy shoulder-length cut','Curly layered bob','Undercut with swept top','Thick warrior braid'],
  Relic:['Ancient idol','Cursed mirror','Rune tablet','Living compass','Royal seal','Sealed eye'],
  Potion:['Life flask','Mana flask','Utility flask','Antidote','Explosive bottle','Transformation brew'],
@@ -1071,7 +1075,7 @@ roles.Quest.push('Recover relic','Break curse','Clear nest','Scout biome','Prote
 roles['Dungeon Room'].push('Resource room','Locked reward room','Lore chamber','Wave defense room','Flooded crossing','Collapsed bridge');
 roles.Biome.push('Crystal forest','Mushroom caves','Royal ruins','Flooded marsh','Ash valley','Ancient battlefield');
 roles.Weapon.push('Fishing spear','One-handed scimitar','Rusty sword','Big club','Slingshot','Ritual dagger');
-roles.Armour.push('Shoulder guard','Round shield','Kite shield','Robe','Mask','Heavy greaves');
+roles.Armour.push('Shoulder guard','Round shield','Kite shield','Mask','Heavy greaves','Vambraces','Handwraps','Fingerless gloves','Footwraps','Cowl','Circlet','Coif');
 
 const encounterUses=['pack filler','elite escort','corridor ambusher','treasure guardian','patrol encounter','rare spawn','dungeon-room anchor','event encounter','support unit in mixed packs'];
 const familyRoots=['Thornling','Mireborn','Ashkin','Crystal Brood','Hollowhide','Moonfang','Rotcap','Stormclaw','Bonebound','Sunken'];
@@ -1134,7 +1138,7 @@ roles.NPC.push('Exiled prince','Grave tender','Rune scholar','Potion peddler','W
 roles.Spell.push('Ward spell','Sigil spell','Beam spell','Nova spell','Chain spell','Hex spell','Ritual spell','Aura spell','Ground rune','Transformation spell','Reflection spell','Weather spell');
 roles.Skill.push('Shield bash','Spear thrust','Whirlwind','Trap throw','Warcry','Marking shot','Pet command','Counter stance','Leap strike','Blade dance','Bomb toss','Rune strike');
 roles.Weapon.push('Warhammer','Spear','Halberd','Crossbow','Flail','Claw weapon','Greatsword','Hand axe','Javelin','Sickle','Spellblade','Totem staff','War pick','Hook blade','Longbow','Shortbow','Recurve bow','Repeating crossbow');
-roles.Armour.push('Breastplate','Chainmail','Leather jerkin','Battle robe','Buckler','Tower shield','Pauldron','Hood','War mask','Bracers','Tabard','Scale mail');
+roles.Armour.push('Battle robe','Buckler','Tower shield','Pauldron','Hood','War mask','Tabard','Cuirass','Brigandine','Hauberk','Surcoat','Kilt','Faulds','Spaulders');
 roles.Relic.push('Broken bell','Saint bone','Stained-glass shard','Dragon scale','Witch candle','Clockwork heart','Prayer wheel','Ancient astrolabe','Mariner compass','Mirror shard','Sealed book','Grave lantern');
 roles.Potion.push('Smoke flask','Rage brew','Iron-skin draught','Luck tonic','Invisibility vial','Haste cordial','Witchwater','Firebomb bottle','Frost phial','Antique perfume');
 roles['Crafting Material'].push('Demon horn','Dragon scale','Ancient parchment','Clockwork spring','Grave wax','Faerie dust','Spider silk','Raven feather','Serpent venom','Star metal','Sea glass','Witch root','Golem core','Cursed thread');
@@ -1298,8 +1302,10 @@ const statPools={
    chest:['Armour','Maximum Life','Resistance','Strength','Reduced Damage Taken','Thorns Damage'],
    gloves:['Attack Speed','Cast Speed','Accuracy','Dexterity','Life on Hit','Critical Chance'],
    boots:['Movement Speed','Armour','Maximum Life','Resistance','Dodge Chance','Stun Recovery'],
+   pants:['Armour','Maximum Life','Resistance','Evasion','Dexterity','Stun Recovery'],
    belt:['Maximum Life','Potion Charges','Strength','Resistance','Gold Find','Inventory Capacity'],
-   cloak:['Evasion','Resistance','Movement Speed','Shadow Resistance','Dodge Chance','Mana']
+   cloak:['Evasion','Resistance','Movement Speed','Shadow Resistance','Dodge Chance','Mana'],
+   shield:['Block Chance','Armour','Maximum Life','Resistance','Stun Recovery','Thorns Damage']
  },
  Relic:{default:['Mana','Cooldown Recovery','Spell Damage','Resistance','All Attributes','Gold Find','Shrine Effect Duration']},
  Potion:{default:['Instant Life Recovery','Life Recovery over Time','Mana Recovery','Movement Speed during effect','Removes Poison','Removes Chill','Short Resistance Boost']},
@@ -1311,7 +1317,7 @@ itemVisualDetails.push('oversized silhouette','clear icon-read shape','distinct 
 function itemSlotGroup(cat,role){
   const r=(role||'').toLowerCase();
   if(cat==='Weapon'){ if(r.includes('mojo')||r.includes('talisman')||r.includes('tome')||r.includes('book')||r.includes('orb')||r.includes('focus')||r.includes('grimoire')||r.includes('phylactery')) return 'caster'; if(r.includes('wand')||r.includes('staff')) return 'caster'; if(r.includes('bow')||r.includes('crossbow')) return 'ranged'; if(r.includes('shield')) return 'shield'; return 'melee'; }
-  if(cat==='Armour'){ if(r.includes('helmet')) return 'helmet'; if(r.includes('chest')) return 'chest'; if(r.includes('gloves')) return 'gloves'; if(r.includes('boots')) return 'boots'; if(r.includes('pants')) return 'pants'; if(r.includes('belt')) return 'belt'; if(r.includes('cloak')) return 'cloak'; return 'chest'; }
+  if(cat==='Armour'){ if(/helmet|\bhelm\b|hood|cowl|circlet|crown|mask|coif/.test(r)) return 'helmet'; if(/glove|gauntlet|bracer|vambrace|handwrap/.test(r)) return 'gloves'; if(/boot|sandal|slipper|shoe|sabaton|greave|footwrap/.test(r)) return 'boots'; if(/pants|trousers|leggings|chausses|kilt|faulds/.test(r)) return 'pants'; if(r.includes('belt')) return 'belt'; if(/cloak|cape/.test(r)) return 'cloak'; if(/buckler|shield/.test(r)) return 'shield'; return 'chest'; }
   return 'default';
 }
 function weaponPresentationGuidance(role){
@@ -1326,25 +1332,88 @@ function weaponPresentationGuidance(role){
   if(r.includes('phylactery')) return 'Caster off-hand presentation: show one compact phylactery by itself, unheld and isolated. Favor a sealed vessel, reliquary, urn, chained capsule, rune jar, or soul-container silhouette with broad readable construction. Keep it clearly an equippable magical object, not a full shrine or environment prop.';
   return 'Caster off-hand presentation: show one compact magical off-hand item by itself, unheld and isolated, with a strong readable silhouette, broad shapes, and clear material separation. Keep it obviously equippable in one hand and avoid character hands, casting poses, or environment dressing.';
 }
+function armourArchetypeGuidance(role){
+  const r=(role||'').toLowerCase();
+  const lead='Armour archetype rules: ';
+  if(r.includes('leather jerkin')) return lead+'this must read unmistakably as a leather jerkin: a fitted leather torso garment ending around the waist, hips, or upper thighs, normally sleeveless or short-sleeved. Keep most of the arms visibly uncovered. Build the silhouette from stitched leather panels, closures, seams, edging, or a few reinforced sections rather than plate-armour masses. Do not turn it into a long coat, robe, cuirass, or full-arm armour set.';
+  if(r.includes('scale mail')) return lead+'this must read unmistakably as scale mail. Cover the torso with clearly overlapping rows of individually readable scales attached to a flexible backing. Keep the garment around waist-to-upper-thigh length; sleeveless or short shoulder/upper-arm coverage is preferred. Do not extend generic solid armour down the full arms, and do not replace the scale construction with smooth plate armour or merely paint a scale texture onto a plate cuirass.';
+  if(r.includes('chainmail')||r.includes('hauberk')) return lead+'this must visibly use interlinked metal-ring mail as the main construction, with a flexible hanging silhouette and readable mail edges. A short chain shirt can end near the waist/hips; a hauberk may extend to the upper thighs or knees and may have short or elbow-length mail sleeves. Do not turn it into solid plate armour and do not automatically add full plate sleeves or gauntlets.';
+  if(r.includes('breastplate')||r.includes('cuirass')||r.includes('chest armour')) return lead+'make the core object a rigid torso shell protecting chest, ribs, and upper abdomen, ending around the waist or hips. The chest piece itself should not automatically include full sleeves, gloves, or complete arm armour. If shoulder straps, tiny shoulder caps, or underlayer cloth are needed, keep them secondary and leave the arms substantially uncovered.';
+  if(r.includes('gambeson')) return lead+'make this padded textile armour with large readable quilted or stitched channels, a soft structured torso silhouette, and cloth construction rather than metal plates. It may be sleeveless, short-sleeved, or long-sleeved, but choose one clear sleeve treatment and keep the padded textile identity dominant. Typical length is hip to upper thigh.';
+  if(r.includes('brigandine')) return lead+'make this a cloth-or-leather body garment reinforced by many hidden or semi-visible small plates, communicated through broad paneling and organized rivet rows. Keep it torso-focused, usually sleeveless or short-sleeved, ending around the hips or upper thighs. Do not turn it into exposed full plate armour.';
+  if(r.includes('battle robe')) return lead+'make this a combat-ready robe rather than generic body armour: a fitted or wrapped upper garment with a split hanging skirt or coat-like robe panels for movement. Use fabric as the dominant material. Sleeves may be sleeveless, short, three-quarter, or full length, but do not default to full sleeves every time and do not cover the arms in plate unless explicitly required by another concept detail.';
+  if(/(^| )robe($| )/.test(r)) return lead+'make this clearly a robe with fabric-led drape and a readable hanging lower section. Vary the coverage rather than defaulting to one full-body silhouette: the robe can end around the knee, calf, or ankle and may be sleeveless, short-sleeved, wide-sleeved, or long-sleeved. Preserve the robe identity and do not quietly turn it into a metal breastplate with a skirt.';
+  if(r.includes('tunic')) return lead+'make this a simple torso garment ending around the hips or upper thighs, normally sleeveless or short-sleeved with the forearms clearly exposed. Keep the construction cloth-led and practical; do not extend it into a floor-length robe or full coat.';
+  if(r.includes('vest')) return lead+'make this a sleeveless torso garment ending around the waist or hips. The armholes and uncovered arms are defining silhouette features. Do not add sleeves, integrated gauntlets, or long hanging robe panels.';
+  if(r.includes('tabard')||r.includes('surcoat')) return lead+'make this a sleeveless heraldic overgarment worn over the torso, with open arm sides and a straight or split hanging hem. Keep it cloth-led and clearly distinct from a robe: no built-in sleeves and no full arm coverage.';
+  if(r.includes('gauntlet')) return lead+'this is plated hand armour, visibly heavier and more structured than a glove. Use articulated plates or segmented protection over the back of the hand, knuckles, wrist, and optionally fingers. Keep finger articulation readable and do not simplify it into a soft cloth glove.';
+  if(r.includes('fingerless glove')) return lead+'this is a soft or lightly armoured glove whose defining feature is exposed fingertips. Keep the finger openings obvious in every pose; do not close them into full gloves or plate gauntlets.';
+  if(r.includes('handwrap')) return lead+'this is cloth or leather wrapping around the hand and wrist, with layered bands following the hand anatomy. Keep much of the finger shape readable and avoid turning the wraps into solid gloves or metal gauntlets.';
+  if(r.includes('glove')) return lead+'this is hand-worn flexible protection with a clear cuff, palm/finger volumes, and soft or lightly reinforced construction. Keep it visually lighter than a plated gauntlet unless the concept explicitly calls for metal reinforcements.';
+  if(r.includes('bracer')||r.includes('vambrace')) return lead+'this is forearm armour only, running from wrist toward elbow. Do not cover the fingers or palm and do not turn it into a full gauntlet. Keep both open ends and the fastening/overlap construction readable.';
+  if(r.includes('heavy greave')) return lead+'this is heavy lower-leg armour focused on the shin and calf, running from ankle toward the knee with thick protective structure. The feet should remain separate from the greaves unless a small integrated ankle guard is necessary. Do not turn them into knee-high boots.';
+  if(r.includes('greave')) return lead+'this is lower-leg armour focused on the shin and calf, running from ankle toward the knee. Keep the foot mostly separate and visible as an implied attachment area; do not turn the item into a tall boot or complete leg armour set.';
+  if(r.includes('sabaton')) return lead+'this is articulated plate armour for the foot, low around the ankle with overlapping toe and instep plates. It should read as metal foot armour, not as a tall boot or shin greave.';
+  if(r.includes('sandal')) return lead+'this is open footwear with a visible sole, straps, and substantial open areas around the foot. Keep the silhouette light and low; do not turn it into a closed boot.';
+  if(r.includes('slipper')) return lead+'this is soft low-profile footwear, closed around the foot but ending below the ankle or only slightly above it. Keep it light, flexible, and simple; do not add a tall boot shaft or shin armour.';
+  if(r.includes('shoe')) return lead+'this is low-cut footwear ending around or below the ankle. Preserve a clear shoe silhouette with a readable sole and opening; do not extend it into a boot or greave.';
+  if(r.includes('footwrap')) return lead+'this is layered cloth or leather wrapping around the foot and ankle with visible overlapping bands. Keep it soft and close-fitting; do not turn it into a structured shoe, boot, or metal sabaton.';
+  if(r.includes('boot')) return lead+'this is closed footwear with a distinct sole, foot volume, ankle transition, and a boot shaft. Vary the shaft sensibly from ankle to mid-calf unless the named concept explicitly calls for taller coverage. Do not automatically extend armour all the way to the knee.';
+  if(r.includes('trousers')||r.includes('pants')) return lead+'this is a separate lower-body garment with a clear waistband, crotch construction, two distinct legs, and readable cuffs or hems. Keep it independent from boots and torso armour.';
+  if(r.includes('leggings')) return lead+'this is close-fitting flexible legwear with a narrow silhouette and minimal bulk. Keep both legs distinct and do not add boot shapes or rigid plate greaves unless explicitly requested.';
+  if(r.includes('kilt')) return lead+'this is a waist-hung skirt-like lower garment ending above or around the knees, with clear folds, panels, or wrapped construction. Do not generate trouser legs underneath as part of the item.';
+  if(r.includes('faulds')) return lead+'this is segmented armour hanging from the waist to protect hips and upper thighs, built from overlapping plate bands or lames. Keep the legs themselves absent; do not turn it into pants, a long skirt, or full leg armour.';
+  if(r.includes('pauldron')||r.includes('spaulder')||r.includes('shoulder guard')) return lead+'this is shoulder armour only. Keep the core form around the shoulder cap and upper-arm edge, with straps or attachment points as needed. Do not expand it into a full chest piece or complete sleeve.';
+  if(r.includes('hood')||r.includes('cowl')) return lead+'this is soft head-and-neck cloth, with a clear face opening and fabric drape around the crown and neck. Do not turn it into a rigid metal helmet unless explicit reinforcement is part of the concept.';
+  if(r.includes('circlet')) return lead+'this is a narrow head band or crown-like strip around the forehead and temples, leaving most of the head uncovered. Keep it light and open rather than helmet-like.';
+  if(r.includes('coif')) return lead+'this is a close-fitting hood or mail head covering that wraps the scalp and neck while leaving the face open. Keep the face opening and flexible construction obvious.';
+  if(r.includes('mask')) return lead+'this is primarily a face covering. Keep the back/top of the head substantially open unless the concept explicitly asks for a full helmet. Do not silently expand it into complete head armour.';
+  if(r.includes('helmet')||/\\bhelm\\b/.test(r)) return lead+'this is rigid protective headgear. Preserve a clear helmet shell and face/eye opening logic, but do not add unrelated shoulder or torso armour.';
+  if(r.includes('buckler')) return lead+'this is a small one-handed shield with a compact circular or faceted face and a clear central grip or boss. Keep it visibly smaller and hand-scale rather than tower-shield sized.';
+  if(r.includes('tower shield')) return lead+'this is a very large tall shield intended to cover much of the body. Use a strong vertical silhouette, broad uninterrupted protective face, and clear edge thickness.';
+  if(r.includes('shield')) return lead+'this is a standalone defensive shield. Show a readable front face, thickness, rim, and grip/strapping logic; do not merge it into body armour.';
+  return lead+'respect the named armour type as the authoritative construction and coverage archetype. Do not default every wearable piece to a full chest-and-arms armour set. Only cover body regions that naturally belong to this item type.';
+}
+
 function armourPresentationGuidance(role, forIcon=false){
   const r=(role||'').toLowerCase();
   const aPoseSleeves = 'Use a game-rig A-pose matching the player base model: upper arms angled about 28–35 degrees away from the torso on each side, elbows only slightly bent, wrists relaxed downward, with clear visible negative space under the armpits. The upper arm silhouette must stay clearly separated from the chest and ribcage silhouette, and the sleeve cuffs/hands must not touch the hips. Aim for obvious empty space between the inner upper arm and the side of the torso so the arm mass and torso mass remain distinct for rigging.';
-  const aPoseLegs = 'Use a game-rig A-pose lower-body stance: legs slightly apart, feet roughly shoulder-width, with a clear gap between the thighs so the pants silhouette is readable.';
-  if(r.includes('helmet')) return forIcon
-    ? 'Show the helmet by itself, centered and clearly readable, with the full helmet fully visible in frame.'
-    : 'Presentation and positioning: show the helmet by itself as a clean isolated piece, fully visible and centered.';
-  if(r.includes('chest')) return forIcon
-    ? 'Show the body armour on a simple headless mannequin or invisible-body A-pose. If it has sleeves, pauldrons, arm guards, or robe sleeves, '+aPoseSleeves+' If it is a sleeveless vest or torso-only chest piece, keep the arms optional or minimal so the torso shape stays clear.'
-    : 'Presentation and positioning: show the body armour on a simple headless mannequin or invisible-body A-pose. If it has sleeves, pauldrons, arm guards, or robe sleeves, '+aPoseSleeves+' If it is a sleeveless vest or torso-only chest piece, keep the arms optional or minimal so the torso shape stays clear.';
-  if(r.includes('pants')) return forIcon
-    ? 'Pants-only presentation: show ONLY the pants, isolated by themselves, arranged in a natural wearable lower-body shape as though supported by an invisible wearer. Do not show any mannequin, body, waist, belly, hips, skin, legs, feet, boots, shoes, or other armour pieces. Keep both pant legs separated with a clear gap so the silhouette reads cleanly. Show the complete waistband, crotch construction, knees, cuffs or hems, and full leg shapes clearly within frame.'
-    : 'Presentation and positioning: show ONLY the pants as one isolated garment, arranged in a natural wearable lower-body stance as though supported by an invisible wearer. Absolutely no visible mannequin or body: no belly, waist flesh, hips, skin, legs, feet, boots, shoes, greaves, or other armour pieces. The pants themselves must form the entire silhouette. Keep both pant legs slightly apart with a clear empty gap between them, and keep the complete waistband, crotch construction, knees, cuffs or hems, and full leg shapes clearly readable. Do not crop the waistband or cuffs.';
-  if(r.includes('gloves')) return forIcon
-    ? 'Show exactly three versions of the same glove design in the same image using one consistent hand only, not left-and-right pairs: one open-hand version, one regular-fist version, and one true clenched-combat-fist version. Use the same hand side and the same viewing orientation for all three, preferably the same right hand shown from one consistent three-quarter dorsal view from the radial side throughout. Very important: the angle must clearly show both the back of the wrist plate and the curled fingers at the same time. The viewer should be able to read the dorsal glove design on the back of the hand and wrist while also clearly seeing the finger curl, thumb placement, and fist compression. Avoid a pure palm-up view and avoid a straight back-of-hand view; instead use this three-quarter dorsal radial-side view so both the glove surface design and the hand pose remain readable together. Keep the three poses aligned to the same side and angle so the set still feels consistent. Keep all three variants fully visible, clearly separated, and non-overlapping. Keep the three pose variants visually matched as the same glove item, with consistent materials, trim, cuffs, silhouette language, and design details. The open-hand version should stay clean and readable like a neutral display pose. The regular-fist version should read like a natural soft fist or grasp-ready hand: fingers curled inward in a relaxed way, thumb resting naturally, and the pose should visually resemble the kind of hand shape that could hold a weapon or tool, but do not place any object in the hand. The true clenched-combat-fist version must read as a clearly tighter unarmed-combat fist: fingers curled tightly into the palm, knuckles clearly defined, thumb locked across or around the fingers, and noticeably more compressed and forceful than the regular fist.'
-    : 'Presentation and positioning: show exactly three versions of the same glove design in the same image using one consistent hand only, not left-and-right pairs: one open-hand version, one regular-fist version, and one true clenched-combat-fist version. Use the same hand side and the same viewing orientation for all three, preferably the same right hand shown from one consistent three-quarter dorsal view from the radial side throughout, so the set feels like one clean pose lineup rather than mixed hands. Very important: this angle must clearly show both the back of the wrist plate and the curled fingers at the same time. The viewer should be able to read the dorsal glove design on the back of the hand and wrist while also clearly seeing the finger curl, thumb placement, knuckle stack, and fist compression. Avoid a pure palm-up view and avoid a straight back-of-hand view; instead use this three-quarter dorsal radial-side view so both the glove surface design and the hand pose remain readable together. Show all three variants fully visible, clearly separated, non-overlapping, and easy to model individually. Keep all three pose variants visibly the same glove item, with matching materials, trim, cuffs, silhouette language, and design details. The open-hand version should serve as the neutral readable display pose. The regular-fist version should read like a natural soft fist or grasp-ready hand: fingers curled inward in a relaxed way, thumb resting naturally, and the pose should visually resemble the kind of hand shape that could hold a weapon, staff, wand, tool, or item later, but do not place any object in the hand. The true clenched-combat-fist version must clearly read as a tighter unarmed-combat fist: fingers curled tightly into the palm, knuckles clearly pronounced, thumb locked across or around the curled fingers, and the pose should look noticeably more compressed and forceful than the regular fist. Keep the glove opening, finger volumes, knuckle areas, thumb shape, cuff, dorsal plate read, and finger silhouette readable in all three variants.';
-  if(r.includes('boots')) return forIcon
-    ? 'Show the boots as a clearly separated left-and-right pair, toes angled slightly outward, with both boots fully visible and not merged together.'
-    : 'Presentation and positioning: show the boots as a clearly separated left-and-right pair, toes angled slightly outward, with both boots fully visible, not merged together, and easy to model individually.';
+  const isHead=/helmet|\\bhelm\\b|hood|cowl|circlet|crown|mask|coif/.test(r);
+  const isBody=/chest|breastplate|cuirass|chainmail|hauberk|scale mail|leather jerkin|gambeson|brigandine|battle robe|\\brobe\\b|tunic|vest|tabard|surcoat/.test(r);
+  const isHand=/glove|gauntlet|handwrap/.test(r);
+  const isForearm=/bracer|vambrace/.test(r);
+  const isGreave=/greave/.test(r);
+  const isFoot=/boot|sandal|slipper|shoe|sabaton|footwrap/.test(r);
+  const isLeg=/pants|trousers|leggings|chausses|kilt|faulds/.test(r);
+  const isShoulder=/pauldron|spaulder|shoulder guard/.test(r);
+  const isShield=/buckler|shield/.test(r);
+  if(isHead) return forIcon
+    ? 'Show the head armour by itself, centered and clearly readable, with the complete piece fully visible in frame. Do not add a face, head, neck, shoulders, or torso unless an invisible support is unavoidable.'
+    : 'Presentation and positioning: show the head armour by itself as a clean isolated piece, fully visible and centered. Avoid a visible wearer or unrelated armour.';
+  if(isBody) return forIcon
+    ? 'Show the body garment or torso armour on a simple headless mannequin or invisible-body A-pose. The named archetype controls coverage: do not invent sleeves, arm guards, or long hems that are not natural to that archetype. If it actually has sleeves, '+aPoseSleeves+' If it is sleeveless or torso-only, keep the arms invisible or minimal so the uncovered armholes and torso silhouette stay clear.'
+    : 'Presentation and positioning: show the body garment or torso armour on a simple headless mannequin or invisible-body A-pose. The named archetype controls coverage: do not automatically add full sleeves, arm guards, gloves, or long robe hems. If this specific piece actually has sleeves, '+aPoseSleeves+' If it is sleeveless or torso-only, keep the arms invisible or minimal and preserve clear open armholes and uncovered-side silhouette.';
+  if(isLeg) return forIcon
+    ? 'Lower-body-only presentation: show ONLY the named lower-body piece, isolated by itself as though supported by an invisible wearer. No visible mannequin, body, skin, feet, boots, shoes, greaves, torso armour, or extra clothing. Keep the complete waist attachment and lower silhouette fully visible and uncropped.'
+    : 'Presentation and positioning: show ONLY the named lower-body piece, isolated by itself as though supported by an invisible wearer. Absolutely no visible mannequin or body: no belly, waist flesh, hips, skin, bare legs, feet, boots, shoes, greaves, or torso armour. Keep the complete waist attachment and lower silhouette fully readable and uncropped.';
+  if(isHand) return forIcon
+    ? 'Show exactly three versions of the same hand-worn item in the same image using one consistent hand only, not left-and-right pairs: one open-hand version, one regular soft-fist / grasp-ready version, and one true clenched-combat-fist version. Use the same hand side and the same viewing orientation for all three, preferably the same right hand shown from one consistent three-quarter dorsal view from the radial side. The angle must show both the back of the wrist/hand design and the finger curl, thumb placement, and fist compression. Keep all three variants fully visible, clearly separated, non-overlapping, and visibly the same item design.'
+    : 'Presentation and positioning: show exactly three versions of the same hand-worn item in the same image using one consistent hand only, not left-and-right pairs: one open-hand version, one regular soft-fist / grasp-ready version, and one true clenched-combat-fist version. Use the same hand side and the same three-quarter dorsal radial-side view throughout so the back-of-hand design, curled fingers, thumb placement, knuckles, and wrist construction all remain readable. Keep the three variants fully visible, clearly separated, non-overlapping, and easy to model individually. The regular fist must stay relaxed and grasp-ready; the combat fist must be visibly tighter and more compressed.';
+  if(isForearm) return forIcon
+    ? 'Show the forearm guards as a clearly separated matching left-and-right pair, with the full wrist-to-elbow silhouettes visible and the open ends/fastenings easy to read. Do not include gloves, hands, weapons, or full sleeves.'
+    : 'Presentation and positioning: show the forearm guards as a clearly separated matching left-and-right pair, fully visible from wrist end to elbow end. Keep the open ends, straps, overlaps, and thickness readable. Do not include gloves, hands, weapons, or full sleeves.';
+  if(isGreave) return forIcon
+    ? 'Show the greaves as a clearly separated matching left-and-right shin pair, upright and fully visible from ankle to knee edge. Do not merge them into boots, shoes, feet, pants, or a full leg armour set.'
+    : 'Presentation and positioning: show the greaves as a clearly separated matching left-and-right shin pair, upright and fully visible from ankle to knee edge. Keep both pieces easy to model individually. Do not merge them into boots, shoes, feet, pants, or a full leg armour set.';
+  if(isFoot) return forIcon
+    ? 'Show the footwear as a clearly separated left-and-right pair, toes angled slightly outward, with both pieces fully visible and not merged together. Preserve the named footwear silhouette rather than defaulting to boots.'
+    : 'Presentation and positioning: show the footwear as a clearly separated left-and-right pair, toes angled slightly outward, with both pieces fully visible, not merged together, and easy to model individually. Preserve the named footwear archetype rather than defaulting to boots.';
+  if(isShoulder) return forIcon
+    ? 'Show the shoulder armour as an isolated matching pair or one clearly readable modular shoulder piece, fully visible and not attached to a chest armour set.'
+    : 'Presentation and positioning: show the shoulder armour as an isolated matching pair or one clearly readable modular shoulder piece, fully visible with straps/attachment logic readable and not attached to a chest armour set.';
+  if(isShield) return forIcon
+    ? 'Show the shield by itself, fully visible and slightly angled so the front face, rim thickness, and grip construction can be understood. No wielder or other equipment.'
+    : 'Presentation and positioning: show the shield by itself, fully visible and slightly angled so the front face, rim thickness, and grip or rear strapping construction can be understood. No wielder or other equipment.';
   if(r.includes('cloak')) return forIcon
     ? 'Show the cloak hanging clearly in full view so the full outer silhouette is readable.'
     : 'Presentation and positioning: show the cloak hanging clearly in full view so the full silhouette, drape, and edge shapes are readable.';
@@ -1352,8 +1421,8 @@ function armourPresentationGuidance(role, forIcon=false){
     ? 'Show the belt clearly by itself, laid out or slightly curved so the full shape and buckle area are readable.'
     : 'Presentation and positioning: show the belt clearly by itself, laid out or slightly curved so the full shape, buckle, and attachment details are readable.';
   return forIcon
-    ? 'Show the armour piece clearly, fully visible, centered, and easy to read. If it includes sleeves or arm coverage, use a relaxed rig-friendly A-pose with arms about 28–35 degrees away from the torso, keeping clear negative space between the upper arms and the torso.'
-    : 'Presentation and positioning: show the armour piece clearly, fully visible, centered, and easy to read. If it includes sleeves or arm coverage, use a relaxed rig-friendly A-pose with arms about 28–35 degrees away from the torso, keeping clear negative space between the upper arms and the torso.';
+    ? 'Show the armour piece clearly, fully visible, centered, and easy to read. Respect the named item type and do not add unrelated body coverage.'
+    : 'Presentation and positioning: show the armour piece clearly, fully visible, centered, and easy to read. Respect the named item type and do not add unrelated body coverage.';
 }
 
 function itemAffixCount(rar){
@@ -1693,7 +1762,7 @@ function directedIdea(){
     [/spell|magic|curse|blessing|ward|hex|nova|beam|bolt/, 'Spell'],
     [/skill|attack|cleave|dash|shot|stance/, 'Skill'],
     [/sword|axe|mace|dagger|bow|staff|wand|spear|hammer|blade|shield|hook/, 'Weapon'],
-    [/helmet|chest|armor|armour|boots|gloves|pants|cloak|belt|robe|bracer/, 'Armour'],
+    [/helmet|helm|hood|cowl|circlet|coif|mask|chest|breastplate|cuirass|armor|armour|chainmail|hauberk|scale mail|jerkin|gambeson|brigandine|robe|tunic|vest|tabard|surcoat|glove|gauntlet|bracer|vambrace|handwrap|boot|sandal|slipper|shoe|sabaton|greave|footwrap|pants|trousers|leggings|kilt|faulds|cloak|belt|pauldron|spaulder/, 'Armour'],
     [/potion|flask|elixir|brew|tonic|vial/, 'Potion'],
     [/coin|currency|token|medal|ticket|badge|seal|writ/, 'Currency'],
     [/material|ore|dust|fang|scale|hide|silk|feather|root|gem|shard|core/, 'Crafting Material'],
@@ -1717,6 +1786,23 @@ function ideaCategory(defaultCat, old){
   if(state.locks.category && old && old.category) return old.category;
   return idea.inferredCategory || defaultCat;
 }
+function ideaRole(cat, defaultRole){
+  const idea=directedIdea();
+  if(!idea) return defaultRole;
+  const lower=idea.lower||'';
+  if(cat==='Armour'){
+    const armourMatches=[
+      [/heavy greaves?/, 'Heavy greaves'],[/scale mail/, 'Scale mail'],[/leather jerkin/, 'Leather jerkin'],[/battle robe/, 'Battle robe'],[/tower shield/, 'Tower shield'],[/kite shield/, 'Kite shield'],[/round shield/, 'Round shield'],[/fingerless gloves?/, 'Fingerless gloves'],[/hand ?wraps?/, 'Handwraps'],[/foot ?wraps?/, 'Footwraps'],[/shoulder guards?/, 'Shoulder guard'],
+      [/gauntlets?/, 'Gauntlets'],[/vambraces?/, 'Vambraces'],[/bracers?/, 'Bracers'],[/gloves?/, 'Gloves'],[/sabatons?/, 'Sabatons'],[/sandals?/, 'Sandals'],[/slippers?/, 'Slippers'],[/greaves?/, 'Greaves'],[/boots?/, 'Boots'],[/shoes?/, 'Shoes'],
+      [/breastplates?/, 'Breastplate'],[/cuirasses?/, 'Cuirass'],[/chain ?mail/, 'Chainmail'],[/hauberks?/, 'Hauberk'],[/gambesons?/, 'Gambeson'],[/brigandines?/, 'Brigandine'],[/tabards?/, 'Tabard'],[/surcoats?/, 'Surcoat'],[/tunics?/, 'Tunic'],[/vests?/, 'Vest'],[/robes?/, 'Robe'],
+      [/trousers?/, 'Trousers'],[/leggings?/, 'Leggings'],[/pants?/, 'Pants'],[/kilts?/, 'Kilt'],[/faulds?/, 'Faulds'],[/pauldrons?/, 'Pauldron'],[/spaulders?/, 'Spaulders'],[/bucklers?/, 'Buckler'],
+      [/hoods?/, 'Hood'],[/cowls?/, 'Cowl'],[/circlets?/, 'Circlet'],[/coifs?/, 'Coif'],[/war masks?/, 'War mask'],[/masks?/, 'Mask'],[/helmets?|\\bhelms?\\b/, 'Helmet'],[/cloaks?/, 'Cloak'],[/belts?/, 'Belt']
+    ];
+    for(const [rx,role] of armourMatches){ if(rx.test(lower)) return role; }
+  }
+  return defaultRole;
+}
+
 function ideaThemes(defaultThemes, fallbackRarity){
   const idea=directedIdea();
   if(!idea) return defaultThemes;
@@ -1882,7 +1968,7 @@ function standardConcept(forceReroll=false){
   const rar=state.locks.rarity&&old.rarity&&!old.creatureMode?old.rarity:R(rarity);
   const ts=state.locks.themes&&old.themes?old.themes:ideaThemes(weightedThemes(rar),rar);
   const att=state.locks.attitude&&old.attitude?old.attitude:R(attitudes);
-  const role=state.locks.role&&old.role?old.role:R(roles[cat]||roles.Monster);
+  const role=state.locks.role&&old.role?old.role:ideaRole(cat,R(roles[cat]||roles.Monster));
   const lifeStage=['NPC','Vendor'].includes(cat)?rollNpcLifeStage(role):null;
   const info=themeInfo(ts);
   const itemMode=isItemCategory(cat);
@@ -2477,7 +2563,7 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('Show a single clear object or a small tidy grouped set only if needed for readability.');
    if(c.role) baseParts.push(`Item type: ${c.role}.`);
    if(c.identity) baseParts.push(`Materials and construction: ${c.identity.materials}; ${c.identity.construction}; ${c.identity.wear}.`);
-   if(cat==='Armour') baseParts.push(armourPresentationGuidance(c.role,false));
+   if(cat==='Armour'){ baseParts.push(armourArchetypeGuidance(c.role)); baseParts.push(armourPresentationGuidance(c.role,false)); }
    if(cat==='Weapon'){ const weaponGuide=weaponPresentationGuidance(c.role); if(weaponGuide) baseParts.push(weaponGuide); }
    if(cat==='Weapon' && /bow|crossbow|slingshot/i.test(c.role||'')){
      baseParts.push('Ranged weapon presentation: show the weapon in a clean side or three-quarter profile with the full limbs, stock, and string clearly visible and the string at rest, not drawn.');
@@ -3056,7 +3142,7 @@ function buildPortraitPromptCore(c,palette,rarityText){
    parts.push('Use a flat easily cut-out background color or chroma-like backdrop. Do not create an environment or scene.');
    parts.push('Keep the silhouette clean and readable, with one main object or a very small tidy grouped set only if the item naturally requires it.');
    parts.push('Prioritize a clean fantasy RPG icon feel: crisp edges, strong material definition, polished textures, low visual noise, and clear readability at small size.');
-   if(cat==='Armour'){ parts.push('If the armor piece is wearable gear, show the entire piece cleanly and fully within frame.'); parts.push(armourPresentationGuidance(c.role,true)); }
+   if(cat==='Armour'){ parts.push('If the armor piece is wearable gear, show the entire piece cleanly and fully within frame.'); parts.push(armourArchetypeGuidance(c.role)); parts.push(armourPresentationGuidance(c.role,true)); }
    if(cat==='Decoration') parts.push('For decoration props, show the full prop cleanly, centered, and isolated, as a usable object icon rather than a scenic prop illustration.');
    parts.push('Avoid background clutter, cast shadows, scenic context, UI text, labels, or extra effects that make cutout difficult.');
    return parts.join(' ');
