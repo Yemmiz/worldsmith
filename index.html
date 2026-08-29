@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.34</title>
+<title>Worldsmith v1.9.35</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.34";
+    content:"v1.9.35";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.34 further refines Structure prompts to suppress accidental visible interior scenes, remove interior clutter and floors, and keep any visible inner wall reveals consistent with the exterior wall materials.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.35 refines Structure doorway rendering so openings read as solid wall cutouts with visible wall thickness and matching inner reveals, rather than pure black voids that imply hollow shell meshes.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -562,7 +562,9 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.34 — Further refined Structure prompts to suppress accidental visible interior scenes: no visible interior furniture, counters, stools, decor, or floor surfaces inside open doorways.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.35 — Refined Structure openings so doorways and similar cutouts read as solid wall openings rather than black voids. Prompts now ask for readable wall thickness, visible inner side reveals, and shallow interior closure cues without generating a furnished interior.
+• Open doorways should no longer default to a pure black empty hole. Instead, the opening should show structural depth, jambs, lintel thickness, and matching inner wall material so the result feels more compatible with image-to-3D conversion.
+• v1.9.34 — Further refined Structure prompts to suppress accidental visible interior scenes: no visible interior furniture, counters, stools, decor, or floor surfaces inside open doorways.
 • If an open doorway or window reveals any interior wall thickness or wall surface, those visible inner wall reveals should match the same exterior wall material family and colour treatment instead of switching to unrelated gray interiors.
 • Structure prompts now prefer dark simple empty openings or only shallow wall-thickness reveals, keeping the building usable as a clean mesh foundation for later door and interior work.
 • v1.9.33 — Refined Structure prompts to better suit image-to-3D building workflows: structures are pushed toward more compact readable building masses, empty door openings instead of modeled doors, isolated presentation with no ground plane, and fewer baked-in loose exterior props such as barrels and crates.
@@ -2432,9 +2434,11 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('Use a clean readable three-quarter or slightly angled presentation that shows the full exterior clearly and feels useful for 3D modelling or set-building reference.');
    baseParts.push('Keep the structure reasonably compact, readable, and game-ready. Favor one primary building mass and only limited secondary attachments when needed. Avoid overly massive sprawling compounds, oversized multi-wing complexes, or elaborate add-on sections that would make image-to-3D conversion difficult.');
    baseParts.push('Very important: where an entrance or large doorway belongs, show an open doorway or empty doorway cutout rather than a closed modeled door, hanging door leaf, or complex door assembly. The mesh foundation should support adding separate openable door assets later.');
+   baseParts.push('Do not render the doorway as a pure black void. Make the opening read as a solid wall cutout with visible wall thickness. Show readable side jambs, top lintel thickness, and shallow inner reveal surfaces so the structure does not read like a single hollow cube shell.');
    baseParts.push('Do not create a visible furnished interior. No interior decorations, no tables, no stools, no counters, no shelving, no hanging interior props, and no readable room scene inside the opening.');
-   baseParts.push('Do not show any interior floor surface through the doorway. If an opening reveals depth, keep it as a dark simple empty opening or at most a shallow wall-thickness reveal only.');
+   baseParts.push('Do not show any interior floor surface through the doorway. If an opening reveals depth, show only shallow structural depth, interior wall thickness, or a shallow rear closure / occlusion surface, rather than a walkable floor or deep room view.');
    baseParts.push('If any inner wall surfaces or doorway/window reveals are visible, they should use the same wall material family and colour treatment as the exterior wall construction. For example, plaster, pastel stone, timber framing, brick, or other exterior wall materials should continue consistently into the visible wall thickness instead of switching to unrelated gray interior walls.');
+   baseParts.push('Use enough light inside the opening to read the wall thickness and reveal surfaces, but not enough to expose a full interior room. The result should imply a solid mesh opening, not a black empty hole and not a furnished room.');
    baseParts.push('Show only the structure itself, isolated on a simple neutral background. Do not include a ground plane, terrain patch, pathway, grass, foundations spreading into the scene, or scenic environment dressing around it.');
    baseParts.push('Do not attach loose exterior props or clutter such as barrels, crates, carts, sacks, tools, lantern posts, signposts, benches, fences, or other separate decoration objects that would be easier to add later as separate models. Keep the focus on the main structure mesh only.');
    baseParts.push(`Structure identity: ${c.visual.join(', ')}.`);
@@ -3227,6 +3231,7 @@ function buildPortraitPromptCore(c,palette,rarityText){
    parts.push('Keep the silhouette, roofline, entrance, and main material breakup clear and iconic.');
    parts.push('Prefer a compact readable building mass rather than a huge sprawling complex.');
    parts.push('Where a doorway appears, prefer an open doorway cutout rather than a closed modeled door.');
+   parts.push('Do not render the opening as a pure black hole; show some visible wall thickness and inner reveal surfaces so it reads as a solid opening in the structure.');
    parts.push('Do not show a furnished visible interior or any interior floor inside the opening. If any wall reveal is visible inside the doorway or windows, keep it consistent with the exterior wall material and colour.');
    parts.push('Show only the structure itself with no ground plane and no loose exterior props or clutter.');
    parts.push('Use a simple cutout-friendly or softly graded background, with no cast shadow, labels, or busy surrounding environment.');
