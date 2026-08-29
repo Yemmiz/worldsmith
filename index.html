@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.32</title>
+<title>Worldsmith v1.9.33</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.32";
+    content:"v1.9.33";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.32 adds a dedicated Structure category for standalone buildings such as huts, houses, taverns, barns, windmills, towers, and workshops, with building-specific role pools and prompt guidance.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.33 refines Structure prompts for cleaner image-to-3D building concepts, with compact building masses, open doorway cutouts, no ground plane, and fewer baked-in loose props.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -562,7 +562,9 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.32 — Added a dedicated Structure category for standalone buildings and architectural structures, including huts, houses, taverns, inns, barns, windmills, chapels, stables, workshops, towers, and similar readable exterior building concepts.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.33 — Refined Structure prompts to better suit image-to-3D building workflows: structures are pushed toward more compact readable building masses, empty door openings instead of modeled doors, isolated presentation with no ground plane, and fewer baked-in loose exterior props such as barrels and crates.
+• Structure prompts now focus more strongly on the structure itself as a reusable mesh foundation, leaving doors, clutter props, and surrounding set dressing to be added later as separate assets.
+• v1.9.32 — Added a dedicated Structure category for standalone buildings and architectural structures, including huts, houses, taverns, inns, barns, windmills, chapels, stables, workshops, towers, and similar readable exterior building concepts.
 • Structure concepts now generate building-specific descriptive data and image prompts focused on silhouette, footprint, roofline, entrance placement, construction materials, and clear 3D-friendly presentation rather than treating buildings like small props or full biome scenes.
 • Directed Idea now recognizes building / structure requests such as hut, house, tavern, inn, barn, windmill, chapel, stable, watchtower, farmhouse, and workshop, and preserves the requested structure type as the selected role.
 • v1.9.31 — Expanded Armour into distinct construction archetypes across hands, feet, head, body, legs, shoulders, and shields, including Gauntlets, Bracers, Vambraces, Handwraps, Sandals, Slippers, Shoes, Sabatons, Greaves, Gambeson, Cuirass, Brigandine, Hauberk, Tunic, Vest, and more.
@@ -2425,7 +2427,10 @@ function buildVisualPromptCore(c,palette,rarityText){
    baseParts.push('Create a standalone exterior structure / building concept for a stylized fantasy RPG world.');
    baseParts.push('Show one full building or architectural structure clearly, with the overall silhouette, footprint, roofline, entrance placement, window rhythm, and major construction materials easy to understand.');
    baseParts.push('Use a clean readable three-quarter or slightly angled presentation that shows the full exterior clearly and feels useful for 3D modelling or set-building reference.');
-   baseParts.push('Focus on the building itself rather than on a large scenic environment. A small amount of simple ground contact or minimal context is acceptable, but do not turn it into a full biome vista or busy story scene.');
+   baseParts.push('Keep the structure reasonably compact, readable, and game-ready. Favor one primary building mass and only limited secondary attachments when needed. Avoid overly massive sprawling compounds, oversized multi-wing complexes, or elaborate add-on sections that would make image-to-3D conversion difficult.');
+   baseParts.push('Very important: where an entrance or large doorway belongs, show an open doorway or empty doorway cutout rather than a closed modeled door, hanging door leaf, or complex door assembly. The mesh foundation should support adding separate openable door assets later.');
+   baseParts.push('Show only the structure itself, isolated on a simple neutral background. Do not include a ground plane, terrain patch, pathway, grass, foundations spreading into the scene, or scenic environment dressing around it.');
+   baseParts.push('Do not attach loose exterior props or clutter such as barrels, crates, carts, sacks, tools, lantern posts, signposts, benches, fences, or other separate decoration objects that would be easier to add later as separate models. Keep the focus on the main structure mesh only.');
    baseParts.push(`Structure identity: ${c.visual.join(', ')}.`);
    if(c.role) baseParts.push(`Structure type: ${c.role}.`);
    const sFoot=(c.detailRows||[]).find(r=>r[0]==='Footprint');
@@ -2437,8 +2442,8 @@ function buildVisualPromptCore(c,palette,rarityText){
    if(sRoof) baseParts.push(`Roofline: ${sRoof[1]}.`);
    if(sMat) baseParts.push(`Primary construction: ${sMat[1]}.`);
    if(sUse) baseParts.push(`World use or fantasy role: ${sUse[1]}.`);
-   if(sSet) baseParts.push(`Typical setting: ${sSet[1]}.`);
-   baseParts.push('No cutaway interior, no floorplan diagram, no UI text, and no technical notes. Keep it as a clear exterior building concept only.');
+   if(sSet) baseParts.push(`Typical setting inspiration only: ${sSet[1]}. Do not render a full surrounding scene.`);
+   baseParts.push('No cutaway interior, no floorplan diagram, no UI text, and no technical notes. Keep it as a clean exterior building concept only.');
    return baseParts.join(' ');
  }
  if(cat==='Quest'){
@@ -3214,6 +3219,9 @@ function buildPortraitPromptCore(c,palette,rarityText){
    parts.push('Create a square icon showing the full exterior of the building or structure clearly.');
    parts.push('Show one readable simplified three-quarter view of the whole structure, centered and fully contained inside the square.');
    parts.push('Keep the silhouette, roofline, entrance, and main material breakup clear and iconic.');
+   parts.push('Prefer a compact readable building mass rather than a huge sprawling complex.');
+   parts.push('Where a doorway appears, prefer an open doorway cutout rather than a closed modeled door.');
+   parts.push('Show only the structure itself with no ground plane and no loose exterior props or clutter.');
    parts.push('Use a simple cutout-friendly or softly graded background, with no cast shadow, labels, or busy surrounding environment.');
    parts.push('Avoid full scenic landscape, interior cutaway views, UI text, or tiny clutter.');
    return parts.join(' ');
