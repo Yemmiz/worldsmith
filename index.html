@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.38</title>
+<title>Worldsmith v1.9.39</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.38";
+    content:"v1.9.39";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.38 refines Structure presentation with a higher top-down isometric camera and a restrained window budget so footprints read more clearly and facades keep broad usable wall sections.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.39 simplifies glove, gauntlet, and handwrap presentation to one clean open-hand reference for the newer modelling workflow.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -562,7 +562,10 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.38 — Structure concepts now use a more elevated top-down isometric / three-quarter camera so the building footprint, wall thickness, open top, and roof alignment are easier to understand for image-to-3D workflows.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.39 — Glove, gauntlet, fingerless-glove, and handwrap prompts now render one single open hand only instead of open, soft-fist, and clenched-fist variants.
+• The open-hand reference keeps one consistent hand side, preferably the right hand, in a three-quarter dorsal radial-side view with naturally separated fingers and thumb so the back-of-hand, wrist, cuff, and finger construction remain easy to model.
+• The same single-open-hand rule now applies to both the main Armour image prompt and the Portrait / Icon prompt.
+• v1.9.38 — Structure concepts now use a more elevated top-down isometric / three-quarter camera so the building footprint, wall thickness, open top, and roof alignment are easier to understand for image-to-3D workflows.
 • Added a strict sparse-window rule: use only a few purposeful windows, leave broad uninterrupted wall sections, avoid filling every wall bay, and avoid repeated rows of identical windows or excessive dormers.
 • v1.9.37 — Refined roof-separated Structure prompts so the roof and main building body must be completely detached, with no connecting mesh, posts, wall stubs, or linking geometry bridging the gap between them.
 • Added stronger floor suppression guidance: if any accidental floor or base plane becomes visible inside the structure body, it should be omitted or rendered in the same flat neutral colour as the background so it effectively disappears.
@@ -1416,8 +1419,8 @@ function armourPresentationGuidance(role, forIcon=false){
     ? 'Lower-body-only presentation: show ONLY the named lower-body piece, isolated by itself as though supported by an invisible wearer. No visible mannequin, body, skin, feet, boots, shoes, greaves, torso armour, or extra clothing. Keep the complete waist attachment and lower silhouette fully visible and uncropped.'
     : 'Presentation and positioning: show ONLY the named lower-body piece, isolated by itself as though supported by an invisible wearer. Absolutely no visible mannequin or body: no belly, waist flesh, hips, skin, bare legs, feet, boots, shoes, greaves, or torso armour. Keep the complete waist attachment and lower silhouette fully readable and uncropped.';
   if(isHand) return forIcon
-    ? 'Show exactly three versions of the same hand-worn item in the same image using one consistent hand only, not left-and-right pairs: one open-hand version, one regular soft-fist / grasp-ready version, and one true clenched-combat-fist version. Use the same hand side and the same viewing orientation for all three, preferably the same right hand shown from one consistent three-quarter dorsal view from the radial side. The angle must show both the back of the wrist/hand design and the finger curl, thumb placement, and fist compression. Keep all three variants fully visible, clearly separated, non-overlapping, and visibly the same item design.'
-    : 'Presentation and positioning: show exactly three versions of the same hand-worn item in the same image using one consistent hand only, not left-and-right pairs: one open-hand version, one regular soft-fist / grasp-ready version, and one true clenched-combat-fist version. Use the same hand side and the same three-quarter dorsal radial-side view throughout so the back-of-hand design, curled fingers, thumb placement, knuckles, and wrist construction all remain readable. Keep the three variants fully visible, clearly separated, non-overlapping, and easy to model individually. The regular fist must stay relaxed and grasp-ready; the combat fist must be visibly tighter and more compressed.';
+    ? 'Show exactly ONE open-hand version of the hand-worn item, using one consistent hand only, preferably the right hand. Present it from a clear three-quarter dorsal view from the radial / thumb side so the back-of-hand design, wrist, cuff, thumb, and finger construction are all readable. Keep the fingers naturally extended and slightly separated, with the thumb clearly separated from the palm. Do not show a fist, gripping pose, clenched hand, second hand, left-and-right pair, or alternate hand pose. Keep the complete glove / gauntlet / handwrap fully visible, centered, uncropped, and easy to model.'
+    : 'Presentation and positioning: show exactly ONE open-hand version of the hand-worn item, using one consistent hand only, preferably the right hand. Use a clear three-quarter dorsal view from the radial / thumb side so the back-of-hand design, wrist construction, cuff, thumb, knuckles, and finger coverage remain readable. Keep the fingers naturally extended and slightly separated with clean negative space between them, and keep the thumb visibly separated from the palm. Do not show a fist, grip, clenched hand, second hand, left-and-right pair, or alternate pose. Keep the entire item fully visible, centered, non-overlapping, uncropped, and easy to model.';
   if(isForearm) return forIcon
     ? 'Show the forearm guards as a clearly separated matching left-and-right pair, with the full wrist-to-elbow silhouettes visible and the open ends/fastenings easy to read. Do not include gloves, hands, weapons, or full sleeves.'
     : 'Presentation and positioning: show the forearm guards as a clearly separated matching left-and-right pair, fully visible from wrist end to elbow end. Keep the open ends, straps, overlaps, and thickness readable. Do not include gloves, hands, weapons, or full sleeves.';
