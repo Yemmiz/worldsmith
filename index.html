@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.42</title>
+<title>Worldsmith v1.9.43</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.42";
+    content:"v1.9.43";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.42 makes the Structure Exploded View stricter by treating the building as one complete shell cut by two clean horizontal slices, with a single aligned doorway opening and no seam-crossing entrance ornaments.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.43 updates the Structure Exploded View with a wider landscape composition and explicit fit-in-frame spacing so broader three-piece buildings have enough room to render cleanly.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -564,7 +564,10 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Structure concepts also provide an Exploded View tab for a three-piece lower-wall / upper-wall / roof separation. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.42 — Tightened the Structure Exploded View prompt again so it now explicitly frames the result as one complete building shell sliced by two perfectly horizontal cuts, instead of three separately designed pieces.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.43 — Updated the Structure Exploded View prompt to ask for a wide landscape / widescreen composition, giving broader buildings more room to show the lower wall shell, upper wall shell, and roof without crowding.
+• Added explicit fit-in-frame guidance for exploded structures: keep all three pieces fully inside the frame with comfortable outer margins, and scale the subject down slightly if needed instead of collapsing the slice spacing.
+• Reinforced that separation readability matters more than filling the canvas, which should help broader footprint buildings keep their clean exploded gaps.
+• v1.9.42 — Tightened the Structure Exploded View prompt again so it now explicitly frames the result as one complete building shell sliced by two perfectly horizontal cuts, instead of three separately designed pieces.
 • Lower wall and upper wall pieces now have stricter seam rules: preserve one shared aligned doorway opening, keep identical doorway width / centerline across both slices, and keep the gap between them completely empty.
 • Added explicit bans on seam-crossing entrance ornaments such as pointed arch crowns, pediments, gables, trim bridges, hanging details, and other geometry that would interfere when recombining the two wall sections.
 • v1.9.41 — Refined the Structure Exploded View prompt so the lower wall band and upper wall section are each described as one complete continuous shell following the same full footprint, rather than disconnected wall fragments.
@@ -2256,12 +2259,15 @@ function buildStructureExplodedPrompt(c,palette,rarityText){
   lines.push('Create a standalone exterior structure / building concept for a stylized fantasy RPG world.');
   lines.push('Show one full building or architectural structure clearly, with the overall silhouette, larger footprint, roofline, entrance placement, window rhythm, and major construction materials easy to understand.');
   lines.push('Use a clearly elevated top-down isometric or high three-quarter camera, looking down at the structure rather than viewing it near eye level. Aim for roughly 40–55 degrees of downward viewing angle so the building footprint, wall thickness, open top, piece separation, and major layout are easy to understand for 3D modelling. Keep enough side visibility to read facade construction; do not use a near-vertical orthographic top view.');
+  lines.push('Compose the image in a wide landscape / widescreen presentation rather than a tall or square-feeling composition. Give the building enough horizontal breathing room so a broader footprint and all three exploded parts can fit comfortably without crowding, distortion, or forced overlap.');
+  lines.push('Keep the entire three-piece structure comfortably inside the frame with clear outer margins on all sides. Scale the subject so the roof, upper wall shell, and lower wall shell all fit cleanly in one shot with ample negative space between the pieces and around the overall silhouette. Do not crop, squeeze, or compress the exploded arrangement just to make it fit.');
   lines.push('Prefer a broader larger-area building footprint than before. Let the structure occupy a roomier width/depth area and read as a more substantial building in plan view, without simply becoming much taller. Favor wider, deeper, more spacious footprints over tall narrow stacks whenever the structure type allows it.');
   lines.push('Keep windows deliberately sparse. Use only a few purposeful windows appropriate to the building type, typically around 2–4 clearly visible windows on a modest structure from the chosen camera angle. Leave broad uninterrupted wall sections between openings. Do not place a window in every wall bay, do not create long repeated rows of identical windows, and avoid excessive roof dormers or decorative window clusters. One strong window placement is better than many repeated ones.');
   lines.push('Very important: present the structure as a clean THREE-PIECE exploded building view. Separate the building into exactly 3 clearly detached parts: 1) a lower wall section forming the bottom band of the building, about one meter tall around the footprint; 2) the rest of the wall/body shell above that lower band; and 3) the roof as its own distinct lifted piece.');
   lines.push('All three pieces must be cleanly separated from each other with visible space between them. They must remain correctly aligned to the same footprint and clearly read as parts of one building, but there must be no touching, no fused edges, no linking supports, no bridging beams, no connector meshes, and no shared geometry joining one exploded piece to another.');
   lines.push('Think of the result as ONE already-complete building that has been sliced apart by two perfectly horizontal cuts, not as three separately designed assets. All three parts must preserve the same outer footprint, same wall alignment, same corner locations, and the same facade logic.');
   lines.push('Use generous, even spacing between the lower wall slice, upper wall slice, and roof, so all three pieces are unmistakably detached and the background is clearly visible between them. Do not let the gaps collapse or vary wildly from one side to another.');
+  lines.push('When in doubt, make the subject slightly smaller in frame rather than letting the wider footprint force the slices too close together. Readability of the three-piece separation is more important than filling every inch of the canvas.');
   lines.push('The bottom wall band must be ONE complete continuous lower-wall shell that wraps the full visible building footprint. It should read like the first meter of the actual walls sliced cleanly away from the upper walls, not like a separate terrain plinth, a chunky platform, or a handful of disconnected wall fragments. Show the full perimeter slice as one coherent part, with the corners and wall runs continuing all the way around as far as the chosen view allows.');
   lines.push('The lower wall band should preserve the exact footprint, thickness, and entrance position of the building. If the building has a doorway, the lower band must contain only the lower continuation of that one same doorway opening. Use the same doorway width, same centerline, and same jamb positions as the upper wall slice. Do not invent a separate extra entrance, separate little doorframe, separate threshold design, or duplicated doorway design for the lower slice.');
   lines.push('The top edge of the lower wall band should read as a clean level horizontal cut plane all the way around the structure. Do not let peaks, gables, doorway pediments, pointed arch tops, decorative trim, or other upward projections rise above that cut edge.');
@@ -2292,7 +2298,7 @@ function buildStructureExplodedPrompt(c,palette,rarityText){
   if(sMat) lines.push(`Primary construction: ${sMat[1]}.`);
   if(sUse) lines.push(`World use or fantasy role: ${sUse[1]}.`);
   if(sSet) lines.push(`Typical setting inspiration only: ${sSet[1]}. Do not render a full surrounding scene.`);
-  lines.push('No cutaway interior, no floorplan diagram, no UI text, and no technical notes. Keep it as a clean exterior building concept in a three-piece exploded presentation for image-to-3D interpretation. The key read should be one building divided horizontally into three aligned, complete, full-shell parts: lower wall shell, upper wall shell, and roof. The lower and upper wall pieces must feel like exact horizontal slices of the same original building shell, with one shared aligned doorway and a completely empty clean seam between them.');
+  lines.push('No cutaway interior, no floorplan diagram, no UI text, and no technical notes. Keep it as a clean exterior building concept in a three-piece exploded presentation for image-to-3D interpretation. The key read should be one building divided horizontally into three aligned, complete, full-shell parts: lower wall shell, upper wall shell, and roof. The lower and upper wall pieces must feel like exact horizontal slices of the same original building shell, with one shared aligned doorway and a completely empty clean seam between them. Favor a wide landscape composition so the broader footprint and clear separation both have enough room.');
   return [lines.join(' '),...designStyleDirectives(c.category),placeholderNameGuidance()].join(' ');
 }
 
