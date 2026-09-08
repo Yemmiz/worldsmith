@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.47</title>
+<title>Worldsmith v1.9.48</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.47";
+    content:"v1.9.48";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.47 replaces the unreliable separate Structure wall/roof prompts with one same-scale three-part sheet: roof, upper wall shell, and a genuinely short lower wall slice rendered together in one image.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.48 replaces the unreliable separate Structure wall/roof prompts with one same-scale three-part sheet: roof, upper wall shell, and a genuinely short lower wall slice rendered together in one image.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -564,7 +564,11 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Structure concepts also provide a 3-Part Sheet tab that renders the roof, upper wall shell, and short lower wall slice together in one image at the exact same scale, avoiding cross-image size drift. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.47 — Removed the separate Split Walls and Roof Only Structure tabs because independent images cannot reliably preserve relative scale between the wall shell and roof.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.48 — Refined the Structure 3-Part Sheet prompt so the upper wall shell must keep fully readable interior-facing wall surfaces instead of losing them or simplifying them into a bland empty colour field.
+• Added explicit material-continuity rules for those visible inner faces: if the inside of the upper wall shell is exposed, it should use the same wall-material family and colour language as the facade rather than becoming a generic void.
+• Added stricter roof-to-wall seating rules: avoid pointed facade peaks, doorway crowns, or wall projections that would collide with the roof when reassembled unless the roof has the exact matching recess.
+• The final validation step now explicitly checks both inner-wall readability and roof-to-wall compatibility alongside the lower-slice height ratio.
+• v1.9.47 — Removed the separate Split Walls and Roof Only Structure tabs because independent images cannot reliably preserve relative scale between the wall shell and roof.
 • Reworked the Structure extra prompt into one ultra-wide 3-Part Sheet containing roof, upper wall shell, and lower wall slice together at one locked pixels-per-meter scale.
 • The lower slice now has an explicit 0.8–1.0 m / 20–25% wall-height rule, while the upper wall shell must be roughly 75–80% of total wall height and visibly 3–4 times taller.
 • Added explicit same-scale, same-camera, same-footprint rules and a left-to-right ROOF | UPPER WALL | LOWER WALL contact-sheet layout so none of the pieces can hide behind another.
@@ -2284,12 +2288,18 @@ function buildStructureExplodedPrompt(c,palette,rarityText){
   lines.push('The top edge of the lower slice must be a flat horizontal cut plane. No windows should appear in the lower slice unless a window truly extends below the one-meter cut; default to NO windows in Piece C. No arch crowns, lintels, gables, banners, decorative peaks, or upward projections may extend above its cut line.');
   lines.push('DOORWAY SPLIT: there is exactly ONE doorway in the original wall position. Piece C contains only the bottom 20–25% of that doorway: a simple open gap with short lower jamb portions. It must NOT contain a complete doorway, arch, lintel, gate, pediment, or separate doorframe.');
   lines.push('PIECE B — UPPER WALL SHELL: show the exact same footprint, corners, wall thickness, support-post positions, and doorway centerline as Piece C, but containing only the upper 75–80% of the walls. This is where the windows, doorway arch/lintel, upper trim, and most facade identity belong.');
+  lines.push('Piece B must keep a FULLY READABLE INNER WALL SHELL all the way around the open top. Do not let the interior faces disappear, dissolve into fog, fade into the background, or collapse into a near-empty void. The interior-facing wall surfaces should be clearly present around the whole perimeter, with believable thickness and readable construction.');
+  lines.push('If the inner faces of Piece B are visible, they must use the SAME MATERIAL FAMILY and closely matching colour treatment as the exterior construction: matching plaster, stone, brick, timber framing, trim logic, and wall-surface language, just simplified slightly for the less-decorated inside. Do not render the inside as a flat bland single colour, a dark empty hole, or a generic untextured surface unrelated to the facade.');
   lines.push('The bottom edge of Piece B must be the matching flat horizontal cut plane. It must not contain foundation blocks or the lower meter of the wall. No geometry may hang downward across the cut seam.');
+  lines.push('The TOP silhouette of Piece B where the roof will sit must also be roof-compatible. Do not create a tall pointed facade peak, wall gable, doorway crown, or ornamental wall projection that would collide with a flatter roof piece above it. Default to a clean simple roof-seat / wall-plate profile that the roof can rest on naturally. If the architecture suggests a front-facing gable or crest, either keep it fully integrated into the roof piece or simplify it so the wall shell does not poke up into the roof volume.');
+  lines.push('Very important roof-seat rule: the roof and upper wall shell must feel mechanically compatible when reassembled. No collision between roof underside and upper-wall peaks. No wall features rising into roof space unless the roof clearly has the exact matching recess; default to avoiding those raised wall peaks altogether.');
   lines.push('FOOTPRINT MATCH TEST: if Piece C were translated straight upward beneath Piece B, every wall edge, inner edge, corner, vertical post, structural bay, and doorway jamb must align exactly. Their plan-view footprint must be identical.');
   lines.push('PIECE A — ROOF: show the complete roof at the exact same pixels-per-meter scale and same building footprint as Pieces B and C. Do not enlarge the roof just because it is shown separately. Its eaves, ridges, dormers, chimneys, and roof ornaments should match the same building geometry and remain proportionate to the wall shells.');
+  lines.push('The underside and lower edge profile of Piece A must visibly make sense with the top profile of Piece B. The roof should appear ready to drop onto the upper wall shell without collisions. Avoid roof shapes that assume a flat wall top if Piece B would instead have protruding peaks, and avoid wall peaks unless the roof explicitly accommodates them. In practice, favor a simpler cleaner roof-to-wall junction over fancy intersecting front peaks.');
   lines.push('Keep windows deliberately sparse, primarily on Piece B. Avoid repeated window rows, window spam, excessive dormers, or filling every wall bay.');
   lines.push('Prefer a broader larger-area building footprint than older compact structure concepts, but keep it as one coherent building footprint that all three pieces can share exactly. Favor width and depth rather than unnecessary extra height.');
   lines.push('Do not show a furnished interior or visible floor. No furniture, counters, shelves, props, floorboards, or interior room scene. If an interior base surface would appear, omit it or render it the same neutral background colour so it disappears.');
+  lines.push('However, while the floor should disappear, the INNER WALLS themselves must remain fully visible and readable on Piece B and, where relevant, Piece C. Remove floors, not wall interiors.');
   lines.push('Show only the three building pieces on a simple neutral background. No terrain, ground plane, path, fences, crates, barrels, carts, benches, signposts, or scenic environment dressing.');
   lines.push(`Structure identity: ${c.visual.join(', ')}.`);
   if(c.role) lines.push(`Structure type: ${c.role}.`);
@@ -2303,7 +2313,7 @@ function buildStructureExplodedPrompt(c,palette,rarityText){
   if(sMat) lines.push(`Primary construction: ${sMat[1]}. Preserve the corresponding materials continuously across the wall cut.`);
   if(sUse) lines.push(`World use or fantasy role: ${sUse[1]}.`);
   if(sSet) lines.push(`Typical setting inspiration only: ${sSet[1]}. Do not render a surrounding scene.`);
-  lines.push('Final check before rendering: exactly three pieces, one building identity, one footprint, one camera, one scale. Roof full size; upper wall shell roughly 75–80% of wall height; lower wall slice only roughly 20–25% of wall height. The lower slice must visibly be much shorter, not a second full-height wall shell.');
+  lines.push('Final check before rendering: exactly three pieces, one building identity, one footprint, one camera, one scale. Roof full size; upper wall shell roughly 75–80% of wall height; lower wall slice only roughly 20–25% of wall height. The lower slice must visibly be much shorter, not a second full-height wall shell. The upper wall shell must keep readable inner wall faces in matching materials, and the roof must be able to sit on the upper wall shell without any colliding doorway peaks or mismatched roof-seat geometry.');
   lines.push('No UI text, labels, dimensions, technical diagrams, floorplan, character, or environment. Keep this as a clean same-scale three-part building model reference sheet.');
   return [lines.join(' '),...designStyleDirectives(c.category),placeholderNameGuidance()].join(' ');
 }
