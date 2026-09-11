@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.48</title>
+<title>Worldsmith v1.9.49</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.48";
+    content:"v1.9.49";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,7 +480,7 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.48 replaces the unreliable separate Structure wall/roof prompts with one same-scale three-part sheet: roof, upper wall shell, and a genuinely short lower wall slice rendered together in one image.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.49 greatly expands Monster and Boss body-plan variety with many new animal-inspired creature frames, including octopus and slug forms.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
@@ -564,7 +564,10 @@
       <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Structure concepts also provide a 3-Part Sheet tab that renders the roof, upper wall shell, and short lower wall slice together in one image at the exact same scale, avoiding cross-image size drift. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.48 — Refined the Structure 3-Part Sheet prompt so the upper wall shell must keep fully readable interior-facing wall surfaces instead of losing them or simplifying them into a bland empty colour field.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.49 — Greatly expanded Monster / Boss animal body-plan variety. Added Octopus / Cephalopod and Slug / Gastropod as requested, plus Crab / Crustacean, Beetle, Centipede, Mantis, Turtle / Tortoise, Worm / Burrower, Jellyfish, Shark / Predatory Fish, Manta / Ray, Ape / Gorilla, Stag, Ram / Goat, Rhinoceros, Feline Stalker, Raptor / Dinosaur, Mammoth / Elephant, and Boar / Tusker creature frames.
+• New creature profiles include role and theme affinities so the extra body plans still tend to appear in sensible encounter contexts while remaining available for unusual fantasy combinations.
+• Updated arthropod handling so newly added crab, beetle, centipede, and mantis frames are not contradicted by the anti-spider / anti-insect prompt safeguard when they are intentionally selected.
+• v1.9.48 — Refined the Structure 3-Part Sheet prompt so the upper wall shell must keep fully readable interior-facing wall surfaces instead of losing them or simplifying them into a bland empty colour field.
 • Added explicit material-continuity rules for those visible inner faces: if the inside of the upper wall shell is exposed, it should use the same wall-material family and colour language as the facade rather than becoming a generic void.
 • Added stricter roof-to-wall seating rules: avoid pointed facade peaks, doorway crowns, or wall projections that would collide with the roof when reassembled unless the roof has the exact matching recess.
 • The final validation step now explicitly checks both inner-wall readability and roof-to-wall compatibility alongside the lower-slice height ratio.
@@ -1271,23 +1274,44 @@ const monsterBodyProfiles=[
   {key:'serpentine',label:'Serpentine monster',prompt:'Use a snake-like, eel-like, or naga-like body plan with one clear dominant sweep and only a few bold secondary shapes. Keep it readable and not over-coiled.',size:'medium streamlined creature',roles:['Assassin','Mage','Controller','Support'],themes:['Serpent','Ocean','Sunken','Void','Astral']},
   {key:'construct-idol',label:'Construct / idol creature',prompt:'Use a simplified construct, animated statue, or living idol frame with bold geometry, thick limbs, and readable material blocks rather than organic bug anatomy.',size:'medium-to-large rigid creature',roles:['Tank','Bruiser','Controller','Summoner'],themes:['Clockwork','Rune-carved','Ancient','Dwarven','Cathedral','Knightly']},
   {key:'arachnid-stalker',label:'Arachnid stalker',prompt:'Use a spider-like creature frame with multiple legs and a low stalking silhouette. Keep the legs fewer, larger, and chunkier.',size:'small-to-medium crawler',roles:['Swarm','Assassin','Controller'],themes:['Spider','Insect','Shadow','Rot']},
-  {key:'scorpion-shellback',label:'Scorpion / shellback',prompt:'Use a scorpion-like or shell-backed arthropod frame with a clear segmented body and a few large limbs, not many tiny ones.',size:'medium crawler',roles:['Bruiser','Tank','Controller'],themes:['Desert','Insect','Rot','Sunken']}
+  {key:'scorpion-shellback',label:'Scorpion / shellback',prompt:'Use a scorpion-like or shell-backed arthropod frame with a clear segmented body and a few large limbs, not many tiny ones.',size:'medium crawler',roles:['Bruiser','Tank','Controller'],themes:['Desert','Insect','Rot','Sunken']},
+
+  {key:'octopus-cephalopod',label:'Octopus / cephalopod',prompt:'Use an octopus, squid, or cuttlefish-inspired body plan with one strong central mantle/head mass and a limited set of large readable tentacles. Keep the tentacles chunky, clearly separated, and easy to follow rather than creating a tangled mass of thin limbs.',size:'medium-to-large tentacled creature',roles:['Controller','Mage','Summoner','Tank','Assassin'],themes:['Ocean','Deep Sea','Sunken','Void','Eldritch','Astral']},
+  {key:'slug-gastropod',label:'Slug / gastropod',prompt:'Use a slug or shell-less gastropod body plan with a low heavy body, broad muscular foot, simple head feelers, and one strong flowing silhouette. Keep it chunky and readable; avoid dozens of tiny feelers or realistic wet micro-detail.',size:'small-to-large low crawler',roles:['Tank','Controller','Support','Swarm'],themes:['Swamp','Rot','Fungal','Nature','Underground','Deep Sea']},
+  {key:'crab-crustacean',label:'Crab / crustacean',prompt:'Use a broad crab or lobster-inspired body plan with a low armored shell, a small number of large walking limbs, and one or two oversized readable claws. Keep the silhouette wide and sturdy rather than spindly.',size:'medium armored crawler',roles:['Tank','Bruiser','Controller'],themes:['Ocean','Deep Sea','Sunken','Insect','Coastal']},
+  {key:'beetle-carapace',label:'Beetle / carapace beast',prompt:'Use a beetle-inspired creature frame with a strong domed carapace, chunky legs, and a bold head or horn shape. Keep the shell as one large readable mass and avoid tiny insect anatomy.',size:'small-to-large armored insect beast',roles:['Tank','Bruiser','Swarm','Controller'],themes:['Insect','Jungle','Nature','Rot','Ancient','Desert']},
+  {key:'centipede-crawler',label:'Centipede / segmented crawler',prompt:'Use a long segmented centipede-like body with a clear head, repeating body rhythm, and fewer larger leg pairs than a realistic centipede. Keep the segments broad and readable, with one strong directional silhouette.',size:'medium-to-large segmented crawler',roles:['Swarm','Assassin','Controller','Bruiser'],themes:['Insect','Underground','Rot','Shadow','Jungle']},
+  {key:'mantis-predator',label:'Mantis predator',prompt:'Use a praying-mantis-inspired frame with a narrow upright thorax, two large folded striking forelimbs, and a small number of readable supporting legs. Emphasize the hooked forearms and angular silhouette without realistic insect clutter.',size:'medium agile insect predator',roles:['Assassin','Bruiser','Controller','Archer'],themes:['Insect','Jungle','Nature','Shadow','Fey']},
+  {key:'turtle-shellback',label:'Turtle / tortoise shellback',prompt:'Use a turtle or tortoise-inspired body plan with one huge readable shell mass, stout limbs, and a compact head. The shell should dominate the silhouette and feel weighty rather than covered in tiny plates.',size:'medium-to-large defensive quadruped',roles:['Tank','Bruiser','Support'],themes:['Nature','Ocean','Swamp','Ancient','Crystal','Dwarven']},
+  {key:'worm-burrower',label:'Worm / burrower',prompt:'Use a thick worm, leech, or burrowing larva body plan with a simple tapered segmented body and a clear head end. Keep the form broad and muscular rather than thin, stringy, or covered in many little appendages.',size:'small-to-large burrowing creature',roles:['Swarm','Controller','Bruiser','Summoner'],themes:['Underground','Rot','Fungal','Blood','Desert','Eldritch']},
+  {key:'jellyfish-floater',label:'Jellyfish / medusa floater',prompt:'Use a jellyfish-inspired floating body plan with one broad bell or umbrella mass and only a few thick trailing tendrils. Keep the silhouette elegant and readable, with large separated hanging forms rather than many hair-thin tentacles.',size:'small-to-large floating creature',roles:['Mage','Support','Controller','Summoner'],themes:['Ocean','Deep Sea','Astral','Celestial','Void','Dream']},
+  {key:'shark-predator',label:'Shark / predatory fish',prompt:'Use a shark, barracuda, or predatory fish-inspired body plan with one powerful streamlined body, clear fins, and a strong jaw silhouette. Keep it stylized and chunky rather than anatomically delicate.',size:'medium-to-large streamlined predator',roles:['Assassin','Bruiser','Controller'],themes:['Ocean','Deep Sea','Sunken','Blood']},
+  {key:'manta-skimmer',label:'Manta / ray skimmer',prompt:'Use a manta ray or stingray-inspired body plan with a broad wing-like disc, tapered tail, and smooth gliding silhouette. Keep the main body as one readable shape with only a few strong secondary forms.',size:'medium-to-large gliding creature',roles:['Mage','Support','Controller','Assassin'],themes:['Ocean','Deep Sea','Astral','Void','Storm']},
+  {key:'ape-brute',label:'Ape / gorilla brute',prompt:'Use an ape or gorilla-inspired frame with a deep chest, long heavy forearms, shorter powerful legs, and a forward-weighted knuckle-walking or semi-upright silhouette. Keep the anatomy chunky and game-readable.',size:'medium-to-large muscular beast',roles:['Bruiser','Tank','Controller'],themes:['Jungle','Nature','Wildwood','Ancient','Tribal']},
+  {key:'stag-antlered',label:'Stag / antlered beast',prompt:'Use a deer, elk, or stag-inspired quadruped with long readable legs, a lifted chest, and one strong antler or branching-horn silhouette. Keep the antlers broad and simplified instead of densely branched.',size:'medium graceful quadruped',roles:['Assassin','Controller','Support','Mage'],themes:['Nature','Wildwood','Fey','Moonlit','Celestial']},
+  {key:'ram-charger',label:'Ram / horned charger',prompt:'Use a ram, goat, or ibex-inspired quadruped with a compact powerful body, thick neck, and one pair of oversized readable curled or sweeping horns. Emphasize forward-driving charge energy.',size:'medium sturdy quadruped',roles:['Bruiser','Tank','Controller'],themes:['Mountain','Norse','Nature','Dwarven','Desert','Ancient']},
+  {key:'rhino-bulwark',label:'Rhinoceros / heavy horned beast',prompt:'Use a rhinoceros-inspired heavy quadruped with a barrel body, short thick legs, broad head, and one or two oversized horns. Keep the mass low, dense, and extremely readable.',size:'large heavy quadruped',roles:['Tank','Bruiser','Controller'],themes:['Desert','Jungle','Nature','Ancient','Tribal']},
+  {key:'feline-stalker',label:'Feline stalker',prompt:'Use a big-cat-inspired quadruped such as a panther, lion, tiger, or lynx, with a long low torso, powerful shoulders, large paws, and a clear predatory head silhouette. Keep the body sleek but chunky enough for game readability.',size:'medium agile quadruped',roles:['Assassin','Bruiser','Controller'],themes:['Jungle','Wildwood','Shadow','Nature','Moonlit']},
+  {key:'raptor-dinosaur',label:'Raptor / dinosaur hunter',prompt:'Use a theropod or raptor-inspired bipedal creature frame with powerful hind legs, a long balancing tail, compact clawed forelimbs, and a strong predatory head. Keep it broad and stylized rather than scientifically intricate.',size:'medium-to-large bipedal predator',roles:['Assassin','Bruiser','Swarm'],themes:['Jungle','Ancient','Desert','Nature','Draconic']},
+  {key:'mammoth-elephant',label:'Mammoth / elephant beast',prompt:'Use an elephant or mammoth-inspired quadruped with a massive torso, pillar-like legs, broad ears or fur masses, a strong trunk, and large simplified tusks. Make the huge weight and front-heavy silhouette the main read.',size:'large-to-colossal quadruped',roles:['Tank','Bruiser','Controller'],themes:['Frost','Ancient','Nature','Tribal','Norse']},
+  {key:'boar-tusker',label:'Boar / tusked charger',prompt:'Use a boar or warthog-inspired quadruped with a thick shoulder hump, short powerful legs, broad snout, and large readable tusks. Keep the silhouette compact, aggressive, and built for charging.',size:'small-to-medium heavy quadruped',roles:['Bruiser','Tank','Swarm'],themes:['Wildwood','Nature','Rot','Norse','Ashen']}
 ];
 function makeMonsterBody(role,ts,tier,cat){
   const themeSet=new Set(ts||[]);
+  const arthropodKeys=new Set(['arachnid-stalker','scorpion-shellback','crab-crustacean','beetle-carapace','centipede-crawler','mantis-predator']);
   let pool=[];
   monsterBodyProfiles.forEach(p=>{
     let w=1;
     if((p.roles||[]).includes(role)) w+=3;
     if((p.themes||[]).some(t=>themeSet.has(t))) w+=3;
-    if((tier==='Boss'||cat==='Boss') && /Hulking|Construct|Serpentine|Flying/.test(p.label)) w+=1;
-    if((tier==='Normal'||tier==='Veteran') && /Small|Simple/.test(p.label)) w+=1;
-    if((p.key==='arachnid-stalker' || p.key==='scorpion-shellback') && !(themeSet.has('Spider')||themeSet.has('Insect')||themeSet.has('Desert'))) w=Math.max(0.2,w-3.5);
+    if((tier==='Boss'||cat==='Boss') && /Hulking|Construct|Serpentine|Flying|Octopus|Turtle|Shark|Ape|Rhinoceros|Mammoth|Centipede/.test(p.label)) w+=1;
+    if((tier==='Normal'||tier==='Veteran') && /Small|Simple|Slug|Worm|Boar/.test(p.label)) w+=1;
+    if(arthropodKeys.has(p.key) && !(themeSet.has('Spider')||themeSet.has('Insect')||themeSet.has('Desert')||themeSet.has('Swamp')||themeSet.has('Jungle')||themeSet.has('Ocean'))) w=Math.max(0.2,w-3.5);
     if((p.key==='winged-flier' || p.key==='avian-raider') && Math.random()<0.25) w+=1;
     for(let i=0;i<Math.max(1,Math.round(w));i++) pool.push(p);
   });
   const chosen=R(pool);
-  const antiArach=((chosen.key!=='arachnid-stalker'&&chosen.key!=='scorpion-shellback') && !(themeSet.has('Spider')||themeSet.has('Insect')));
+  const antiArach=(!arthropodKeys.has(chosen.key) && !(themeSet.has('Spider')||themeSet.has('Insect')));
   return {label:chosen.label,prompt:chosen.prompt,size:chosen.size,antiArach};
 }
 function makeFamily(ts){
