@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worldsmith v1.9.50</title>
+<title>Worldsmith v1.9.51</title>
 <style>
   :root{
     --bg0:#07080c;
@@ -87,7 +87,7 @@
     line-height:1.45;
   }
   header:after{
-    content:"v1.9.50";
+    content:"v1.9.51";
     flex:0 0 auto;
     padding:9px 13px;
     border:1px solid #f3c66f55;
@@ -480,10 +480,30 @@
 </style>
 </head>
 <body>
-<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.50 adds Dungeon Zones: larger connected dungeon areas that preserve the readable hand-painted Dungeon Room style while showing multi-space level flow.</div></div></header>
+<header><div><h1>Worldsmith</h1><div class="sub">Fantasy content forge for ARPG monsters, items, spells, NPCs, quests, encounters, and saved design notes. v1.9.51 adds Animation Guide Sheets: consistent fantasy characters, five readable key poses per action, fixed cameras, reference locks and separate animator timing instructions.</div></div></header>
 <main>
   <aside class="box controls">
     <label>Category</label><select id="category"></select>
+
+    <section id="guideControls" hidden style="margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)">
+      <h2 style="font-size:16px;margin:0 0 8px">Animation Guide Sheet</h2>
+      <p class="small">Exactly 5 poses per action. Timing stays in its own tab; the image contains no text.</p>
+      <label for="guideBody">Body plan</label><select id="guideBody"><option value="humanoid">Humanoid</option><option value="quadruped">Quadruped creature</option><option value="winged">Winged quadruped creature</option></select>
+      <label for="guideCount">Animation rows</label><select id="guideCount"><option value="1">1 action / 5 poses</option><option value="2">2 actions / 10 poses</option><option value="3" selected>3 actions / 15 poses</option></select>
+      <label for="guideMove1">Action 1</label><select id="guideMove1"></select>
+      <label for="guideMove2">Action 2</label><select id="guideMove2"></select>
+      <label for="guideMove3">Action 3</label><select id="guideMove3"></select>
+      <label for="guideCamera">Fixed camera</label><select id="guideCamera"><option value="side">True side / facing right</option><option value="front">True front</option><option value="three">Three-quarter front / 45°</option><option value="game">Isometric game check / 35° above</option></select>
+      <label for="guideReference">Character consistency</label><select id="guideReference"><option value="new">Create a new character</option><option value="locked">Lock to attached front + side images</option></select>
+      <p class="small">Reference images are attached to your image generator, not to Worldsmith. Generate the Character Reference first if needed.</p>
+      <details><summary>Character details &amp; single pose</summary>
+        <label for="guideIdentity">Exact identity / outfit / weapons (optional)</label><textarea id="guideIdentity" style="min-height:100px;height:100px" placeholder="Name / role, heads tall, build, face, hair, garments + colours, footwear, weapon dimensions and grip. Leave empty for a generated fantasy character."></textarea>
+        <p class="small">For custom characters, define the props needed by your selected actions. Choose a matching body plan and use Exact anatomy for special limb counts.</p>
+        <label for="guideAnatomy">Exact anatomy (optional)</label><textarea id="guideAnatomy" style="min-height:90px;height:90px" placeholder="Override with exact limb counts, attachment points, joint directions, wings, tail, head, horns and eyes. Leave empty to use the selected body plan."></textarea>
+        <label for="guidePoseRow">Single Pose: action row</label><select id="guidePoseRow"><option value="0">Action 1</option><option value="1">Action 2</option><option value="2">Action 3</option></select>
+        <label for="guidePoseFrame">Single Pose: key pose</label><select id="guidePoseFrame"><option value="0">1 — Ready / start</option><option value="1">2 — Anticipation / weight shift</option><option value="2">3 — Action / contact / apex</option><option value="3">4 — Follow-through / landing</option><option value="4">5 — Recovery / cycle end</option></select>
+      </details>
+    </section>
     <label>Directed idea</label><input id="ideaInput" type="text" placeholder="e.g. Raven Statue, Goblin Chef, Frost Wolf" />
     <label>Idea Drift: <span id="ideaChaosLabel">25</span>%</label><input id="ideaChaos" type="range" min="0" max="100" value="25" />
     <label>Chaos: <span id="chaosLabel">50</span>%</label><input id="chaos" type="range" min="0" max="100" value="50" />
@@ -530,6 +550,9 @@
       </div>
       <div class="prompt-tab-row" id="promptTabs">
         <button class="prompt-tab active" data-prompt-tab="prompt">Image Prompt</button>
+        <button class="prompt-tab" data-prompt-tab="guideReferencePrompt">Character Reference</button>
+        <button class="prompt-tab" data-prompt-tab="guidePosePrompt">Single Pose</button>
+        <button class="prompt-tab" data-prompt-tab="guideTimingPrompt">Animation Timing</button>
         <button class="prompt-tab" data-prompt-tab="structureExplodedPrompt">3-Part Sheet</button>
         <button class="prompt-tab" data-prompt-tab="hairGreyscalePrompt">Greyscale Prompt</button>
         <button class="prompt-tab" data-prompt-tab="followupPrompt">Follow-up Prompt</button>
@@ -541,6 +564,9 @@
         <button class="prompt-tab" data-prompt-tab="portraitPromptLegacy">Legacy Spell Icon Prompt</button>
       </div>
       <textarea id="prompt" readonly></textarea>
+      <textarea id="guideReferencePrompt" readonly style="display:none" placeholder="Front and side references for Animation Guide Sheet."></textarea>
+      <textarea id="guidePosePrompt" readonly style="display:none" placeholder="One selected key pose for Animation Guide Sheet."></textarea>
+      <textarea id="guideTimingPrompt" readonly style="display:none" placeholder="Separate animation timing and interpolation instructions."></textarea>
       <textarea id="structureExplodedPrompt" readonly style="display:none" placeholder="Generated only for Structure concepts. Creates one same-scale three-part sheet: roof, upper wall shell, and short lower wall slice."></textarea>
       <textarea id="hairGreyscalePrompt" readonly style="display:none" placeholder="Generated only for Hair concepts. Creates a neutral dye-friendly greyscale version of the same hairstyle."></textarea>
       <textarea id="followupPrompt" readonly style="display:none" placeholder="Generated for Monster, Boss, NPC, Vendor, Companion, and Flora concepts."></textarea>
@@ -561,10 +587,13 @@
       <textarea id="sfxLoopPrompt" readonly style="display:none" placeholder="ElevenLabs looping ambience prompt, generated where a continuous sound makes sense."></textarea>
       <textarea id="sfxUiPrompt" readonly style="display:none" placeholder="ElevenLabs UI / pickup sound prompt, generated for item-like categories."></textarea>
       <p class="prompt-panel-note sfx-settings-note" id="sfxSettingsNote" style="display:none"></p>
-      <p class="prompt-panel-note" id="promptPanelGenericNote">The general image prompt is shown by default after each generation. Structure concepts also provide a 3-Part Sheet tab that renders the roof, upper wall shell, and short lower wall slice together in one image at the exact same scale, avoiding cross-image size drift. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
+      <p class="prompt-panel-note" id="promptPanelGenericNote">Animation Guide Sheet creates one to three rows of exactly five key poses in Worldsmith’s clean stylized 3D character style. Character Reference establishes the front and side design; Single Pose isolates the selected action and key pose; Animation Timing keeps seconds, event holds and easing instructions outside the image. Attach front and side references in your image generator when using the reference lock. The general image prompt is shown by default after each generation. Structure concepts also provide a 3-Part Sheet tab that renders the roof, upper wall shell, and short lower wall slice together in one image at the exact same scale, avoiding cross-image size drift. Hair concepts also provide a Greyscale Prompt for generating the same hairstyle as a neutral dye-friendly base. Click another tab to switch prompt type. Tabs that do not apply to the current category are dimmed automatically. Spell, Skill, Spell VFX, Anime Spell VFX, and VFX Arc now also provide both a newer premium Portrait / Icon Prompt and a Legacy Spell Icon Prompt for easy comparison. Anime Spell VFX and VFX Arc also provide a Shader Masks Prompt for establishing the texture plan, plus Post-Texture Plan Instructions for turning that plan into individually optimized generation prompts and reviewing each resulting map critically. The 🔊 Audio mode generates matching ElevenLabs sound-effect prompts: one-shots are kept dry (no baked reverb) so they stay usable anywhere in-game, while ambience prompts are meant for seamless loops.</p>
     </div>
     <div class="section"><h2>Implementation Stub</h2><div class="code" id="stub"></div></div>
-    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.50 — Added a new Dungeon Zone category for larger authored playable areas that sit between a single Dungeon Room and a full Biome.
+    <div class="section"><h2>Worldsmith Changelog</h2><div class="code">• v1.9.51 — Added Animation Guide Sheet with one to three actions and exactly five key poses per action, preserving Worldsmith’s clean stylized fantasy 3D character treatment.
+• Added exclusive side, front, three-quarter and isometric camera choices; exact humanoid/creature anatomy; optional custom identity and anatomy; front/side reference locking; and right-hand prop continuity.
+• Added Character Reference, Single Pose and separate Animation Timing tabs. Sheet prompts stay free of text, illustrated effects and playback graphics.
+• v1.9.50 — Added a new Dungeon Zone category for larger authored playable areas that sit between a single Dungeon Room and a full Biome.
 • Dungeon Zones generate connected room clusters, fortress wings, cavern complexes, ruined courtyards, flooded ruins, crypt networks, field-like dungeon spaces, and other multi-space level chunks.
 • Zone generation now rolls overall layout, connection logic, a major landmark, traversal structure, encounter/environmental pressure, and an optional side-content pocket.
 • Dungeon Zone image prompts use the same hand-painted gameplay-readable environment language as Dungeon Rooms, but pull the camera farther back and explicitly show the complete multi-space flow without turning the result into a minimap or distant biome vista.
@@ -687,17 +716,20 @@
 <script>
 const R = a => a[Math.floor(Math.random()*a.length)];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const categories=['Monster','Boss','NPC','Spell','Skill','Spell VFX','Anime Spell VFX','VFX Arc','Weapon','Armour','Hair','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Dungeon Zone','Structure','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
+const categories=['Monster','Boss','NPC','Animation Guide Sheet','Spell','Skill','Spell VFX','Anime Spell VFX','VFX Arc','Weapon','Armour','Hair','Relic','Potion','Crafting Material','Currency','Quest','Dungeon Room','Dungeon Zone','Structure','Biome','Vendor','Flora','Companion','Decoration','Texture','Random Event'];
 const categoryEl=document.getElementById('category'); categories.forEach(c=>categoryEl.add(new Option(c,c)));
 const ideaInputEl=document.getElementById('ideaInput'); const ideaChaosEl=document.getElementById('ideaChaos'); const ideaChaosLabel=document.getElementById('ideaChaosLabel');
 const favCatEl=document.getElementById('favCat'); const favRarityEl=document.getElementById('favRarity');
 const state={current:null, activePromptTab:'prompt', promptMode:'visual', activeVisualTab:'prompt', activeAudioTab:'sfxPrimaryPrompt', locks:{category:false,themes:false,rarity:false,attitude:false,role:false,mechanic:false}};
 
-const visualPromptTabs=['prompt','structureExplodedPrompt','hairGreyscalePrompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','postTexturePlanPrompt','portraitPrompt','portraitPromptLegacy'];
+const visualPromptTabs=['prompt','guideReferencePrompt','guidePosePrompt','guideTimingPrompt','structureExplodedPrompt','hairGreyscalePrompt','followupPrompt','timelinePrompt','spellFlipbookPrompt','shaderMasksPrompt','postTexturePlanPrompt','portraitPrompt','portraitPromptLegacy'];
 const audioPromptTabs=['sfxPrimaryPrompt','sfxSecondaryPrompt','sfxLoopPrompt','sfxUiPrompt'];
 const promptTabs=[...visualPromptTabs,...audioPromptTabs];
 const promptTabMeta={
   prompt:{title:'Image Prompt',copyLabel:'📋 Copy Image Prompt'},
+  guideReferencePrompt:{title:'Animation — Character Reference',copyLabel:'📋 Copy Character Reference'},
+  guidePosePrompt:{title:'Animation — Single Key Pose',copyLabel:'📋 Copy Single Pose'},
+  guideTimingPrompt:{title:'Animation — Timing Instructions',copyLabel:'📋 Copy Animation Timing'},
   structureExplodedPrompt:{title:'Structure — 3-Part Sheet Prompt',copyLabel:'📋 Copy 3-Part Sheet Prompt'},
   hairGreyscalePrompt:{title:'Hair Greyscale Prompt',copyLabel:'📋 Copy Greyscale Prompt'},
   followupPrompt:{title:'Follow-up Prompt',copyLabel:'📋 Copy Follow-up Prompt'},
@@ -1867,6 +1899,7 @@ function directedIdea(){
   synonymThemes.forEach(([rx,t])=>{ if(rx.test(lower) && themes.includes(t) && !foundThemes.includes(t)) foundThemes.push(t); });
   let inferred=null;
   const catRules=[
+    [/animation guide|animation sheet|key pose sheet/, 'Animation Guide Sheet'],
     [/boss|lord|queen|king|ancient one|god/, 'Boss'],
     [/vendor|merchant|seller|trader|shop|blacksmith|apothecary|chef|cook/, 'Vendor'],
     [/npc|villager|priest|scholar|guard|captain|farmer|hermit|jester|child|noble/, 'NPC'],
@@ -2131,6 +2164,7 @@ function standardConcept(forceReroll=false){
   const c={category:cat,themes:ts,rarity:rar,attitude:att,role,lifeStage:lifeStage?lifeStage.label:null,lifeStageRange:lifeStage?lifeStage.range:null,itemSlot:itemMode?itemSlotGroup(cat,role):null,affixCount:itemStats?itemStats.length:null,tech,name,signature,desc,loot,visual,palette,why,dna:dna(ts),itemStats,identity,itemMode,allowItemMechanic,narrativeMode,detailRows:narrative?narrative.detailRows:null,structureRows:narrative?narrative.structureRows:null,directedIdea:directedIdea(),animeVfxForm,arcVfxForm}; state.current=c; render(c);
 }
 function concept(forceReroll=false){
+  if(categoryEl.value===GUIDE_CATEGORY || (state.locks.category&&state.current?.category===GUIDE_CATEGORY) || ideaCategory(categoryEl.value,state.current)===GUIDE_CATEGORY){categoryEl.value=GUIDE_CATEGORY;return animationGuideConcept();}
   if(isCreatureCategory(categoryEl.value) || (state.locks.category && state.current && state.current.creatureMode)) return creatureConcept(forceReroll);
   return standardConcept(forceReroll);
 }
@@ -2312,6 +2346,7 @@ function designStyleDirectives(cat){
   return [];
 }
 function buildVisualPrompt(c,palette,rarityText){
+  if(c.category===GUIDE_CATEGORY)return buildAnimationSheetPrompt(c);
   const base=buildVisualPromptCore(c,palette,rarityText);
   const extra=designStyleDirectives(c.category);
   return [base,...extra,placeholderNameGuidance()].join(' ');
@@ -2417,6 +2452,7 @@ function buildHairGreyscalePrompt(c,palette,rarityText){
 }
 
 function buildPortraitPrompt(c,palette,rarityText){
+  if(c.category===GUIDE_CATEGORY)return 'Not generated for this category. Use Character Reference or Single Pose.';
   const base=buildPortraitPromptCore(c,palette,rarityText);
   const extra=designStyleDirectives(c.category);
   return [base,...extra,placeholderNameGuidance()].join(' ');
@@ -3074,6 +3110,7 @@ function buildSfxPrompts(c){
   return out;
 }
 function render(c){
+ syncGuideControls(c);
  document.getElementById('name').textContent=c.name;
  const kindLabel=c.creatureMode?'Encounter Tier':(c.itemMode?'Item Rarity':'Rarity');
  document.getElementById('meta').innerHTML=`<span class="pill gold">${c.category}</span><span class="pill">${kindLabel}: ${c.creatureMode?c.encounterTier:c.rarity}</span><span class="pill ${c.attitude=='Friendly'?'good':c.attitude=='Hostile'||c.attitude=='Corrupted'?'bad':''}">${c.attitude}</span>`+c.themes.map(t=>`<span class="pill">${t}</span>`).join('');
@@ -3097,7 +3134,7 @@ function render(c){
    if(c.phases) brainRows += kv('Boss Phases',c.phases.join(' | '));
    document.getElementById('tech').innerHTML=brainRows;
  } else if(c.narrativeMode){
-   document.getElementById('details').innerHTML=(c.detailRows||[]).map(r=>kv(r[0],r[1])).join('');
+   document.getElementById('details').innerHTML=(c.detailRows||[]).map(r=>kv(r[0],c.category===GUIDE_CATEGORY?escapeHtml(r[1]):r[1])).join('');
    document.querySelector('#signature').parentElement.querySelector('h2').textContent=c.category+' Focus';
    document.getElementById('signature').textContent=c.signature;
    document.querySelector('#tech').parentElement.querySelector('h2').textContent=c.category+' Structure';
@@ -3123,6 +3160,10 @@ function render(c){
  document.getElementById('dnaText').textContent=c.dna.map(d=>`${d.l} ${d.v}%`).join(' • ');
  const rarityText=c.creatureMode?`${c.encounterTier} encounter-tier`:c.rarity;
  const prompt=buildVisualPrompt(c,palette,rarityText);
+ const isGuide=c.category===GUIDE_CATEGORY;
+ document.getElementById('guideReferencePrompt').value=isGuide?buildGuideReferencePrompt(c):'Not generated for this category.';
+ document.getElementById('guidePosePrompt').value=isGuide?buildGuidePosePrompt(c):'Not generated for this category.';
+ document.getElementById('guideTimingPrompt').value=isGuide?buildGuideTiming(c):'Not generated for this category.';
  const structureExplodedPrompt=buildStructureExplodedPrompt(c,palette,rarityText);
  const hairGreyscalePrompt=buildHairGreyscalePrompt(c,palette,rarityText);
  const followupPrompt=buildFollowupPrompt(c,palette,rarityText);
@@ -3659,10 +3700,12 @@ function buildTimelinePrompt(c,palette,rarityText){
 }
 
 function exportData(c){
+ if(c.category===GUIDE_CATEGORY)return {id:c.name.toLowerCase().replace(/[^a-z0-9]+/g,'_'),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,guide:c.guide,identity:guideIdentity(c),anatomy:c.guide.anatomy||guideBodies[c.guide.body],actions:c.guide.moves.map(key=>({key,...guideMoves[key]})),sheetPrompt:buildAnimationSheetPrompt(c),referencePrompt:buildGuideReferencePrompt(c),singlePosePrompt:buildGuidePosePrompt(c),timingInstructions:buildGuideTiming(c)};
  if(c.creatureMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,encounterTier:c.encounterTier,themes:c.themes,palette:c.palette,monsterRole:c.monsterRole,combatPersonality:c.combatPersonality,threatBudget:c.threatBudget,abilities:c.abilities,rotation:c.rotation,habitat:c.habitat,encounterUse:c.encounterUse,weakness:c.weakness,family:c.family,phases:c.phases||undefined,mechanic:c.tech||null,brainValidation:c.brainValidation,why:c.why};}
  if(c.narrativeMode){return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,lifeStage:c.lifeStage||undefined,lifeStageRange:c.lifeStageRange||undefined,concept:c.signature,details:c.detailRows,structure:c.structureRows,visualIdentity:c.visual,mechanic:null,designRule:'No combat proc mechanics for narrative/environment categories.',why:c.why};}
  return {id:c.name.toLowerCase().replaceAll(' ','_').replace(/[^a-z0-9_]/g,''),name:c.name,category:c.category,rarity:c.rarity,themes:c.themes,palette:c.palette,role:c.role,itemSlot:c.itemSlot||undefined,affixCount:c.affixCount||undefined,itemStats:c.itemStats||undefined,visualIdentity:c.visual,animeVfxForm:c.animeVfxForm||undefined,arcVfxForm:c.arcVfxForm||undefined,mechanic:(c.itemMode&&!c.allowItemMechanic)?null:c.tech,designRule:c.itemMode?itemDesignFocus(c.rarity):undefined,why:c.why};}
 function markdownNote(c){
+ if(c.category===GUIDE_CATEGORY)return '# '+c.name+'\n\n'+buildGuideTiming(c)+'\n\n## Sheet Prompt\n'+buildAnimationSheetPrompt(c)+'\n';
  if(c.creatureMode){
    let out = '# '+c.name+'\n\n';
    out += '**'+c.encounterTier+' '+c.category+'** • '+c.monsterRole+' • '+c.themes.join(', ')+'\n\n';
@@ -3705,7 +3748,7 @@ function renderFavs(){
  const all=favs(); const f=all.map((x,i)=>({...x,_i:i})).filter(x=>(!fc||x.category===fc)&&(!fr||(x.encounterTier||x.rarity)===fr)&&(!q||(x.name+' '+x.category+' '+(x.encounterTier||x.rarity)+' '+(x.themes||[]).join(' ')).toLowerCase().includes(q)));
  const countEl=document.getElementById('libraryCount');
  if(countEl) countEl.textContent=all.length===f.length?`${all.length} saved`:`${f.length} shown • ${all.length} saved`;
- document.getElementById('favs').innerHTML=f.length?f.map(x=>`<div class="fav" data-i="${x._i}"><b>${x.name}</b><br><span class="small">${x.encounterTier||x.rarity} ${x.category} • ${(x.themes||[]).join(', ')}</span></div>`).join(''):'No saved ideas match.';
+ document.getElementById('favs').innerHTML=f.length?f.map(x=>`<div class="fav" data-i="${x._i}"><b>${escapeHtml(x.name)}</b><br><span class="small">${x.encounterTier||x.rarity} ${x.category} • ${(x.themes||[]).join(', ')}</span></div>`).join(''):'No saved ideas match.';
  document.querySelectorAll('.fav').forEach(el=>el.onclick=()=>{state.current=all[+el.dataset.i];render(state.current)})
 }
 
@@ -3806,6 +3849,185 @@ document.getElementById('copyJson').onclick=()=>state.current&&navigator.clipboa
 document.getElementById('copyMarkdown').onclick=()=>state.current&&navigator.clipboard.writeText(markdownNote(state.current));
 ideaChaosEl.addEventListener('input',()=>ideaChaosLabel.textContent=ideaChaosEl.value);
 ['favSearch','favCat','favRarity'].forEach(id=>document.getElementById(id).addEventListener('input',renderFavs));
+// Animation Guide Sheet: independent model-reference workflow.
+const GUIDE_CATEGORY='Animation Guide Sheet';
+const guideMoves={
+  cast:{name:'Spell casting',body:'humanoid',times:[0,0.48,0.60,0.76,1.10],event:'release',hold:0.06,poses:[
+    'Relaxed staggered stance, left foot forward, both hands open and separated from the torso.',
+    'Weight settles onto the rear right foot; right hand draws behind the shoulder, left hand reaches forward, chest coils gently.',
+    'Push from the rear foot into the planted left foot; right arm extends forward with open fingers, left elbow draws back; the whole body directs the release.',
+    'Right arm travels slightly beyond the release pose; chest opens, rear heel lifts while the front foot stays planted.',
+    'Weight settles back into the starting stance; elbows relax to different angles and both hands return to ready.'
+  ],prop:'Keep the sword sheathed and the wand holstered in all five poses. Cast with empty hands.',line:'casting fingertips'},
+  wand:{name:'Wand firing',body:'humanoid',times:[0,0.24,0.34,0.46,0.72],event:'release',hold:0.04,poses:[
+    'Left foot forward, wand in the right hand at chest height, left hand held open away from the body.',
+    'Right elbow folds back, wand tip angles upward; weight loads the rear right leg and the left hand balances forward.',
+    'Right arm snaps forward at shoulder height, wand points screen-right toward the imagined target, left shoulder counter-rotates.',
+    'Right wrist and elbow settle after the forward flick; left knee absorbs the shift while the rear heel rises slightly.',
+    'Wand returns to chest-height ready position; weight balances between staggered feet.'
+  ],prop:'The same short wooden wand with a bronze tip stays in the RIGHT hand throughout, thumb toward its tip. Sword remains sheathed. The wand holster is empty.',line:'wand tip'},
+  sword:{name:'Sword swinging',body:'humanoid',times:[0,0.40,0.56,0.74,1.08],event:'contact',hold:0.06,poses:[
+    'Staggered guard, left foot forward, sword in the right hand held away from the torso, left hand open for balance.',
+    'Right hip loads over the rear foot, chest rotates back, right elbow bends and sword rises above the right shoulder.',
+    'Rear foot drives the hip rotation into the planted left leg; right arm extends into a diagonal descending cut, blade entirely visible beside the body.',
+    'Sword continues down and across toward the left side in clear empty space; torso follows the hips while the left knee absorbs the weight.',
+    'Sword returns to guard without changing hands; chest unwinds and the feet recover the original staggered stance.'
+  ],prop:'The same steel sword with bronze crossguard, blade approximately leg-length, stays in the RIGHT hand in all five poses, thumb toward the guard. Sword scabbard is empty. Wand remains holstered.',line:'sword tip'},
+  punch:{name:'Unarmed strike',body:'humanoid',times:[0,0.26,0.38,0.50,0.80],event:'contact',hold:0.04,poses:[
+    'Left foot forward, right fist at cheek height, left hand lower and farther forward.',
+    'Load the right hip and rear leg, right elbow folds back, left shoulder angles toward the target.',
+    'Drive the right fist forward with a nearly straight elbow and neutral wrist; pelvis rotates over the planted left foot.',
+    'Right fist extends slightly beyond contact, left arm counterbalances without crossing the torso.',
+    'Retract right fist to guard and settle back onto both staggered feet.'
+  ],prop:'Both hands are empty; sword sheathed and wand holstered throughout.',line:'right fist'},
+  bite:{name:'Creature bite',body:'quadruped',times:[0,0.36,0.50,0.66,1.00],event:'contact',hold:0.06,poses:[
+    'Stable staggered four-foot stance, head level and jaws closed.',
+    'Hindquarters load, shoulders lower, head draws back and jaw opens; feet stay separated.',
+    'Neck extends forward into a bite and jaw closes; front-left paw anchors while the rear legs drive the torso.',
+    'Head travels slightly beyond contact, shoulders absorb the push with bent front elbows.',
+    'Head retracts, jaw closes and all four feet settle into the original stance.'
+  ],prop:'No held weapons or added accessories. Keep the same tail and, if present, folded wings.',line:'jaw'},
+  pounce:{name:'Creature pounce',body:'quadruped',times:[0,0.34,0.52,0.72,1.10],event:'airborne apex',hold:0,poses:[
+    'Four-foot ready stance with front-left paw forward and hind feet staggered.',
+    'Hips crouch low over compressed hind legs, front shoulders dip and tail counterbalances.',
+    'Midair apex: hind legs extend behind at different angles, front paws reach forward with distinct elbow bends; entire body stays visible.',
+    'Front paws land in staggered order, elbows flex to absorb weight; hind legs tuck beneath the pelvis.',
+    'Rear feet land and the body rises into the original ready stance.'
+  ],prop:'No weapons. Wings, if present, remain folded for this ground-based pounce.',line:'head'},
+  walk:{name:'Walk cycle',body:'any',times:[0,0.25,0.50,0.75,1.00],event:'opposite-foot contact',hold:0,poses:[
+    'Initial foot contact: left foot forward and right foot behind; use opposing arm swing for a humanoid or staggered diagonal leg pairs for a quadruped.',
+    'Weight accepts onto the leading leg; trailing foot lifts and begins passing beneath the pelvis.',
+    'Opposite-foot contact: right foot leads, left foot trails; keep limbs separated and preserve exact joint anatomy.',
+    'Weight accepts onto the right-side leading leg; left-side trailing foot passes underneath.',
+    'Return exactly to the first contact pose to demonstrate the cycle seam; this endpoint is not an extra unique playback frame.'
+  ],prop:'Keep sword sheathed, wand holstered, and wings folded wherever those features are present.',line:'leading foot'}
+};
+const guideBodies={
+  humanoid:'Biped humanoid. Exactly two arms rooted at the shoulders and two legs rooted at the hips; elbows and knees bend anatomically forward, hands have five digits each. One head with two eyes, no horns, no wings, no tail. No extra or missing limbs.',
+  quadruped:'Quadruped beast. Exactly four legs: front pair rooted at the shoulders, hind pair at the pelvis. Front elbows flex backward; hind knees flex forward with backward-projecting digitigrade hocks. Exactly one head with two eyes, two ears and zero horns, exactly one tail, no wings. No extra or missing limbs.',
+  winged:'Winged quadruped. Exactly four walking legs: front pair rooted at the shoulders, hind pair at the pelvis; front elbows flex backward, hind knees flex forward with backward-projecting digitigrade hocks. Exactly two additional wings rooted at the shoulder blades behind the front legs. Exactly one head with two eyes and two horns, exactly one tail. No extra or missing limbs.'
+};
+const guideCameras={
+  side:'Orthographic-style true side view, subject facing screen-right. Camera at hip height, level, far away with a long lens and negligible perspective distortion.',
+  front:'Orthographic-style true front view facing the camera. Camera at hip height, level, far away with a long lens and negligible perspective distortion. Translate any screen-right action direction into forward movement toward the camera; keep lateral limb separation.',
+  three:'Orthographic-style three-quarter front view at 45 degrees to the subject facing direction. Camera at hip height and level, far away with a long lens and negligible perspective distortion. Preserve the same anatomical action, adapting screen-right descriptions to the selected view.',
+  game:'Orthographic, no perspective. Camera 35 degrees above the horizon, looking down from front-left at 45 degrees to the subject facing direction, like a classic isometric action-RPG view. Preserve the same anatomical action, adapting screen-right descriptions to this view.'
+};
+function guideSettings(){
+  const val=id=>document.getElementById(id).value;
+  const body=val('guideBody');
+  const allowed=key=>guideMoves[key].body==='any'||guideMoves[key].body===(body==='humanoid'?'humanoid':'quadruped');
+  const fallback=body==='humanoid'?['cast','wand','sword']:['bite','pounce','walk'];
+  const moves=[val('guideMove1'),val('guideMove2'),val('guideMove3')].slice(0,+val('guideCount')).map((key,i)=>allowed(key)?key:fallback[i]);
+  return {body,moves,camera:val('guideCamera'),reference:val('guideReference'),identity:val('guideIdentity').trim(),anatomy:val('guideAnatomy').trim(),poseRow:+val('guidePoseRow'),poseFrame:+val('guidePoseFrame')};
+}
+function syncGuideControls(c){
+  const active=categoryEl.value===GUIDE_CATEGORY||c?.category===GUIDE_CATEGORY;
+  document.getElementById('guideControls').hidden=!active;
+  if(!active)return;
+  const g=c?.category===GUIDE_CATEGORY?c.guide:null;
+  if(g){
+    categoryEl.value=GUIDE_CATEGORY;
+    const mapping={guideBody:g.body,guideCount:g.moves.length,guideCamera:g.camera,guideReference:g.reference,guideIdentity:g.identity||'',guideAnatomy:g.anatomy||'',guidePoseRow:g.poseRow||0,guidePoseFrame:g.poseFrame||0};
+    Object.entries(mapping).forEach(([id,value])=>document.getElementById(id).value=value);
+    g.moves.forEach((key,i)=>document.getElementById('guideMove'+(i+1)).value=key);
+  }
+  const body=document.getElementById('guideBody').value;
+  const count=+document.getElementById('guideCount').value;
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById('guideMove'+i);
+    [...el.options].forEach(o=>o.disabled=guideMoves[o.value].body!=='any'&&guideMoves[o.value].body!==(body==='humanoid'?'humanoid':'quadruped'));
+    if(el.selectedOptions[0]?.disabled)el.value=(body==='humanoid'?['cast','wand','sword']:['bite','pounce','walk'])[i-1];
+    el.disabled=i>count;
+  });
+  const row=document.getElementById('guidePoseRow');
+  [...row.options].forEach((o,i)=>o.disabled=i>=count);
+  if(+row.value>=count)row.value='0';
+}
+function guideIdentity(c){
+  if(c.guide.identity)return c.guide.identity;
+  const p=c.palette;
+  if(c.guide.body==='humanoid')return `Adult fantasy adventurer, six heads tall, sturdy athletic build. Broad oval face, expressive dark eyes, no facial markings. Short swept dark-brown hair with three broad sculpted clumps. Short sleeveless cloth tunic in ${p[0].hex}, fitted leather trousers in ${p[1].hex}, broad leather belt and ankle boots, simple bronze wrist guards. Steel sword with bronze crossguard and a blade approximately leg-length; short wooden wand with bronze tip. Closed sword scabbard on left hip and wand holster on right hip. Use ${p[2].hex} as secondary garment colour. Each weapon is drawn only for its corresponding action; the other stays stowed. All props keep exactly the same size and design.`;
+  return `Broad-snouted fantasy beast, low sturdy torso, large padded paws and a long thick tail. Three head-lengths from shoulder to hip. Short swept mane, round dark eyes, no outfit or held weapons. Broad hide planes in ${p[0].hex}, muzzle and underside in ${p[1].hex}, mane in ${p[2].hex}. ${c.guide.body==='winged'?'Two short backward-swept horns and two broad folded leathery wings.':'Two round ears and no horns.'}`;
+}
+function animationGuideConcept(){
+  const old=state.current||{};
+  const same=old.category===GUIDE_CATEGORY;
+  const rar=state.locks.rarity&&old.rarity?old.rarity:R(rarity);
+  const ts=state.locks.themes&&old.themes?old.themes:ideaThemes(weightedThemes(rar),rar);
+  const g=guideSettings();
+  const moves=g.moves.map(k=>guideMoves[k]);
+  const idea=directedIdea();
+  const c={category:GUIDE_CATEGORY,guide:g,themes:ts,rarity:rar,attitude:'Neutral',role:g.body==='humanoid'?'Humanoid animator reference':'Creature animator reference',
+    name:(idea?.raw||`${ts[0]} ${g.body==='humanoid'?'Adventurer':'Beast'}`)+' — Animation Guide',
+    palette:same&&state.locks.themes?old.palette:makePalette(ts,'NPC'),
+    desc:`${moves.length} animation ${moves.length===1?'row':'rows'}, exactly five key poses per row, with the same character design and a fixed camera.`,
+    signature:'Readable anticipation, action, follow-through and recovery; character identity stays consistent across every pose.',
+    visual:['chunky stylized fantasy proportions','crisp material separation','polished readable textures','clear negative spaces between limbs'],
+    why:'Large poses make weight transfer, weapon grip and silhouette easy to judge. Timing stays in separate written instructions for animators.',
+    dna:dna(ts),narrativeMode:true,tech:null,itemMode:false,creatureMode:false,directedIdea:idea};
+  refreshGuideDetails(c);state.current=c;render(c);
+}
+function refreshGuideDetails(c){
+  const g=c.guide;
+  c.detailRows=[['Character identity',guideIdentity(c)],['Exact anatomy',g.anatomy||guideBodies[g.body]],['Actions',g.moves.map(k=>guideMoves[k].name).join(' / ')],['Camera',guideCameras[g.camera]],['Reference lock',g.reference==='locked'?'Attach Image 1 (front) and Image 2 (side) to the image generator. Their design is authoritative.':'New character; use Character Reference to establish front and side designs first if desired.']];
+  c.structureRows=g.moves.map((key,i)=>{const m=guideMoves[key];return [`Row ${i+1}: ${m.name}`,`Five key poses at ${m.times.map(t=>t.toFixed(2)+'s').join(', ')}. ${m.event} at ${m.times[2].toFixed(2)}s; ${m.hold?'hold '+m.hold.toFixed(2)+'s':'continuous cycle'}.`];});
+}
+function guideStyle(c){
+  const intensity=designStyleValue();
+  return 'STYLE: Stylized fantasy 3D game model reference for animation production. Neutral studio lighting, large readable shapes, simple geometric forms, broad planes, minimal surface noise, chunky stylized proportions and model-friendly construction. Crisp edges, clean material separation, clear forms and polished readable textures. Subtle hand-painted fantasy material treatment on a clean 3D model; simplify shading into broad readable values. '+(intensity==='grounded'?'For a new design use plain practical clothing, muted natural materials and minimal decoration.':intensity==='stylized'?'For a new design keep thematic accents restrained and the silhouette simple.':'For a new design use readable fantasy accents and a limited saturated palette.')+' An established reference design takes precedence over design intensity. Clean reference-sheet presentation for a 3D animator.';
+}
+function guideCommon(c,camera=true){
+  const g=c.guide;
+  return [guideStyle(c),`IDENTITY: ${guideIdentity(c)}`,`ANATOMY: ${g.anatomy||guideBodies[g.body]}`,
+    `PALETTE: ${palettePrompt(c.palette)}. Preserve assigned colours in every pose.`,
+    g.reference==='locked'?'LOCK: Use attached Image 1 (front) and Image 2 (side) as the exact character design. These images must be supplied to the image generator. Their face, hair, outfit, colours, proportions, anatomy and weapon design are authoritative if text conflicts. Change only the pose; add no new features or props.':'LOCK: Establish one character from the identity and anatomy description and repeat that exact design in every panel. Same face, hair, outfit, colours, proportions, anatomy and weapon dimensions; change only the pose. If a directed idea describes the subject, incorporate it once into that common design.',
+    g.reference==='new'&&c.directedIdea?.raw?`SUBJECT BRIEF: ${c.directedIdea.raw}. Preserve exact stated anatomy and the animation constraints.`:'',
+    camera?`CAMERA: ${guideCameras[g.camera]} Keep the view fixed across all panels.`:'',
+    'FRAMING: Full body head to toe; both hands or all paws, every foot, the entire weapon, tail and wings when present remain inside each panel with clear empty margins. Use one shared scale, no auto-zoom per pose. Feet rest on the same implied horizontal baseline except when the specified pose is airborne; do not draw a ground line. Subject fills about '+(g.camera==='game'?'60':'80')+'% of each panel height; size every panel to fit the widest pose.',
+    'PRESENTATION: Plain flat light-grey background, no scenery, cast shadows or ground effects, no text, labels, captions or interface. Frozen still moments with crisp clean edges. Draw complete anatomically possible limbs; separate their projected silhouettes as much as the chosen camera allows. Body and prop geometry alone communicate the action; exclude trails, glow, particles, dust and illustrated effects.',
+    'POSE RULES: Readable animation key poses. One clear line of action through the support foot, spine and action endpoint. Asymmetric joint angles, except an intentionally repeated cycle endpoint. Hold arms, legs and weapons away from the torso so each pose reads as a solid black silhouette. Push beyond a casual stance while respecting real joint limits, grip and weight transfer.'].filter(Boolean).join('\n\n');
+}
+function guideProp(c,m){
+  return c.guide.body==='humanoid'?m.prop:m.prop.replace('Keep sword sheathed, wand holstered, and wings folded wherever those features are present.','Keep wings folded if present; no held weapons.');
+}
+function buildAnimationSheetPrompt(c){
+  const g=c.guide;
+  const lines=[guideCommon(c),`SHEET: One wide landscape image, exactly ${g.moves.length} horizontal ${g.moves.length===1?'row':'rows'} and exactly five columns; ${g.moves.length*5} complete poses total. Each row is one continuous action, read left to right. Keep generous even gutters, no panel overlaps. Use the entire width for the five poses; no extra sidebar, inset, extra views or playback graphics. Different rows may use the explicitly defined action props; design and anatomy remain identical.`];
+  g.moves.forEach((key,i)=>{const m=guideMoves[key];lines.push(`ROW ${i+1} — ${m.name}. ${guideProp(c,m)} Line of action ends at the ${m.line}.`);m.poses.forEach((pose,j)=>lines.push(`COLUMN ${j+1}: ${pose}`));});
+  lines.push('Times and instructions are supplied separately to the animator. Do not print them on this image. Verify exact row/column count, same scale, anatomical limb count, stable props and uncut silhouettes before finishing.');
+  return lines.join('\n\n');
+}
+function buildGuideReferencePrompt(c){
+  const reference={...c,guide:{...c.guide,camera:'side'}};
+  return [guideCommon(reference,false),'REFERENCE SHEET: Exactly two equal panels: true front view on the left, true side view facing screen-right on the right. Camera at hip height and level, long lens with negligible perspective distortion. One shared scale and baseline. Relaxed neutral stance with separated arms or legs; same character in both views. For a humanoid show sword sheathed and wand holstered, both hands open and empty. For a winged creature hold wings slightly away from the body so their shoulder roots are readable. No action sequence or extra views. Use these two panels as Image 1 (front) and Image 2 (side) in later pose requests. Do not print these instructions on the image.'].join('\n\n');
+}
+function buildGuidePosePrompt(c){
+  const g=c.guide;const row=Math.min(g.poseRow||0,g.moves.length-1);const frame=clamp(g.poseFrame||0,0,4);const m=guideMoves[g.moves[row]];
+  return [guideCommon(c),`SINGLE POSE: Exactly one full-body pose of ${m.name}, key pose ${frame+1} of 5. ${guideProp(c,m)} Line of action ends at the ${m.line}.`,m.poses[frame],'Show only this pose. No other figures, sheet panels or extra views.'].join('\n\n');
+}
+function buildGuideTiming(c){
+  const g=c.guide;
+  const lines=['ANIMATOR TIMING GUIDE — '+c.name,'Suggested starting timings in seconds at 30 fps. Five key poses are unevenly spaced samples, not five equal-duration playback frames. Interpolate the rig between poses. Frame numbers are rounded time × 30; seconds are authoritative.','Reference setup: '+(g.reference==='locked'?'Attach the front and side images to every generation request.':'Generate the Character Reference first, then attach its front and side panels and choose the reference-lock mode for later requests.'),'Camera: '+guideCameras[g.camera]];
+  g.moves.forEach((key,i)=>{const m=guideMoves[key];lines.push(`\nROW ${i+1}: ${m.name} — duration ${m.times[4].toFixed(2)}s`);m.poses.forEach((pose,j)=>lines.push(`Key ${j+1} | ${m.times[j].toFixed(2)}s | frame ${Math.round(m.times[j]*30)} | ${pose}`));if(key==='pounce')lines.push(`Wind-up: 0.00–${m.times[1].toFixed(2)}s, ease into the crouch. Push off and rise to the airborne apex at ${m.times[2].toFixed(2)}s. Do not hold the airborne apex; preserve continuous root travel. Landing event at ${m.times[3].toFixed(2)}s, absorb through the shoulders and bent front elbows. Ease into recovery at ${m.times[4].toFixed(2)}s. Keep the front paws planted after landing and bring the rear feet down without sliding.`);else if(key==='walk')lines.push('Use alternating stance and swing phases. Match the first and final pose and tangent for a seamless loop. Omit the repeated endpoint from a looping sprite export. Keep a support foot planted through its stance phase; advance the root consistently or remove forward travel for an in-place cycle.');else lines.push(`Wind-up: 0.00–${m.times[1].toFixed(2)}s, ease into the loaded pose. Accelerate into ${m.event}: ${m.times[1].toFixed(2)}–${m.times[2].toFixed(2)}s. ${capitalize(m.event)} at ${m.times[2].toFixed(2)}s; optional pose hold ${m.hold.toFixed(2)}s within the follow-through interval (not extra total duration). Follow-through ends ${m.times[3].toFixed(2)}s; decelerate and ease out into recovery at ${m.times[4].toFixed(2)}s. Add a gameplay event at the stated ${m.event} time. ${key==='pounce'?'Keep the airborne arc continuous and absorb landing through the shoulders.':'Keep the support foot planted; hips initiate movement and shoulders follow.'}`);lines.push('Equipment continuity: '+guideProp(c,m));});
+  lines.push('\nValidation: inspect a black silhouette from the selected camera, then check foot sliding, joint limits, exact anatomy, weapon-hand attachment and final pose continuity. These prompts create static guides; a GIF or video requires interpolation and rendering in an animation tool.');
+  return lines.join('\n');
+}
+
+
+[1,2,3].forEach(i=>{const el=document.getElementById('guideMove'+i);Object.entries(guideMoves).forEach(([key,m])=>el.add(new Option(m.name,key)));el.value=['cast','wand','sword'][i-1];});
+categoryEl.addEventListener('change',()=>syncGuideControls());
+document.querySelectorAll('#guideControls select, #guideControls textarea').forEach(el=>el.addEventListener('change',()=>{
+  syncGuideControls();
+  if(state.current?.category!==GUIDE_CATEGORY)return;
+  const active=state.activePromptTab;
+  state.current.guide=guideSettings();
+  const n=state.current.guide.moves.length;
+  state.current.desc=`${n} animation ${n===1?'row':'rows'}, exactly five key poses per row, with the same character design and a fixed camera.`;
+  state.current.role=state.current.guide.body==='humanoid'?'Humanoid animator reference':'Creature animator reference';
+  refreshGuideDetails(state.current);render(state.current);setActivePromptTab(active);
+}));
+
 setActivePromptTab('prompt'); renderFavs(); concept();
 </script>
 </body>
